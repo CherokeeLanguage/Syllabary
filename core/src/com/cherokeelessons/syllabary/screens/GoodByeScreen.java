@@ -1,0 +1,35 @@
+package com.cherokeelessons.syllabary.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
+import com.cherokeelessons.syllabary.one.App;
+
+public class GoodByeScreen extends ChildScreen {
+	
+	@Override
+	public boolean keyDown(int keycode) {
+		switch (keycode) {
+		case Keys.BACK:
+		case Keys.ESCAPE:
+			return true;
+		default:
+		}
+		return super.keyDown(keycode);
+	}
+
+	public GoodByeScreen(Screen caller) {
+		super(caller);
+	}
+
+	@Override
+	public void show() {
+		Gdx.input.setInputProcessor(null);		
+	}
+	
+	@Override
+	public void render(float delta) {
+		App.glClearColor();
+		Gdx.app.exit();
+	}
+}
