@@ -10,5 +10,6 @@ public class Syllabary extends Game {
 		App.setGame(this);
 		App.setManager(new AssetManager());
 		App.setClearColor(Color.WHITE);
+		Font.addFonts(App.getManager());
 	}
 }

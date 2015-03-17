@@ -3,8 +3,14 @@ package com.cherokeelessons.syllabary.one;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -71,6 +77,13 @@ public class App {
 
 	public static void setManager(AssetManager manager) {
 		App.manager = manager;
+		FileHandleResolver resolver = new InternalFileHandleResolver();
+		manager.setLoader(FreeTypeFontGenerator.class,
+				new FreeTypeFontGeneratorLoader(resolver));
+		manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(
+				resolver));
+		manager.setLoader(BitmapFont.class, ".otf", new FreetypeFontLoader(
+				resolver));
 	}
 
 	public static Color getClearColor() {
