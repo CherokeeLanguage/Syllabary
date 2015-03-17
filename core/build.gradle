@@ -8,4 +8,5 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project {
     name = appName + "-core"
+    linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/android/assets'
 }
