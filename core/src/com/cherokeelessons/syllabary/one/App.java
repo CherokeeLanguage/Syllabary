@@ -13,8 +13,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.cherokeelessons.util.GooglePlayGameServices;
 
 public class App {
+	
+	public static GooglePlayGameServices gpgs;
 	
 	private static Color clearColor;
 	

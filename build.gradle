@@ -43,6 +43,11 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        //FOR DESKTOP GOOGLE API
+        compile 'com.google.apis:google-api-services-games:v1-rev92-1.19.1'
+        compile 'com.google.apis:google-api-services-drive:v2-rev161-1.19.1'
+        compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.19.0'
     }
 }
 
@@ -63,6 +68,11 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+        //FOR ANDROID GOOGLE API
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.19.0' exclude module: 'httpclient'
+		compile 'com.google.api-client:google-api-client-android:1.19.0' exclude module: 'httpclient'		
+        compile 'com.google.apis:google-api-services-drive:v2-rev161-1.19.1' exclude module: 'httpclient'
+		compile 'com.google.apis:google-api-services-games:v1-rev93-1.19.1' exclude module: 'httpclient'
     }
 }
 
@@ -79,6 +89,11 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        //FOR IOS GOOGLE API
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.19.0' exclude module: 'httpclient'
+		compile 'com.google.api-client:google-api-client-android:1.19.0' exclude module: 'httpclient'		
+        compile 'com.google.apis:google-api-services-drive:v2-rev161-1.19.1' exclude module: 'httpclient'
+		compile 'com.google.apis:google-api-services-games:v1-rev93-1.19.1' exclude module: 'httpclient'
     }
 }
 
