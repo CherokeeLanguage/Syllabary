@@ -19,9 +19,9 @@ public class DesktopLauncher {
 		config.forceExit = true;
 		config.height = height;
 		config.width = width;
-		config.addIcon("icons/icon-128.png", FileType.Internal);
-		config.addIcon("icons/icon-32.png", FileType.Internal);
-		config.addIcon("icons/icon-16.png", FileType.Internal);
+//		config.addIcon("icons/icon-128.png", FileType.Internal);
+//		config.addIcon("icons/icon-32.png", FileType.Internal);
+//		config.addIcon("icons/icon-16.png", FileType.Internal);
 		new LwjglApplication(new Syllabary(), config);
 	}
 }
