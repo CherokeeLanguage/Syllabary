@@ -30,8 +30,7 @@ public class LoadingScreen extends ChildScreen {
 		img.defaults().pad(0).space(0);
 		for (int y = 0; y < 2; y++) {
 			img.row();
-			for (int x = 0; x < 4; x++) {
-				
+			for (int x = 0; x < 4; x++) {				
 				Image part = new Image(new TextureRegionDrawable(new TextureRegion(loading[x][y])));
 				part.setScaling(Scaling.fit);
 				img.add(part);
@@ -52,8 +51,4 @@ public class LoadingScreen extends ChildScreen {
 		img.clear();
 	}
 
-	@Override
-	public void render(float delta) {
-		super.render(delta);
-	}
 }
