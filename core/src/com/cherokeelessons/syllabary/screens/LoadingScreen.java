@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.cherokeelessons.syllabary.one.App;
 
 public class LoadingScreen extends ChildScreen {
 
@@ -50,5 +51,18 @@ public class LoadingScreen extends ChildScreen {
 		stage.clear();
 		img.clear();
 	}
+	
+	@Override
+	public void dispose() {
+		log("dispose");
+		super.dispose();
+	}
 
+	@Override
+	public void act(float delta) {
+		if (App.getManager().update()) {
+			App.getGame().setScreen(new MainMenu());
+		}
+		super.act(delta);
+	}
 }

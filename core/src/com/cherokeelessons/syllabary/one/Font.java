@@ -73,7 +73,7 @@ public enum Font {
 		}
 		for (Font font : values()) {			
 			FreeTypeFontLoaderParameter param = new FreeTypeFontLoaderParameter();
-			param.fontFileName = "otf/FreeSerif.otf";
+			param.fontFileName = "fonts/CherokeeHandone.ttf";
 			param.fontParameters.characters = defaultChars;
 			param.fontParameters.kerning = true;
 			param.fontParameters.size = font.size;

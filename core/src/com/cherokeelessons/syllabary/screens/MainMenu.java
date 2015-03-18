@@ -13,7 +13,7 @@ public class MainMenu extends ChildScreen {
 	}
 
 	@Override
-	public void render(float delta) {
-		super.render(delta);
+	public void hide() {
+		super.hide();
 	}
 }

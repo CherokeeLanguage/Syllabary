@@ -13,6 +13,14 @@ import com.cherokeelessons.syllabary.one.App;
 
 public class ChildScreen implements Screen, InputProcessor {
 	
+	public void log(){
+		Gdx.app.log(this.getClass().getSimpleName(), " ");
+	}
+	
+	public void log(String message) {
+		Gdx.app.log(this.getClass().getSimpleName(), message);
+	}
+	
 	protected final Screen caller;
 	protected final Stage stage;
 	protected final InputMultiplexer multi;
