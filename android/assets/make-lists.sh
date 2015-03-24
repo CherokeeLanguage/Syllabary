@@ -7,7 +7,7 @@ cp /dev/null dir.txt
 P="$(basename "$0")"
 C="$(pwd)"
 
-find . | sed 's:^./::' | while read x; do
+find . | sed 's:^./::' | sort | while read x; do
 	if [ x"$x" = x"" ]; then
 		continue
 	fi	
