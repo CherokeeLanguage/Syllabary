@@ -1,6 +1,9 @@
 package com.cherokeelessons.syllabary.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -58,11 +61,28 @@ public class LoadingScreen extends ChildScreen {
 		super.dispose();
 	}
 
+	boolean startup=false;
 	@Override
 	public void act(float delta) {
-		if (App.getManager().update()) {
+		super.act(delta);
+		final AssetManager manager = App.getManager();
+		if (!startup && manager.isLoaded(App.Sound.STARTUP)){
+			startup=true;
+			Music m = manager.get(App.Sound.STARTUP, Music.class);
+			m.setLooping(false);
+			m.setVolume(1f);
+			m.setOnCompletionListener(new OnCompletionListener() {
+				@Override
+				public void onCompletion(Music music) {
+					music.dispose();
+					manager.unload(App.Sound.STARTUP);
+				}
+			});
+			m.play();
+			return;
+		}
+		if (manager.update()) {
 			App.getGame().setScreen(new MainMenu());
 		}
-		super.act(delta);
 	}
 }
