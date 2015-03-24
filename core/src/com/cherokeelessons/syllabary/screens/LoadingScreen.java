@@ -26,7 +26,7 @@ public class LoadingScreen extends ChildScreen {
 	public void show() {
 		for (int ix = 0; ix < 8; ix++) {
 			loading[ix % 4][ix / 4] = new Texture(
-					Gdx.files.internal("img/loading/p_loading_" + ix + ".png"));
+					Gdx.files.internal("images/loading/p_loading_" + ix + ".png"));
 			loading[ix % 4][ix / 4].setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		}
 		stage.clear();
