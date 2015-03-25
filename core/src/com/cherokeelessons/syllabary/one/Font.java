@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 
 public enum Font {
 
-	Small(36), Medium(42), Large(58), LLarge(62), XLarge(72);
+	Small(36), Medium(42), Large(58), LLarge(72), XLarge(96);
 
 	public final int size;
 
@@ -18,6 +18,10 @@ public enum Font {
 
 	public String fontName() {
 		return this.name() + ".ttf";
+	}
+	
+	public BitmapFont get() {
+		return App.getManager().get(fontName(), BitmapFont.class);
 	}
 
 	public static final String DIAMOND = "\u25c8";

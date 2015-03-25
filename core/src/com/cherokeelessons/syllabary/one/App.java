@@ -108,4 +108,8 @@ public class App {
 	public static void log(String message) {
 		log(null, message);
 	}
+
+	public static void log(Object source, char character) {
+		log(source, Character.toString(character));		
+	}
 }

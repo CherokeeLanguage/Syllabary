@@ -1,0 +1,35 @@
+=== Cherokee Syllabary ===
+
+"A no-nonsense approach to learning the Syllabary..."
+
+- Game Creator -
+Michael Joyner
+
+- Audio -
+Startup Sequence Flute - ᏣᎵ ᎡᎵᏂ ᎠᏍᎦᏳᏏᏩᏍᎩ
+Audio Challenges - Michael Joyner
+Audio Effects - freesound.org
+All audio effects are cc-zero or public domain.
+
+- Fonts Used For Challenge Images -
+Aboriginal Serif - http://www.languagegeek.com/
+Digohweli - http://www.languagegeek.com/
+Nikwasi - Chung deh Tien
+Cherokee Handone - Joseph Erb
+
+- Font Used For Game Menus -
+Cherokee Handone - Joseph Erb
+
+- Language Reference -
+Language Assistance - ᏣᎵ ᎡᎵᏂ ᎠᏍᎦᏳᏏᏩᏍᎩ
+Cherokee-English Dictionary (Durbin-Feeling)
+
+- Pictures -
+Commons.Wikimedia.Org
+OpenClipart.Org
+OpenGameart.Org
+All pictures are cc-zero or public domain.
+
+http://www.CherokeeLessons.com/
+
+Game Version 3.00

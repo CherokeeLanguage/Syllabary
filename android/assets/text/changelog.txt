@@ -1,0 +1,18 @@
+3.0
+Total rewrite.
+
+Re-imaged as "falling blocks into stacks" where you have to get the correct ones
+based on supplied challenges.
+
+Each challenge "cycle" the row of "blocks" drops down one level. As game play
+progresses should the cycling get faster arcade style?
+
+Incorrectly select Syllabary turn into "Bombs" that explode if they reach bottom
+without being correctly chosen. Double bad chosen Syllabary explode.
+Bombs are "defused" if they are correctly chosen as Syllabary.
+
+If a bomb explodes.... game over.
+
+Points per Syllabary are awarded based on the Leitner box rating and current
+session's Pimsleur timings. Game to run in "levels" based on the Leitner box
+scores.

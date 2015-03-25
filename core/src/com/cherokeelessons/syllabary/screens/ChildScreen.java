@@ -28,17 +28,34 @@ public class ChildScreen implements Screen, InputProcessor {
 	protected final ClickListener exit = new ClickListener() {
 		public boolean touchDown(InputEvent event, float x, float y,
 				int pointer, int button) {
-			doBack.run();;
+			Gdx.app.postRunnable(doBack);
 			return true;
 		};
 	};
 	
-	protected Runnable doBack = new Runnable(){
+	private Runnable doBack = new Runnable(){
 		public void run() {
+			goodBye();
 		};
 	};
 	
-	protected Runnable doMenu = new Runnable(){
+	public Runnable getDoBack() {
+		return doBack;
+	}
+
+	public void setDoBack(Runnable doBack) {
+		this.doBack = doBack;
+	}
+
+	public Runnable getDoMenu() {
+		return doMenu;
+	}
+
+	public void setDoMenu(Runnable doMenu) {
+		this.doMenu = doMenu;
+	}
+
+	private Runnable doMenu = new Runnable(){
 		public void run() {
 		};
 	};
@@ -48,6 +65,12 @@ public class ChildScreen implements Screen, InputProcessor {
 		this.multi=new InputMultiplexer();
 		stage = new Stage();
 		stage.setViewport(App.getFitViewport(stage.getCamera()));
+	}
+	
+	protected void goodBye(){
+		if (caller!=null) {
+			App.getGame().setScreen(caller);
+		}
 	}
 	
 	@Override
