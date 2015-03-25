@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 
-public class GoodByeScreen extends ChildScreen {
+public class GoodBye extends ChildScreen {
 	
 	@Override
 	public boolean keyDown(int keycode) {
@@ -17,7 +17,7 @@ public class GoodByeScreen extends ChildScreen {
 		return super.keyDown(keycode);
 	}
 
-	public GoodByeScreen(Screen caller) {
+	public GoodBye(Screen caller) {
 		super(caller);
 	}
 

@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.cherokeelessons.syllabary.screens.LoadingScreen;
+import com.cherokeelessons.syllabary.screens.Loading;
 
 public class Syllabary extends Game {
 	@Override
@@ -23,6 +23,6 @@ public class Syllabary extends Game {
 		UI.load(manager);
 		Font.addFonts(manager);
 		
-		setScreen(new LoadingScreen());
+		setScreen(new Loading());
 	}
 }

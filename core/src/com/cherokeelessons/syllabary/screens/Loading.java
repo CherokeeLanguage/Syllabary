@@ -13,12 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.syllabary.one.App;
 
-public class LoadingScreen extends ChildScreen {
+public class Loading extends ChildScreen {
 
 	private Texture[][] loading = new Texture[4][4];
 	private Table img = new Table();
 
-	public LoadingScreen() {
+	public Loading() {
 		super(null);
 	}
 

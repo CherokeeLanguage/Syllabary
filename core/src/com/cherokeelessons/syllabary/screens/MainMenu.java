@@ -79,7 +79,7 @@ public class MainMenu extends ChildScreen {
 	private Runnable goodbye = new Runnable() {		
 		@Override
 		public void run() {
-			App.getGame().setScreen(new GoodByeScreen(MainMenu.this));
+			App.getGame().setScreen(new GoodBye(MainMenu.this));
 			dispose();			
 		}
 	};
