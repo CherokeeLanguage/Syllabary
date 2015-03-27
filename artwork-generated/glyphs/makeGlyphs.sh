@@ -44,12 +44,13 @@ gm convert -background none \
 	-fill white \
 	-stroke none \
 	-font "$font" \
-	-size 512x512 \
+	-size 1024x1024 \
+	-filter Sinc \
 	-trim \
 	label:"$glyph" \
 	"$file"
-gm mogrify -gravity center -background none -scale 92x92 "$file"
-#mogrify -white-threshold 0% "$file"
+gm mogrify -gravity center -background none -scale 128x128 "$file"
+#gm mogrify -operator Opacity Threshold 1 "$file"
 ix=$(($ix+1))
 done
 done

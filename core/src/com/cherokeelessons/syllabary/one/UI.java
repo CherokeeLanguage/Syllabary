@@ -51,16 +51,19 @@ public class UI {
 	public static TextButtonStyle getTbs() {
 		TextButtonStyle tbs = new TextButtonStyle(getSkin().get(
 				TextButtonStyle.class));
+		tbs.font=Font.Medium.get();
 		return tbs;
 	}
 
 	public static WindowStyle getWs() {
 		WindowStyle style = new WindowStyle(getSkin().get(WindowStyle.class));
+		style.titleFont=Font.Large.get();
 		return style;
 	}
 
 	public static LabelStyle getLs() {
 		LabelStyle style = new LabelStyle(getSkin().get(LabelStyle.class));
+		style.font=Font.Medium.get();
 		return style;
 	}
 
@@ -175,7 +178,7 @@ public class UI {
 			topRow.add(score).right().expandX();
 
 			row();
-			add(blocks).fill(false, true).expand();
+			add(blocks).fill().expand();
 
 			row();
 			Table bottomRow = new Table();
