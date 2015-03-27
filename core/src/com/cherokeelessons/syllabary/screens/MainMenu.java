@@ -26,6 +26,13 @@ public class MainMenu extends ChildScreen {
 	public MainMenu() {
 		super(null);
 	}
+	
+	private ClickListener gameScreen = new ClickListener(){
+		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			App.getGame().setScreen(new GameScreen(MainMenu.this));
+			return true;
+		};
+	};
 
 	@Override
 	public void show() {
@@ -47,6 +54,7 @@ public class MainMenu extends ChildScreen {
 		TextButtonStyle bstyle=UI.getTbs();
 		bstyle.font=Font.LLarge.get();
 		button = new TextButton("New Game", bstyle);
+		button.addCaptureListener(gameScreen);
 		container.row();
 		container.add(button);
 		
