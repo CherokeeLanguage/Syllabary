@@ -1,6 +1,10 @@
 #!/bin/bash
 
+set -e
+
 cd "$(dirname "$0")" || exit 1
+
+chmod +x graphics_utf
 
 DEST2=white92
 if [ -d "${DEST2}" ]; then
@@ -8,8 +12,8 @@ if [ -d "${DEST2}" ]; then
 fi
 mkdir "${DEST2}"
 
-F1=./AboriginalSerifREGULAR943.ttf
-F2=./Digohweli_1_7.ttf
+F1=./Fonts/AboriginalSerifREGULAR943.ttf
+F2=./Fonts/Digohweli_1_7.ttf
 F3=./Fonts/CherokeeHandone.ttf
 F4=./Fonts/Nikwasi.ttf
 F5=./Fonts/Oconostota.ttf
