@@ -5,6 +5,8 @@ import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.UI;
 
 public class GameScreen extends ChildScreen {
+	private GameBoard gameboard;
+
 	public GameScreen(Screen caller) {
 		super(caller);
 	}
@@ -12,12 +14,13 @@ public class GameScreen extends ChildScreen {
 	@Override
 	public void show() {
 		super.show();
-		GameBoard gameboard = UI.getGameBoard();
+		gameboard = UI.getGameBoard();
 		stage.addActor(gameboard);
 	}
 
 	@Override
 	public void hide() {
 		super.hide();
+		gameboard.dispose();
 	}
 }

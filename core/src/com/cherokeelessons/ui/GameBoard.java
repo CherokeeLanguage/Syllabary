@@ -84,7 +84,6 @@ public class GameBoard extends Table implements Disposable {
 						img.setColor(new Color(new Random().nextFloat(),
 								new Random().nextFloat(), new Random()
 										.nextFloat(), 1f));
-						App.log("wxh: "+cell.get(0).getActorWidth()+"x"+cell.get(0).getActorHeight());
 						return true;
 					}
 
@@ -107,8 +106,6 @@ public class GameBoard extends Table implements Disposable {
 				float col_height = getHeight();
 				float blocks_height = blocks.getHeight();
 				if (blocks_height>0) {
-					App.log(this, "column height: "+col_height);
-					App.log(this, "blocks height: "+blocks_height);
 					if (col_height-blocks_height>6*24) {
 						if (bar==null) {
 							bar = new Texture(Gdx.files.internal("images/misc/bar.png"));
