@@ -16,9 +16,10 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
@@ -27,14 +28,27 @@ import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.syllabary.one.App;
 
 public class GameBoard extends Table implements Disposable {
-	public static final int width = 7;
 	public static final int height = 5;
-	private List<Cell<Image>> cell;
-	private Cell<Actor> leftTopCell;
-	private Cell<Actor> leftBottomCell;
+	public static final int width = 7;
 	private Texture bar = null;
+	private List<Cell<Stack>> cell;
+	private Label challenge_latin;
+	private Image challenge_pic;
+	private Cell<Stack> challenge_stack;
+	private Cell<Actor> leftBottomCell;
+	
+	private Cell<Actor> leftTopCell;
+	private TextButton mainMenu;
+	private TextButton mute;
 
+	private TextButton pause;
+
+	private Texture question = null;
+	private Label score;
 	public GameBoard() {
+		question = new Texture(Gdx.files.internal("images/misc/003f_4.png"));
+		question.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
 		setFillParent(true);
 		setTransform(true);
 		defaults().expandX().fill();
@@ -58,7 +72,7 @@ public class GameBoard extends Table implements Disposable {
 		for (int iy = 0; iy < height; iy++) {
 			blocks.row();
 			for (int ix = 0; ix < width; ix++) {
-				cell.add(blocks.add(i).expand().fill());
+				cell.add(blocks.stack(i).expand().fill());
 			}
 		}
 		for (int iy = 0; iy < height; iy++) {
@@ -88,12 +102,14 @@ public class GameBoard extends Table implements Disposable {
 					}
 
 				});
-				setGlyph(ix, iy, img);
+				getStackAt(ix, iy).add(img);
 			}
 		}
 
-		challenge = new Label("GWA", ls);
 		score = new Label("000000000", ls);
+		challenge_latin = new Label("GWA", ls);
+		challenge_pic = new Image(question);
+		challenge_pic.setScaling(Scaling.fit);
 		mainMenu = new TextButton("Menu", tbs);
 		mute = new TextButton("Mute", tbs);
 		pause = new TextButton("Pause", tbs);
@@ -136,47 +152,53 @@ public class GameBoard extends Table implements Disposable {
 		Table rightColumn = new Table();
 		rightColumn.defaults().pad(0).space(0).center();
 		add(rightColumn).right();
-		
 		rightColumn.row();
 		rightColumn.add(score);
 		rightColumn.row();
-		rightColumn.add(challenge);
+		rightColumn.add().expandY();
+		rightColumn.row();
+		rightColumn.add(challenge_latin);
+		rightColumn.row();
+		challenge_stack = rightColumn.stack(challenge_pic);
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
-		rightColumn.add(mute).fill();
+		rightColumn.add(mute).fillX();
 		rightColumn.row();
-		rightColumn.add(pause).fill();
+		rightColumn.add(pause).fillX();
 		rightColumn.row();
-		rightColumn.add(mainMenu).fill();
+		rightColumn.add(mainMenu).fillX();
 	}
-	
-	public Label challenge;
-	public Label score;
-	public TextButton mainMenu;
-	public TextButton mute;
-	public TextButton pause;
-
-	public Image getGlyph(int x, int y) {
-		return cell.get(x + y * width).getActor();
-	}
-
-	public void setGlyph(int x, int y, Image img) {
-		Cell<Image> c = cell.get(x + y * width);
-		c.setActor(img);
-	}
-
 	@Override
 	public void dispose() {
+		if (question!=null) {
+			question.dispose();
+			question=null;
+		}
 		if (bar!=null) {
 			bar.dispose();
 			bar=null;
 		}
 	}
-	
 	@Override
 	protected void finalize() throws Throwable {
 		dispose();
 		super.finalize();
+	}
+
+	public String getChallenge_latin() {
+		return challenge_latin.getText().toString().intern();
+	}
+
+	public Stack getStackAt(int x, int y) {
+		x%=width;
+		y%=height;
+		if (x<0) x=width+x;
+		if (y<0) y=height+y;
+		return cell.get(x + y * width).getActor();
+	}
+	
+	public void setChallenge_latin(String challenge_latin) {
+		this.challenge_latin.setText(challenge_latin.intern());
 	}
 }
