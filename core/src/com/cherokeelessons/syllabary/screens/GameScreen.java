@@ -21,9 +21,3 @@ public class GameScreen extends ChildScreen {
 		super.hide();
 	}
 }
-
-/*
- * [challenge] <=> [score]
- * blocks
- * [main] [mute] [pause]
- */

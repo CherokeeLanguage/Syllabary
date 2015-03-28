@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -25,9 +26,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 
 public class UI {
@@ -99,16 +101,18 @@ public class UI {
 		return container;
 	}
 
-	public static class GameBoard extends Table {
-		public static final int width = 9;
+	public static class GameBoard extends Table implements Disposable {
+		public static final int width = 7;
 		public static final int height = 5;
 		private List<Cell<Image>> cell;
+		private Cell<Actor> leftTopCell;
+		private Cell<Actor> leftBottomCell;
+		private Texture bar = null;
 
 		public GameBoard() {
 			setFillParent(true);
 			setTransform(true);
 			defaults().expandX().fill();
-			setDebug(true, true);
 			
 			Texture t = App.getManager().get(BG, Texture.class);
 			TextureRegion tr = new TextureRegion(t);
@@ -122,7 +126,7 @@ public class UI {
 			LabelStyle ls = getLs();
 			TextButtonStyle tbs = getTbs();
 
-			Table blocks = new Table();
+			final Table blocks = new Table();
 			blocks.defaults().pad(8);
 			cell = new ArrayList<>();
 			Image i = new Image();
@@ -144,7 +148,6 @@ public class UI {
 					syl_text.setFilter(TextureFilter.Linear,
 							TextureFilter.Linear);
 					final Image img = new Image(syl_text);
-					img.setDebug(true);
 					img.setScaling(Scaling.fit);
 					img.setColor(new Color(new Random().nextFloat(),
 							new Random().nextFloat(), new Random().nextFloat(),
@@ -167,25 +170,63 @@ public class UI {
 
 			challenge = new Label("GWA", ls);
 			score = new Label("000000000", ls);
-			mainMenu = new TextButton("MAIN MENU", tbs);
+			mainMenu = new TextButton("Menu", tbs);
 			mute = new TextButton("Mute", tbs);
 			pause = new TextButton("Pause", tbs);
 
 			row();
-			Table topRow = new Table();
-			add(topRow).align(Align.left).fillX();
-			topRow.add(challenge).left().expandX();
-			topRow.add(score).right().expandX();
-
-			row();
-			add(blocks).fill().expand();
-
-			row();
-			Table bottomRow = new Table();
-			add(bottomRow);
-			bottomRow.add(mainMenu);
-			bottomRow.add(mute);
-			bottomRow.add(pause);
+			final Table leftColumn = new Table() {
+				@Override
+				public void layout() {
+					super.layout();
+					float col_height = getHeight();
+					float blocks_height = blocks.getHeight();
+					if (blocks_height>0) {
+						App.log(this, "column height: "+col_height);
+						App.log(this, "blocks height: "+blocks_height);
+						if (col_height-blocks_height>6*24) {
+							if (bar==null) {
+								bar = new Texture(Gdx.files.internal("images/misc/bar.png"));
+								bar.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+								leftTopCell.setActor(new Image(bar)).center();
+								leftBottomCell.setActor(new Image(bar)).center();
+							}
+						} else {
+							leftTopCell.clearActor();
+							leftBottomCell.clearActor();
+							if (bar!=null) {
+								bar.dispose();
+								bar=null;
+							}
+						}
+					}
+				}				
+			};
+			add(leftColumn).fill().expand();
+			leftColumn.defaults().pad(0).space(0).center();
+			leftColumn.row();
+			leftTopCell = leftColumn.add(new Actor()).center().expandY();
+			leftColumn.row();
+			leftColumn.add(blocks).pad(20);
+			leftColumn.row();
+			leftBottomCell = leftColumn.add(new Actor()).center().expandY();
+			
+			Table rightColumn = new Table();
+			rightColumn.defaults().pad(0).space(0).center();
+			add(rightColumn).right();
+			
+			rightColumn.row();
+			rightColumn.add(score);
+			rightColumn.row();
+			rightColumn.add(challenge);
+			rightColumn.row();
+			rightColumn.add().expandY();
+			rightColumn.row();
+			rightColumn.add(mute).fill();
+			rightColumn.row();
+			rightColumn.add(pause).fill();
+			rightColumn.row();
+			rightColumn.add(mainMenu).fill();
 		}
 		
 		public Label challenge;
@@ -201,6 +242,14 @@ public class UI {
 		public void setGlyph(int x, int y, Image img) {
 			Cell<Image> c = cell.get(x + y * width);
 			c.setActor(img);
+		}
+
+		@Override
+		public void dispose() {
+			if (bar!=null) {
+				bar.dispose();
+				bar=null;
+			}
 		}
 	}
 

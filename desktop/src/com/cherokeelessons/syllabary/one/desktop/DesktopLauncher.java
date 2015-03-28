@@ -3,7 +3,6 @@ package com.cherokeelessons.syllabary.one.desktop;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.cherokeelessons.syllabary.one.Syllabary;
@@ -14,6 +13,8 @@ public class DesktopLauncher {
 				.getDefaultScreenDevice();
 		int width = (75 * gd.getDisplayMode().getWidth()) / 100;
 		int height = (75 * gd.getDisplayMode().getHeight()) / 100;
+		width=2048/2;
+		height=1536/2;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.allowSoftwareMode = true;
 		config.forceExit = true;
