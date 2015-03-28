@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Font;
-import com.cherokeelessons.syllabary.one.UI;
+import com.cherokeelessons.ui.UI;
 
 
 public class MainMenu extends ChildScreen {

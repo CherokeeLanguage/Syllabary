@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.cherokeelessons.syllabary.screens.Loading;
+import com.cherokeelessons.ui.UI;
 
 public class Syllabary extends Game {
 	@Override

@@ -1,8 +1,8 @@
 package com.cherokeelessons.syllabary.screens;
 
 import com.badlogic.gdx.Screen;
-import com.cherokeelessons.syllabary.one.UI;
-import com.cherokeelessons.syllabary.one.UI.GameBoard;
+import com.cherokeelessons.ui.GameBoard;
+import com.cherokeelessons.ui.UI;
 
 public class GameScreen extends ChildScreen {
 	public GameScreen(Screen caller) {

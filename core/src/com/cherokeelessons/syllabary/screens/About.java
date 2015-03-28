@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.cherokeelessons.syllabary.one.Font;
-import com.cherokeelessons.syllabary.one.UI;
+import com.cherokeelessons.ui.UI;
 
 public class About extends ChildScreen {
 
