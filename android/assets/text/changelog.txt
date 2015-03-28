@@ -13,6 +13,8 @@ Bombs are "defused" if they are correctly chosen as Syllabary.
 
 If a bomb explodes.... game over.
 
+At most 14 total or 7 new Syllabary letters per "game session".  
+
 Points per Syllabary are awarded based on the Leitner box rating and current
 session's Pimsleur timings. Game to run in "levels" based on the Leitner box
 scores.
