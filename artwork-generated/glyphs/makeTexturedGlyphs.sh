@@ -14,7 +14,7 @@ mkdir "${DEST}"
 
 #inkscape -z -e "test.png" -d 90 -D test.svg
 
-for x in $(seq 5024 5108); do
+for x in 63 0x25CF $(seq 5024 5108); do
 	h=$(printf "%04x" "$x")
 	i=$(printf "%04x" "$(($x+1))")
 	glyph="$(echo -e '\u'${h})"

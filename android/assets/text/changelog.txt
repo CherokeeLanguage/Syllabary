@@ -4,16 +4,23 @@ Total rewrite.
 Re-imaged as "falling blocks into stacks" where you have to get the correct ones
 based on supplied challenges.
 
-Each challenge "cycle" the row of "blocks" drops down one level. As game play
-progresses should the cycling get faster arcade style?
+Start with seven hidden "lives".
 
-Incorrectly select Syllabary turn into "Bombs" that explode if they reach bottom
-without being correctly chosen. Double bad chosen Syllabary explode.
-Bombs are "defused" if they are correctly chosen as Syllabary.
+Each challenge "cycle", win or lose, the row of "blocks" drops down one level.
 
-If a bomb explodes.... game over.
+If a challenge is not answered correctly within xxx-seconds or is answered
+incorrectly you lose a life. If no more lives the session terminates early.
 
-At most 14 total or 7 new Syllabary letters per "game session".  
+Get as many as you can during xxx-seconds. Any you miss become subtracted points.
+
+At most 14 total or 7 new Syllabary letters per "game session".
+4 total tries each letter. 3 correct in a row eliminates 4th try.
+
+At the end of a session, award bonus based on overall extra left.
+
+Then present optional "bonus round" for "old-script" forms. 2 tries each letter.
+Max 7 letters total. Keep track of "ability" separately.
+Any wrong selection or timeout terminates session.
 
 Points per Syllabary are awarded based on the Leitner box rating and current
 session's Pimsleur timings. Game to run in "levels" based on the Leitner box
