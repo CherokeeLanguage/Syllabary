@@ -1,15 +1,16 @@
 package com.cherokeelessons.syllabary.screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.syllabary.one.App;
+import com.cherokeelessons.syllabary.one.Fonts;
+import com.cherokeelessons.syllabary.one.GameSound;
 
 public class Loading extends ChildScreen {
 
@@ -23,9 +24,7 @@ public class Loading extends ChildScreen {
 	@Override
 	public void show() {
 		for (int ix = 0; ix < 8; ix++) {
-			loading[ix % 4][ix / 4] = new Texture(
-					Gdx.files.internal("images/loading/p_loading_" + ix + ".png"));
-			loading[ix % 4][ix / 4].setFilter(TextureFilter.Linear, TextureFilter.Linear);
+			loading[ix % 4][ix / 4] = ui.getTextureFor("images/loading/p_loading_" + ix + ".png");
 		}
 		stage.clear();
 		img.clear();
@@ -40,6 +39,9 @@ public class Loading extends ChildScreen {
 		}
 		stage.addActor(img);
 		img.setFillParent(true);
+		manager.load(GameSound.STARTUP, Music.class);
+		
+		Fonts.init();
 	}
 
 	@Override
@@ -55,7 +57,6 @@ public class Loading extends ChildScreen {
 	
 	@Override
 	public void dispose() {
-		log("dispose");
 		super.dispose();
 	}
 
@@ -63,20 +64,22 @@ public class Loading extends ChildScreen {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		final AssetManager manager = App.getManager();
-		if (!startup && manager.isLoaded(App.Sound.STARTUP)){
+		if (!startup && manager.isLoaded(GameSound.STARTUP)){
 			startup=true;
-//			Music m = manager.get(App.Sound.STARTUP, Music.class);
-//			m.setLooping(false);
-//			m.setVolume(1f);
-//			m.setOnCompletionListener(new OnCompletionListener() {
-//				@Override
-//				public void onCompletion(Music music) {
-//					music.dispose();
-//					manager.unload(App.Sound.STARTUP);
-//				}
-//			});
-//			m.play();
+			Music m = manager.get(GameSound.STARTUP, Music.class);
+			m.setLooping(false);
+			m.setVolume(1f);
+			m.setOnCompletionListener(new OnCompletionListener() {
+				@Override
+				public void onCompletion(Music music) {
+					music.dispose();
+					manager.unload(GameSound.STARTUP);
+				}
+			});
+			m.play();
+			return;
+		}
+		if (!Fonts.isLoaded()) {
 			return;
 		}
 		if (manager.update()) {

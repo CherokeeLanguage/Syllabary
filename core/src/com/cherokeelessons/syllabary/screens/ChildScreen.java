@@ -5,11 +5,20 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.cherokeelessons.syllabary.one.App;
+import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.ui.UI;
 
 public class ChildScreen implements Screen, InputProcessor {
 	
@@ -65,11 +74,28 @@ public class ChildScreen implements Screen, InputProcessor {
 		this.multi=new InputMultiplexer();
 		stage = new Stage();
 		stage.setViewport(App.getFitViewport(stage.getCamera()));
+		
+		FileHandleResolver resolver = new InternalFileHandleResolver();
+		manager = new AssetManager();
+		manager.setLoader(FreeTypeFontGenerator.class,
+				new FreeTypeFontGeneratorLoader(resolver));
+		manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(
+				resolver));
+		manager.setLoader(BitmapFont.class, ".otf", new FreetypeFontLoader(
+				resolver));
+		ui = new UI(manager);
+		gs = new GameSound(manager);
 	}
+	
+	protected final GameSound gs;
+	protected final UI ui;
+	
+	protected final AssetManager manager;
 	
 	protected void goodBye(){
 		if (caller!=null) {
 			App.getGame().setScreen(caller);
+			this.dispose();
 		}
 	}
 	
@@ -86,6 +112,9 @@ public class ChildScreen implements Screen, InputProcessor {
 
 	@Override
 	public void render(float delta) {
+		if (!manager.update()) {
+			return;
+		}
 		act(delta);
 		draw(delta);
 	}
@@ -177,5 +206,7 @@ public class ChildScreen implements Screen, InputProcessor {
 	public boolean scrolled(int amount) {
 		return false;
 	}
+	
+	
 
 }

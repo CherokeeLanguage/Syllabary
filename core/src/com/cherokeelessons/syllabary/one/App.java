@@ -16,23 +16,26 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.util.GooglePlayGameServices;
 
 public class App {
-	
+
 	public static GooglePlayGameServices gpgs;
-	
+
 	private static Color clearColor;
-	
+
 	public static void glClearColor() {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b,
 				clearColor.a);
 	}
-	
-	private static AssetManager manager;
 
 	private static final String TAG = "App";
 
 	private static Syllabary game;
 
 	private static Preferences prefs;
+
+	public static class Volume {
+		public static float effects = 1f;
+		public static float challenges = 1f;
+	}
 
 	public static Preferences getPrefs() {
 		if (prefs == null) {
@@ -53,44 +56,26 @@ public class App {
 	public static void setGame(Syllabary game) {
 		App.game = game;
 	}
-	
+
 	public static FitViewport getFitViewport(Camera camera) {
 		Rectangle surrounds = fittedSize();
 		FitViewport fitViewport = new FitViewport(surrounds.width,
 				surrounds.height, camera);
 		fitViewport.update((int) surrounds.width, (int) surrounds.height, true);
 		Gdx.app.log(TAG, "Camera Size: " + (int) surrounds.getWidth() + "x"
-						+ (int) surrounds.getHeight());
+				+ (int) surrounds.getHeight());
 		return fitViewport;
 	}
-	
-	private final static Rectangle targetScreenSize = new Rectangle(0, 0, 1280, 720);
 
-	public static class Sound {
-		public static final String STARTUP = "music/startup.wav";
-	}
-	
+	private final static Rectangle targetScreenSize = new Rectangle(0, 0, 1280,
+			720);
+
 	private static Rectangle fittedSize() {
 		int h = Gdx.graphics.getHeight();
 		int w = Gdx.graphics.getWidth();
 		Rectangle surrounds = new Rectangle(0, 0, w, h);
 		surrounds.fitOutside(targetScreenSize);
 		return surrounds;
-	}
-
-	public static AssetManager getManager() {
-		return manager;
-	}
-
-	public static void setManager(AssetManager manager) {
-		App.manager = manager;
-		FileHandleResolver resolver = new InternalFileHandleResolver();
-		manager.setLoader(FreeTypeFontGenerator.class,
-				new FreeTypeFontGeneratorLoader(resolver));
-		manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(
-				resolver));
-		manager.setLoader(BitmapFont.class, ".otf", new FreetypeFontLoader(
-				resolver));
 	}
 
 	public static Color getClearColor() {
@@ -102,14 +87,16 @@ public class App {
 	}
 
 	public static void log(Object source, String message) {
-		Gdx.app.log(source!=null?source.getClass().getName():App.class.getName(), message!=null?message:"");
+		Gdx.app.log(
+				source != null ? source.getClass().getName() : App.class
+						.getName(), message != null ? message : "");
 	}
-	
+
 	public static void log(String message) {
 		log(null, message);
 	}
 
 	public static void log(Object source, char character) {
-		log(source, Character.toString(character));		
+		log(source, Character.toString(character));
 	}
 }

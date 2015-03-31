@@ -25,3 +25,11 @@ Any wrong selection or timeout terminates session.
 Points per Syllabary are awarded based on the Leitner box rating and current
 session's Pimsleur timings. Game to run in "levels" based on the Leitner box
 scores.
+
+Show the challenge on the right where the "?" is by default for all zero box
+letters.
+
+For all other challenges show a "?". If the user hits the "?", subtract
+ 100*box points from score then show letter.
+
+ Always show under the "?" how many points it will cost to reveale the challenge.

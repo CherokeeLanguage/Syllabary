@@ -3,13 +3,13 @@ package com.cherokeelessons.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,12 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
+import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI.UIProgressBar;
 
-public class GameBoard extends Table implements Disposable {
+public class GameBoard extends Table {
 	public static final int height = 5;
 	public static final int width = 7;
 	private Texture bar = null;
@@ -41,50 +42,58 @@ public class GameBoard extends Table implements Disposable {
 	private TextButton pause;
 
 	private Texture question = null;
-	private Label score;
+	private Label lbl_score;
+	private Label points_value;
 
 	private UIProgressBar remaining;
 	private Texture p_fg;
 	private Texture p_bg;
-	private final AssetManager manager;
+	private boolean paused;
+	private final GameSound gs;
+	private final UI ui;
+
+	public boolean isPaused() {
+		return paused;
+	}
 	
+	public void setPaused(boolean paused) {
+		this.paused = paused;
+		if (paused) {
+			blocks.setVisible(false);
+			blocks.setTouchable(Touchable.disabled);
+			overlay_pause=ui.getImageFor(UI.PAUSED);
+			overlay_pause.setPosition(blocks.getX(), blocks.getY());
+			overlay_pause.setWidth(blocks.getWidth());
+			overlay_pause.setHeight(blocks.getHeight());
+			overlay_pause.setScaling(Scaling.fit);
+			getStage().addActor(overlay_pause);
+		} else {
+			blocks.setVisible(true);
+			blocks.setTouchable(Touchable.childrenOnly);
+			overlay_pause.remove();
+			overlay_pause.clear();
+		}
+	}
+
 	public static class Res {
 		public static final String question = "images/misc/003f_4.png";
 		public static final String bar = "images/misc/bar.png";
 		public static final String p_bg = "images/misc/progress_bg.png";
 		public static final String p_fg = "images/misc/progress_fg.png";
 	}
-	
-	private void loadAssets(){
-		TextureParameter tp = new TextureParameter();
-		tp.magFilter=TextureFilter.Linear;
-		tp.minFilter=TextureFilter.Linear;
-		manager.load(Res.question, Texture.class, tp);
-		manager.load(Res.bar, Texture.class, tp);
-		manager.load(Res.p_bg, Texture.class, tp);
-		manager.load(Res.p_fg, Texture.class, tp);
-	}
-	
-	private void unloadAssets(){
-		manager.unload(Res.question);
-		manager.unload(Res.bar);
-		manager.unload(Res.p_bg);
-		manager.unload(Res.p_fg);
-	}
 
-	
-	public GameBoard(Stage stage, AssetManager assetManager) {
-		this.manager = assetManager;
+	private Table blocks;
+	private Image overlay_pause;
+	public GameBoard(Stage stage, UI ui, GameSound gs) {
+		this.ui=ui;
+		this.gs=gs;
 		stage.addActor(this);
-		loadAssets();
-		manager.finishLoadingAsset(Res.question);
-		question = manager.get(Res.question, Texture.class);		
+		question = ui.getTextureFor(Res.question);
 
 		setFillParent(true);
-
 		defaults().expandX().fill();
-
-		Texture t = manager.get(UI.BG, Texture.class);
+		
+		Texture t = ui.getTextureFor(UI.BG);
 		TextureRegion tr = new TextureRegion(t);
 		TiledDrawable background = new TiledDrawable(tr);
 		Table btable = new Table();
@@ -93,10 +102,10 @@ public class GameBoard extends Table implements Disposable {
 		btable.addAction(Actions.alpha(.5f));
 		addActor(btable);
 
-		LabelStyle ls = UI.getLs();
-		TextButtonStyle tbs = UI.getTbs();
+		LabelStyle ls = ui.getLs();
+		TextButtonStyle tbs = ui.getTbs();
 
-		final Table blocks = new Table() {
+		blocks = new Table() {
 			@Override
 			public void act(float delta) {
 				if (needsLayout()) {
@@ -105,6 +114,7 @@ public class GameBoard extends Table implements Disposable {
 				super.act(delta);
 			}
 		};
+		blocks.setTouchable(Touchable.childrenOnly);
 		blocks.defaults().pad(8);
 		cell = new ArrayList<>();
 		glyph = new ArrayList<>();
@@ -117,24 +127,31 @@ public class GameBoard extends Table implements Disposable {
 				glyph.add("");
 			}
 		}
-		manager.finishLoadingAsset(Res.bar);
-		bar = manager.get(Res.bar, Texture.class);
+		bar = ui.getTextureFor(Res.bar);
 		final Image topFillerBar = new Image(bar);
 		topFillerBar.setScaling(Scaling.fit);
 		final Image bottomFillerBar = new Image(bar);
 		bottomFillerBar.setScaling(Scaling.fit);
 
-		score = new Label("000000000", ls);
+		lbl_score = new Label("000000000", ls);
+		points_value = new Label("5", ls);
 		challenge_latin = new Label("GWA", ls);
 		challenge_pic = new Image(question);
 		challenge_pic.setScaling(Scaling.fit);
 		mainMenu = new TextButton("Menu", tbs);
 		mute = new TextButton("Mute", tbs);
 		pause = new TextButton("Pause", tbs);
-		manager.finishLoadingAsset(Res.p_bg);
-		manager.finishLoadingAsset(Res.p_fg);
-		p_bg = manager.get(Res.p_bg);
-		p_fg = manager.get(Res.p_fg);
+		pause.addListener(new ClickListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				setPaused(!isPaused());
+				pause.setChecked(isPaused());
+				return true;
+			}
+		});
+		p_bg = ui.getTextureFor(Res.p_bg);
+		p_fg = ui.getTextureFor(Res.p_fg);
 		remaining = new UIProgressBar(p_bg, p_fg);
 		remaining.setValue(0, false, 0f);
 		row();
@@ -170,13 +187,15 @@ public class GameBoard extends Table implements Disposable {
 		rightColumn.row();
 		rightColumn.add(remaining).fillX().pad(10).padTop(15).padBottom(0);
 		rightColumn.row();
-		rightColumn.add(score);
+		rightColumn.add(lbl_score);
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
 		rightColumn.add(challenge_latin);
 		rightColumn.row();
 		challenge = rightColumn.add(challenge_pic);
+		rightColumn.row();
+		rightColumn.add(points_value);
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
@@ -191,42 +210,84 @@ public class GameBoard extends Table implements Disposable {
 	public float getRemaining() {
 		return remaining.getValue();
 	}
-	
+
 	public void setRemaining(float percent, float interval) {
 		setRemaining(percent, true, interval);
 	}
-	
+
 	public void setRemaining(float percent, boolean animate, float interval) {
-		if (percent>1f) percent=1f;
-		if (percent<0f) percent=0f;
+		if (percent > 1f)
+			percent = 1f;
+		if (percent < 0f)
+			percent = 0f;
 		remaining.setValue(percent, animate, interval);
-	}
-
-	@Override
-	public void dispose() {
-		unloadAssets();
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		dispose();
-		super.finalize();
 	}
 
 	public String getChallenge_latin() {
 		return challenge_latin.getText().toString().intern();
 	}
 
+	public void setChallenge_latin(String challenge_latin) {
+		this.challenge_latin.setText(challenge_latin.intern());
+	}
+
+	private int score;
+
+	public int getScore() {
+		return score;
+	}
+
+	StringBuilder score_sb = new StringBuilder(9);
+
+	public void resetScore() {
+		score = 0;
+		updateScoreDisplay(score);
+	}
+
+	public synchronized void addToScore(int amount) {
+		score += amount;
+		float delay = 0f;
+		final boolean whip = amount < 0;
+		do  {
+			amount /= 7;
+			Action u1 = null;
+			final int tmp = amount;
+			u1 = Actions.run(new Runnable() {
+				@Override
+				public void run() {
+					if (whip) {
+						gs.whip_pop();
+					} else {
+						gs.ding();
+					}
+					updateScoreDisplay(score - tmp);
+				}
+			});
+			Action s = Actions.sequence(Actions.delay(delay), u1);
+			addAction(s);
+			delay += .2f;
+		} while (amount != 0);
+	}
+
+	private void updateScoreDisplay(int score) {
+		lbl_score.setLayoutEnabled(false);
+		score_sb.setLength(0);
+		score_sb.append(score);
+		if (score < 0) {
+			score_sb.setCharAt(0, '0');
+		}
+		while (score_sb.length() < 9) {
+			score_sb.insert(0, '0');
+		}
+		if (score < 0) {
+			score_sb.setCharAt(0, '-');
+		}
+		lbl_score.setText(score_sb.toString());
+		lbl_score.layout();
+	}
+
 	public Image getChallenge_image() {
 		return challenge.getActor();
-	}
-	
-	public String getGlyphAt(int x, int y){
-		return null;
-	}
-	
-	public void setGlyphAt(int x, int y){
-		
 	}
 
 	public Image getImageAt(int x, int y) {
@@ -238,7 +299,7 @@ public class GameBoard extends Table implements Disposable {
 			y = height + y;
 		return cell.get(x + y * width).getActor();
 	}
-	
+
 	public Cell<Image> getCellAt(int x, int y) {
 		x %= width;
 		y %= height;
@@ -248,7 +309,7 @@ public class GameBoard extends Table implements Disposable {
 			y = height + y;
 		return cell.get(x + y * width);
 	}
-	
+
 	public void setImageAt(int x, int y, Image img) {
 		x %= width;
 		y %= height;
@@ -257,9 +318,5 @@ public class GameBoard extends Table implements Disposable {
 		if (y < 0)
 			y = height + y;
 		cell.get(x + y * width).setActor(img);
-	}
-	
-	public void setChallenge_latin(String challenge_latin) {
-		this.challenge_latin.setText(challenge_latin.intern());
 	}
 }

@@ -1,18 +1,22 @@
 package com.cherokeelessons.syllabary.one;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 
-public enum Font {
+public enum Fonts {
 
 	Small(36), Medium(42), Large(58), LLarge(72), XLarge(96);
 
 	public final int size;
-
-	private Font(int size) {
+	
+	private Fonts(int size) {
 		this.size = size;
 	}
 
@@ -21,7 +25,7 @@ public enum Font {
 	}
 	
 	public BitmapFont get() {
-		return App.getManager().get(fontName(), BitmapFont.class);
+		return manager.get(fontName(), BitmapFont.class);
 	}
 
 	public static final String DIAMOND = "\u25c8";
@@ -55,7 +59,20 @@ public enum Font {
 				+ DOT + LDQUOTE + RDQUOTE;
 	}
 
-	public static void addFonts(AssetManager manager) {
+	private static AssetManager manager;
+	public static void dispose(){
+		Fonts.manager.clear();
+	}
+	public static void init() {
+		FileHandleResolver resolver = new InternalFileHandleResolver();
+		Fonts.manager=new AssetManager();
+		manager.setLoader(FreeTypeFontGenerator.class,
+				new FreeTypeFontGeneratorLoader(resolver));
+		manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(
+				resolver));
+		manager.setLoader(BitmapFont.class, ".otf", new FreetypeFontLoader(
+				resolver));
+		
 		String defaultChars = FreeTypeFontGenerator.DEFAULT_CHARS;
 		for (char c = 'Ꭰ'; c <= 'Ᏼ'; c++) {
 			String valueOf = String.valueOf(c);
@@ -75,7 +92,7 @@ public enum Font {
 				defaultChars += valueOf;
 			}
 		}
-		for (Font font : values()) {			
+		for (Fonts font : values()) {			
 			FreeTypeFontLoaderParameter param = new FreeTypeFontLoaderParameter();
 			param.fontFileName = "fonts/CherokeeHandone.ttf";
 			param.fontParameters.characters = defaultChars;
@@ -86,5 +103,9 @@ public enum Font {
 			manager.load(font.fontName(), BitmapFont.class, param);
 		}
 		return;
+	}
+	
+	public static boolean isLoaded(){
+		return manager.update();
 	}
 }

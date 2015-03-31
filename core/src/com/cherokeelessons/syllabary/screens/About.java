@@ -10,8 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
-import com.cherokeelessons.syllabary.one.Font;
-import com.cherokeelessons.ui.UI;
+import com.cherokeelessons.syllabary.one.Fonts;
 
 public class About extends ChildScreen {
 
@@ -27,22 +26,22 @@ public class About extends ChildScreen {
 	@Override
 	public void show() {
 		super.show();
-		container = UI.getMenuTable();
+		container = ui.getMenuTable();
 		stage.addActor(container);
 		
-		LabelStyle ls = new LabelStyle(UI.getLs());
-		ls.font=Font.Medium.get();
+		LabelStyle ls = new LabelStyle(ui.getLs());
+		ls.font=Fonts.Medium.get();
 		
 		container.row();
-		TextButtonStyle bls=UI.getTbs();
-		bls.font=Font.Medium.get();
+		TextButtonStyle bls=ui.getTbs();
+		bls.font=Fonts.Medium.get();
 		TextButton back = new TextButton("BACK", bls);
 		container.add(back).left().fill(false, false).expand(false, false);
 		back.addListener(exit);
 		
 		table = new Table();
 		
-		scroll = new ScrollPane(table,UI.getSps());
+		scroll = new ScrollPane(table,ui.getSps());
 		scroll.setColor(Color.DARK_GRAY);
 		scroll.setFadeScrollBars(false);
 		scroll.setSmoothScrolling(true);

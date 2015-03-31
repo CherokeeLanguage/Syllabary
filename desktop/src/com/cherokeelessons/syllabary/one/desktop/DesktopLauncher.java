@@ -11,10 +11,12 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice();
-		int width = (75 * gd.getDisplayMode().getWidth()) / 100;
-		int height = (75 * gd.getDisplayMode().getHeight()) / 100;
-		width=2048/2;
-		height=1536/2;
+		int width = (70 * gd.getDisplayMode().getWidth()) / 100;
+		int height = (70 * gd.getDisplayMode().getHeight()) / 100;
+//		width=2048/2;
+//		height=1536/2;
+//		width=1280;
+//		height=720;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.allowSoftwareMode = true;
 		config.forceExit = true;

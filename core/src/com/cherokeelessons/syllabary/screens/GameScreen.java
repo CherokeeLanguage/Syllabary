@@ -2,12 +2,8 @@ package com.cherokeelessons.syllabary.screens;
 
 import java.util.Random;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -15,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.UI;
 
@@ -29,33 +24,31 @@ public class GameScreen extends ChildScreen {
 	@Override
 	public void show() {
 		super.show();
-		gameboard = UI.getGameBoard(stage, App.getManager());
-
+		gameboard = ui.getGameBoard(stage, ui, gs);
 		for (int iy = 0; iy < GameBoard.height; iy++) {
 			for (int ix = 0; ix < GameBoard.width; ix++) {
-				int letter = new Random().nextInt('Ᏼ' - 'Ꭰ') + 'Ꭰ';
-				int font = new Random().nextInt(4);
-				String glyph = Integer.toHexString(letter).toLowerCase();
-				String path = "images/glyphs/" + glyph + "_" + font + ".png";
-				FileHandle file = Gdx.files.internal(path);
-				Texture syl_text = new Texture(file);
-				syl_text.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-				final Image img = new Image(syl_text) {
-					@Override
-					public void act(float delta) {
-						if (needsLayout()) {
-							return;
-						}
-						super.act(delta);
-					}
-				};
+				// int letter = new Random().nextInt('Ᏼ' - 'Ꭰ') + 'Ꭰ';
+				// int font = new Random().nextInt(5);
+				// String glyph = Integer.toHexString(letter).toLowerCase();
+				// String path = "images/glyphs/" + glyph + "_" + font + ".png";
+				// FileHandle file = Gdx.files.internal(path);
+				// Texture syl_text = new Texture(file);
+				// syl_text.setFilter(TextureFilter.Linear,
+				// TextureFilter.Linear);
+				final Image img = ui.getImageFor(UI.DISC);
 				img.setScaling(Scaling.fit);
-				img.setColor(new Color(new Random().nextFloat(), new Random()
-						.nextFloat(), new Random().nextFloat(), 1f));
+				Color img_color;
+				do {
+					img_color = new Color(new Random().nextFloat(),
+							new Random().nextFloat(), new Random().nextFloat(),
+							1f);
+				} while (UI.luminance(img_color)<.6);
+				img.setColor(img_color);
 				img.addListener(new ClickListener() {
 					@Override
 					public boolean touchDown(InputEvent event, float x,
 							float y, int pointer, int button) {
+						gameboard.addToScore(new Random().nextInt(10000)-5000);
 						img.setColor(new Color(new Random().nextFloat(),
 								new Random().nextFloat(), new Random()
 										.nextFloat(), 1f));
@@ -92,16 +85,17 @@ public class GameScreen extends ChildScreen {
 	@Override
 	public void hide() {
 		super.hide();
-		gameboard.dispose();
 	}
 
 	private float maxTime = 10f;
 	private float total_elapsed = 0f;
 	private float challenge_elapsed = 0f;
 	private float update_prev = 0f;
-
 	@Override
 	public void act(float delta) {
+		if (gameboard.isPaused()) {
+			return;
+		}
 		total_elapsed += delta;
 		challenge_elapsed += delta;
 		if (challenge_elapsed - update_prev > 1f) {

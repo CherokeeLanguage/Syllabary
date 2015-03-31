@@ -9,8 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.cherokeelessons.syllabary.one.App;
-import com.cherokeelessons.syllabary.one.Font;
-import com.cherokeelessons.ui.UI;
+import com.cherokeelessons.syllabary.one.Fonts;
 
 
 public class MainMenu extends ChildScreen {
@@ -38,21 +37,21 @@ public class MainMenu extends ChildScreen {
 	public void show() {
 		super.show();
 		
-		container = UI.getMenuTable();
+		container = ui.getMenuTable();
 		
 		stage.addActor(container);
 		
 		TextButton button;
 		
-		LabelStyle lstyle = UI.getLs();
-		lstyle.font=Font.XLarge.get();
+		LabelStyle lstyle = ui.getLs();
+		lstyle.font=Fonts.XLarge.get();
 		Label title = new Label("Cherokee Language\nSyllabary Practice", lstyle);
 		title.setAlignment(Align.center);
 		container.row();
 		container.add(title).colspan(2).align(Align.center);
 		
-		TextButtonStyle bstyle=UI.getTbs();
-		bstyle.font=Font.LLarge.get();
+		TextButtonStyle bstyle=ui.getTbs();
+		bstyle.font=Fonts.LLarge.get();
 		button = new TextButton("New Game", bstyle);
 		button.addCaptureListener(gameScreen);
 		container.row();
