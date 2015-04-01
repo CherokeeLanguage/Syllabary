@@ -4,80 +4,13 @@ import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class SlotInfo implements Serializable {
-	private String signature = "";
-
-	public String getSignature() {
-		return signature;
-	}
-
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
-
-	private static final int StatsVersion = 1;
+	
 	public static final int FULLY_LEARNED_BOX = 10;
-	public static final int PROFICIENT_BOX = 5;
 	public static final int JUST_LEARNED_BOX = 1;
-
-	/**
-	 * The summed "box" values for all active cards
-	 */
-	public int fullScore = 0;
-	/**
-	 * The summbed "box" values for the most recent learning session
-	 */
-	public int sessionScore = 0;
-
-	public int activeCards = 0;
-	public int shortTerm = 0;
-	public int mediumTerm = 0;
-	public int longTerm = 0;
-	public Settings settings = new Settings();
-	private int version;
-	public LevelName level;
-	public int lastScore;
-	public boolean perfect;
-	public long lastrun;
-
-	public SlotInfo() {
-	}
-
-	public SlotInfo(SlotInfo info) {
-		this.activeCards = info.activeCards;
-		this.level = info.level;
-		this.longTerm = info.longTerm;
-		this.mediumTerm = info.mediumTerm;
-		this.settings = new Settings(info.settings);
-
-	}
-
-	public void validate() {
-		if (level == null) {
-			level = LevelName.Newbie;
-		}
-		if (settings == null) {
-			settings = new Settings();
-		}
-		settings.validate();
-	}
-
-	public int getVersion() {
-		return StatsVersion;
-	}
-
-	public boolean updatedVersion() {
-		return version == StatsVersion;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
-	}
-
-	public static void calculateStats(SlotInfo info, ActiveDeck activeDeck) {
-		if (activeDeck == null || info == null || activeDeck.deck.size() == 0) {
-			return;
-		}
-
+	public static final int PROFICIENT_BOX = 5;
+	private static final int StatsVersion = 1;
+	public static void calculateStatsFor(SlotInfo info) {
+		ActiveDeck activeDeck = info.activeDeck;
 		/*
 		 * Set "level" to ceil(average box value) found in active deck. Negative
 		 * box values are ignored.
@@ -127,5 +60,61 @@ public class SlotInfo implements Serializable {
 				info.shortTerm++;
 			}
 		}
+	}
+	public int activeCards = 0;
+	public ActiveDeck activeDeck=new ActiveDeck();
+	public long lastrun;
+	public int lastScore;
+	public LevelName level;
+	public int longTerm = 0;
+	public int mediumTerm = 0;
+	public boolean perfect;
+	public Settings settings = new Settings();
+	public int shortTerm = 0;
+	public String signature = "";
+
+	private int version;
+
+	public SlotInfo() {
+	}
+
+	public SlotInfo(SlotInfo info) {
+		this.activeCards = info.activeCards;
+		this.activeDeck=new ActiveDeck(info.activeDeck);
+		this.lastrun=info.lastrun;
+		this.lastScore=info.lastScore;
+		this.level = info.level;
+		this.longTerm = info.longTerm;
+		this.mediumTerm = info.mediumTerm;
+		this.settings = new Settings(info.settings);
+		this.perfect=info.perfect;
+		this.shortTerm=info.shortTerm;
+		this.signature=info.signature.intern();
+	}
+
+	public int getVersion() {
+		return StatsVersion;
+	}
+
+	public void recalculateStats() {
+		calculateStatsFor(this);
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public boolean isUpdatedVersion() {
+		return version == StatsVersion;
+	}
+	
+	public void validate() {
+		if (level == null) {
+			level = LevelName.Newbie;
+		}
+		if (settings == null) {
+			settings = new Settings();
+		}
+		settings.validate();
 	}
 }

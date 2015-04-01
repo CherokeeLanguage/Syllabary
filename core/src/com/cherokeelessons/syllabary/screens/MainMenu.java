@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
+import com.cherokeelessons.ui.UI.UIDialog;
 
 
 public class MainMenu extends ChildScreen {
@@ -28,7 +29,9 @@ public class MainMenu extends ChildScreen {
 	
 	private ClickListener gameScreen = new ClickListener(){
 		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-			App.getGame().setScreen(new GameScreen(MainMenu.this));
+			UIDialog slotsDialog = ui.getMainSlotDialog();
+			slotsDialog.show(stage);
+//			App.getGame().setScreen(new GameScreen(MainMenu.this));
 			return true;
 		};
 	};

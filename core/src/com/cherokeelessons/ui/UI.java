@@ -9,30 +9,46 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.cherokeelessons.cards.SlotInfo;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.util.StringUtils;
 
 public class UI {
 	
 	public static final String PAUSED = "images/misc/paused.png";
 	public static final String SKIN = "skins/holo/Holo-light-xhdpi.json";
-	public static final String BG = "images/backgrounds/461223187.jpg";
+	public static final String BG = "images/backgrounds/461223187_50.jpg";
 	public static final String DISC = "images/misc/25cf_4.png";
+	public static final String WHITE = "images/misc/white-dot.png";
+	public static final String BLACK = "images/misc/black-dot.png";
+	public static final String DIM = "images/misc/dim.png";
+	
+	public static final String IMG_SETTINGS = "images/misc/gear.png";
+	public static final String IMG_ERASE = "images/misc/trash.png";
+	public static final String IMG_SYNC = "images/misc/refresh.png";
+	
 	private final AssetManager manager;
 
 	public UI(AssetManager manager) {
@@ -49,6 +65,13 @@ public class UI {
 		TextButtonStyle tbs = new TextButtonStyle(getSkin().get(
 				TextButtonStyle.class));
 		tbs.font = Fonts.Medium.get();
+		return tbs;
+	}
+	
+	public TextButtonStyle getTbsSmall() {
+		TextButtonStyle tbs = new TextButtonStyle(getSkin().get(
+				TextButtonStyle.class));
+		tbs.font = Fonts.Small.get();
 		return tbs;
 	}
 
@@ -77,11 +100,7 @@ public class UI {
 		Texture t = getTextureFor(BG);
 		TextureRegion tr = new TextureRegion(t);
 		TiledDrawable background = new TiledDrawable(tr);
-		Table btable = new Table();
-		btable.setFillParent(true);
-		btable.setBackground(background);
-		btable.addAction(Actions.alpha(.5f));
-		container.addActor(btable);
+		container.setBackground(background);
 		return container;
 	}
 
@@ -202,5 +221,104 @@ public class UI {
 		manager.load(name, Texture.class, tp);
 		manager.finishLoadingAsset(name);
 		return manager.get(name, Texture.class);
+	}
+	
+	/*
+	 * Customized window style for dialogs that has a "dimmed" stage background.
+	 * Really needs to use a nine-path for the direct background to have proper borders.
+	 */
+	public WindowStyle getDialogStyle() {
+		WindowStyle ws = getWs();
+		ws.titleFont=Fonts.Large.get();
+		ws.stageBackground=new TiledDrawable(new TextureRegion(getTextureFor(DIM)));
+		TiledDrawable td = new TiledDrawable(new TextureRegion(getTextureFor(BG)));
+		td.setMinHeight(0);
+		td.setMinWidth(0);
+		td.setTopHeight(ws.titleFont.getCapHeight()+20);
+		ws.background=td;
+		return ws;
+	}
+	
+	public static class UIDialog extends Dialog {
+		public UIDialog(String title, UI ui) {
+			super(title, ui.getDialogStyle());
+		}
+	}
+	
+	public UIDialog getMainSlotDialog(){
+		UIDialog dialog = new UIDialog("Select Session", this);
+		dialog.setModal(true);
+		dialog.setFillParent(true);
+		
+		Table slots = new Table();
+		ScrollPane scroll = new ScrollPane(slots, getSps());
+		scroll.setFadeScrollBars(false);
+		scroll.setColor(Color.DARK_GRAY);
+		
+		dialog.getContentTable().add(scroll).expand().fill();
+		
+		for (int ix = 0; ix < 4; ix++) {
+			SlotInfo info = App.getSlotInfo(ix);
+			info.validate();
+			if (!info.isUpdatedVersion()) {
+				info.recalculateStats();
+				App.saveSlotInfo(ix, info);
+			}
+			String displayName = info.settings.name;
+			if (info.lastrun==0) {
+				displayName="*** NEW SESSION ***";
+			}
+			StringBuilder sb = new StringBuilder();
+			sb.append(info.level.getEngrish());
+			sb.append(" ");
+			sb.append(StringUtils.isBlank(displayName)?"ᎤᏲᏒ ᏥᏍᏕᏥ!":displayName);
+			sb.append(" - ");
+			sb.append("Score: ");
+			sb.append(info.lastScore);
+			sb.append("\n");
+			sb.append(info.activeCards);
+			sb.append(" letters: ");
+			sb.append(info.shortTerm);
+			sb.append(" short, ");
+			sb.append(info.mediumTerm);
+			sb.append(" medium, ");
+			sb.append(info.longTerm);
+			sb.append(" long");
+			TextButtonStyle tbs = getTbs();
+			TextButton textb = new TextButton(sb.toString(), tbs);
+			Image icon = new Image(getTextureFor("images/levels/"+info.level.getLevel()+"-75.png"));
+			slots.row();
+			slots.add(icon).pad(5).left();
+			slots.add(textb).pad(0).expand().fill().left();
+			Table editControls = new Table();
+			editControls.center();
+			editControls.defaults().pad(10);
+			ImageButton editb = getImageButton(IMG_SETTINGS);
+			ImageButton deleteb = getImageButton(IMG_ERASE);
+			ImageButton syncb = getImageButton(IMG_SYNC);
+			editControls.add(editb).center();
+			editControls.add(deleteb).center();
+			editControls.add(syncb).center();
+			slots.add(editControls);
+			if (ix>0) {
+				editb.setDisabled(true);
+				editb.setTouchable(Touchable.disabled);
+				editb.getImage().setColor(Color.CLEAR);
+				deleteb.setDisabled(true);
+				deleteb.setTouchable(Touchable.disabled);
+				deleteb.getImage().setColor(Color.CLEAR);
+			}
+		}
+		return dialog;
+	}
+	
+	public ImageButton getImageButton(String texture) {
+		Texture textureFor = getTextureFor(texture);
+		TextureRegion region = new TextureRegion(textureFor);
+		TextureRegionDrawable imageUp = new TextureRegionDrawable(region);
+		ImageButton imageButton = new ImageButton(imageUp);
+		imageButton.getImage().setScaling(Scaling.fit);
+		imageButton.getImage().setColor(Color.DARK_GRAY);
+		return imageButton;
 	}
 }

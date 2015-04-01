@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActiveDeck {
-	private String signature="";
-	public String getSignature() {
-		return signature;
+	public ActiveDeck() {
 	}
-	public void setSignature(String signature) {
-		this.signature = signature;
+	public ActiveDeck(ActiveDeck activeDeck) {
+		lastrun=activeDeck.lastrun;
+		deck.clear();
+		deck.addAll(activeDeck.deck);
 	}
 	public long lastrun=0;
-	public List<ActiveCard> deck=new ArrayList<ActiveCard>();
+	public List<ActiveCard> deck=new ArrayList<>();
 }

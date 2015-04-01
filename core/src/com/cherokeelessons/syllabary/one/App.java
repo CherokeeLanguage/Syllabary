@@ -2,17 +2,15 @@ package com.cherokeelessons.syllabary.one;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
-import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.util.GooglePlayGameServices;
 
 public class App {
@@ -98,5 +96,61 @@ public class App {
 
 	public static void log(Object source, char character) {
 		log(source, Character.toString(character));
+	}
+	
+	public static FileHandle getFolder(int ix) {
+		return getFolder(ix + "");
+	}
+	
+	public static FileHandle getFolder(String child) {
+		final FileHandle p0;
+		String path0 = "CherokeeSyllabary/slots";
+		p0 = Gdx.files.external(path0);
+		p0.child(child).mkdirs();
+		return p0.child(child);
+	}
+	
+	private static Json _json;
+	public static Json json() {
+		if (_json!=null) {
+			return _json;
+		}
+		_json = new Json();
+		_json.setIgnoreUnknownFields(true);
+		_json.setOutputType(OutputType.json);
+		_json.setQuoteLongValues(true);
+		_json.setTypeName("class");
+		_json.setUsePrototypes(false);
+		return _json;
+	}
+	
+	public static void toJson(Object object, FileHandle file) {
+		file.writeString(json().prettyPrint(object), false, "UTF-8");
+	}
+	
+	public static <T> T fromJson(FileHandle file, Class<T> type) {
+		return json().fromJson(type, file);
+	}
+	
+	public static SlotInfo getSlotInfo(int ix) {
+		FileHandle folder = getFolder(ix);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+		FileHandle json_file = folder.child("info.json");
+		if (!json_file.exists()) {
+			SlotInfo info = new SlotInfo();
+			toJson(info, json_file);
+			return info;
+		}
+		return fromJson(json_file, SlotInfo.class);
+	}
+	
+	public static void saveSlotInfo(int ix, SlotInfo info) {
+		FileHandle folder = getFolder(ix);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+		toJson(info, folder.child("info.json"));
 	}
 }
