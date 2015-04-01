@@ -24,6 +24,9 @@ public class GameScreen extends ChildScreen {
 	@Override
 	public void show() {
 		super.show();
+		
+		loadDeck();
+		
 		gameboard = ui.getGameBoard(stage, ui, gs);
 		for (int iy = 0; iy < GameBoard.height; iy++) {
 			for (int ix = 0; ix < GameBoard.width; ix++) {
@@ -80,6 +83,10 @@ public class GameScreen extends ChildScreen {
 				img.setVisible(false);
 			}
 		}
+	}
+
+	private void loadDeck() {
+		
 	}
 
 	@Override

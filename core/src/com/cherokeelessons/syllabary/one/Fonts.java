@@ -49,7 +49,7 @@ public enum Fonts {
 	public static final String DOT = "•";
 	public static final String RDQUOTE = "”";
 	public static final String LDQUOTE = "“";
-	private static final String SPECIALS;
+	public static final String SPECIALS;
 
 	static {
 		SPECIALS = DSUNDERLINE + DUNDERDOT + DUNDERLINE + OVERLINE + STHRU
