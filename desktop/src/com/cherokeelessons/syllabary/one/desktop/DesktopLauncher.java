@@ -5,7 +5,7 @@ import java.awt.GraphicsEnvironment;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.cherokeelessons.syllabary.one.Syllabary;
+import com.cherokeelessons.syllabary.one.SyllabaryApp;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -25,6 +25,6 @@ public class DesktopLauncher {
 //		config.addIcon("icons/icon-128.png", FileType.Internal);
 //		config.addIcon("icons/icon-32.png", FileType.Internal);
 //		config.addIcon("icons/icon-16.png", FileType.Internal);
-		new LwjglApplication(new Syllabary(), config);
+		new LwjglApplication(new SyllabaryApp(), config);
 	}
 }

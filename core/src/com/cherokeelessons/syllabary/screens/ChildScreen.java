@@ -21,19 +21,19 @@ import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI;
 
 public class ChildScreen implements Screen, InputProcessor {
-	
-	public void log(){
+
+	public void log() {
 		Gdx.app.log(this.getClass().getSimpleName(), " ");
 	}
-	
+
 	public void log(String message) {
 		Gdx.app.log(this.getClass().getSimpleName(), message);
 	}
-	
+
 	protected final Screen caller;
 	protected final Stage stage;
 	protected final InputMultiplexer multi;
-	
+
 	protected final ClickListener exit = new ClickListener() {
 		public boolean touchDown(InputEvent event, float x, float y,
 				int pointer, int button) {
@@ -41,13 +41,13 @@ public class ChildScreen implements Screen, InputProcessor {
 			return true;
 		};
 	};
-	
-	private Runnable doBack = new Runnable(){
+
+	private Runnable doBack = new Runnable() {
 		public void run() {
 			goodBye();
 		};
 	};
-	
+
 	public Runnable getDoBack() {
 		return doBack;
 	}
@@ -64,19 +64,32 @@ public class ChildScreen implements Screen, InputProcessor {
 		this.doMenu = doMenu;
 	}
 
-	private Runnable doMenu = new Runnable(){
+	private Runnable doMenu = new Runnable() {
 		public void run() {
 		};
 	};
-	
-	public ChildScreen(Screen caller) {		
-		this.caller=caller;
-		this.multi=new InputMultiplexer();
+
+	private static int managerCount = 0;
+
+	public ChildScreen(Screen caller) {
+		this.caller = caller;
+		this.multi = new InputMultiplexer();
 		stage = new Stage();
 		stage.setViewport(App.getFitViewport(stage.getCamera()));
-		
+
 		FileHandleResolver resolver = new InternalFileHandleResolver();
-		manager = new AssetManager();
+		manager = new AssetManager() {
+			{
+				managerCount++;
+			}
+
+			@Override
+			public synchronized void dispose() {
+				super.dispose();
+				managerCount--;
+				App.log(this, "Disposed Manager. "+managerCount+" managers remaining.");
+			}
+		};
 		manager.setLoader(FreeTypeFontGenerator.class,
 				new FreeTypeFontGeneratorLoader(resolver));
 		manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(
@@ -86,27 +99,27 @@ public class ChildScreen implements Screen, InputProcessor {
 		ui = new UI(manager);
 		gs = new GameSound(manager);
 	}
-	
+
 	protected final GameSound gs;
 	protected final UI ui;
-	
+
 	protected final AssetManager manager;
-	
-	protected void goodBye(){
-		if (caller!=null) {
+
+	protected void goodBye() {
+		if (caller != null) {
 			App.getGame().setScreen(caller);
 			this.dispose();
 		}
 	}
-	
+
 	@Override
-	public void show() {		
+	public void show() {
 		multi.addProcessor(this);
 		multi.addProcessor(stage);
 		Gdx.input.setInputProcessor(multi);
 	}
-	
-	public void act(float delta){
+
+	public void act(float delta) {
 		stage.act(delta);
 	}
 
@@ -118,8 +131,8 @@ public class ChildScreen implements Screen, InputProcessor {
 		act(delta);
 		draw(delta);
 	}
-	
-	public void draw(float delta){
+
+	public void draw(float delta) {
 		App.glClearColor();
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
@@ -146,8 +159,9 @@ public class ChildScreen implements Screen, InputProcessor {
 
 	@Override
 	public void dispose() {
-		stage.dispose();
 		App.log(this, "dispose()");
+		stage.dispose();
+		manager.dispose();
 	}
 
 	@Override
@@ -156,14 +170,14 @@ public class ChildScreen implements Screen, InputProcessor {
 		case Keys.BACK:
 		case Keys.ESCAPE:
 			App.log(this, "<<BACK>>");
-			if (doBack!=null) {
+			if (doBack != null) {
 				Gdx.app.postRunnable(doBack);
 				return true;
 			}
 		case Keys.MENU:
 		case Keys.F1:
 			App.log(this, "<<MENU>>");
-			if (doMenu!=null) {
+			if (doMenu != null) {
 				Gdx.app.postRunnable(doMenu);
 				return true;
 			}
@@ -206,7 +220,5 @@ public class ChildScreen implements Screen, InputProcessor {
 	public boolean scrolled(int amount) {
 		return false;
 	}
-	
-	
 
 }

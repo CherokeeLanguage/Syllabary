@@ -23,12 +23,12 @@ public class GoodBye extends ChildScreen {
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor(null);		
+		Gdx.input.setInputProcessor(null);
+		Gdx.app.exit();
 	}
 	
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		Gdx.app.exit();
 	}
 }

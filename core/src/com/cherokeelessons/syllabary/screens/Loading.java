@@ -84,6 +84,7 @@ public class Loading extends ChildScreen {
 		}
 		if (manager.update()) {
 			App.getGame().setScreen(new MainMenu());
+			this.dispose();
 		}
 	}
 }

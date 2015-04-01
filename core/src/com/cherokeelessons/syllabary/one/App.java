@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.cards.SlotInfo;
@@ -26,7 +25,7 @@ public class App {
 
 	private static final String TAG = "App";
 
-	private static Syllabary game;
+	private static SyllabaryApp game;
 
 	private static Preferences prefs;
 
@@ -47,11 +46,11 @@ public class App {
 				.getName();
 	}
 
-	public static Syllabary getGame() {
+	public static SyllabaryApp getGame() {
 		return game;
 	}
 
-	public static void setGame(Syllabary game) {
+	public static void setGame(SyllabaryApp game) {
 		App.game = game;
 	}
 
