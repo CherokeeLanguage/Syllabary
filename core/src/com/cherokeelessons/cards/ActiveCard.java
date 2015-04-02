@@ -3,12 +3,18 @@ package com.cherokeelessons.cards;
 
 public class ActiveCard {
 
+	public static final int SendToNextBoxThreshold = 3;
+	
+	public boolean sendToNextBox(){
+		return correct_in_a_row>=SendToNextBoxThreshold;
+	}
+
 	public boolean noErrors = true;
 
 	/**
 	 * Used to match this card up with the master deck card
 	 */
-	public String id;
+	public String answer;
 
 	/**
 	 * Is this a brand new card never seen before?
@@ -54,6 +60,6 @@ public class ActiveCard {
 			return false;
 		}
 		ActiveCard other = (ActiveCard) obj;
-		return id.equals(other.id);
+		return answer.equals(other.answer);
 	}
 }

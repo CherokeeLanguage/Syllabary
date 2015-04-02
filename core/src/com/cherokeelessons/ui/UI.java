@@ -1,5 +1,7 @@
 package com.cherokeelessons.ui;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Color;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -16,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -24,16 +28,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.cherokeelessons.cards.DisplayMode;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.util.StringUtils;
+import com.cherokeelessons.util.WordUtils;
 
 public class UI {
 	
@@ -61,6 +70,13 @@ public class UI {
 		return manager.get(SKIN);
 	}
 
+	public TextButtonStyle getTbsLarge() {
+		TextButtonStyle tbs = new TextButtonStyle(getSkin().get(
+				TextButtonStyle.class));
+		tbs.font = Fonts.Large.get();
+		return tbs;
+	}
+	
 	public TextButtonStyle getTbs() {
 		TextButtonStyle tbs = new TextButtonStyle(getSkin().get(
 				TextButtonStyle.class));
@@ -86,6 +102,12 @@ public class UI {
 		style.font = Fonts.Medium.get();
 		return style;
 	}
+	
+	public LabelStyle getLsLarge() {
+		LabelStyle style = new LabelStyle(getSkin().get(LabelStyle.class));
+		style.font = Fonts.Large.get();
+		return style;
+	}
 
 	public ImageButtonStyle getIbs() {
 		ImageButtonStyle style = new ImageButtonStyle(getSkin().get(
@@ -97,7 +119,7 @@ public class UI {
 		Table container = new Table();
 		container.setFillParent(true);
 		container.defaults().expand().fill();
-		Texture t = getTextureFor(BG);
+		Texture t = loadTexture(BG);
 		TextureRegion tr = new TextureRegion(t);
 		TiledDrawable background = new TiledDrawable(tr);
 		container.setBackground(background);
@@ -210,17 +232,21 @@ public class UI {
 		return 0.2126d * r + .7152d * g + .0722d * b;
 	}
 
-	public Image getImageFor(String name) {
-		return new Image(getTextureFor(name));
+	public Image loadImage(String name) {
+		return new Image(loadTexture(name));
 	}
 	
-	public Texture getTextureFor(String name) {
+	public Texture loadTexture(String name) {
 		TextureParameter tp = new TextureParameter();
 		tp.magFilter = TextureFilter.Linear;
 		tp.minFilter = TextureFilter.Linear;
 		manager.load(name, Texture.class, tp);
 		manager.finishLoadingAsset(name);
 		return manager.get(name, Texture.class);
+	}
+	
+	public void unloadTexture(String name) {
+		manager.unload(name);
 	}
 	
 	/*
@@ -230,8 +256,7 @@ public class UI {
 	public WindowStyle getDialogStyle() {
 		WindowStyle ws = getWs();
 		ws.titleFont=Fonts.Large.get();
-		ws.stageBackground=new TiledDrawable(new TextureRegion(getTextureFor(DIM)));
-		TiledDrawable td = new TiledDrawable(new TextureRegion(getTextureFor(BG)));
+		TiledDrawable td = new TiledDrawable(new TextureRegion(loadTexture(BG)));
 		td.setMinHeight(0);
 		td.setMinWidth(0);
 		td.setTopHeight(ws.titleFont.getCapHeight()+20);
@@ -245,7 +270,7 @@ public class UI {
 		}
 	}
 	
-	public UIDialog getMainSlotDialog(){
+	public UIDialog getMainSlotDialog(final SlotsDialogHandler handler){
 		UIDialog dialog = new UIDialog("Select Session", this);
 		dialog.setModal(true);
 		dialog.setFillParent(true);
@@ -265,16 +290,18 @@ public class UI {
 				App.saveSlotInfo(ix, info);
 			}
 			String displayName = info.settings.name;
-			if (info.lastrun==0) {
-				displayName="*** NEW SESSION ***";
+			boolean isBlank=false;
+			if (StringUtils.isBlank(displayName)&&info.activeCards==0){
+				displayName="** BLANK **";
+				isBlank=true;
 			}
 			StringBuilder sb = new StringBuilder();
 			sb.append(info.level.getEngrish());
 			sb.append(" ");
 			sb.append(StringUtils.isBlank(displayName)?"ᎤᏲᏒ ᏥᏍᏕᏥ!":displayName);
-			sb.append(" - ");
-			sb.append("Score: ");
-			sb.append(info.lastScore);
+//			sb.append(" - ");
+//			sb.append("Score: ");
+//			sb.append(info.lastScore);
 			sb.append("\n");
 			sb.append(info.activeCards);
 			sb.append(" letters: ");
@@ -286,7 +313,7 @@ public class UI {
 			sb.append(" long");
 			TextButtonStyle tbs = getTbs();
 			TextButton textb = new TextButton(sb.toString(), tbs);
-			Image icon = new Image(getTextureFor("images/levels/"+info.level.getLevel()+"-75.png"));
+			Image icon = new Image(loadTexture("images/levels/"+info.level.getLevel()+"-75.png"));
 			slots.row();
 			slots.add(icon).pad(5).left();
 			slots.add(textb).pad(0).expand().fill().left();
@@ -300,7 +327,7 @@ public class UI {
 			editControls.add(deleteb).center();
 			editControls.add(syncb).center();
 			slots.add(editControls);
-			if (ix>0) {
+			if (isBlank) {
 				editb.setDisabled(true);
 				editb.setTouchable(Touchable.disabled);
 				editb.getImage().setColor(Color.CLEAR);
@@ -308,17 +335,218 @@ public class UI {
 				deleteb.setTouchable(Touchable.disabled);
 				deleteb.getImage().setColor(Color.CLEAR);
 			}
+			final int slot = ix;
+			textb.addListener(new ClickListener(){
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					handler.play(slot);
+					return true;
+				}
+			});
+			editb.addListener(new ClickListener(){
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					handler.edit(slot);
+					return true;
+				}
+			});
+			deleteb.addListener(new ClickListener(){
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					handler.erase(slot);
+					return true;
+				}
+			});
+			syncb.addListener(new ClickListener(){
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					handler.sync(slot);
+					return true;
+				}
+			});
 		}
 		return dialog;
 	}
 	
 	public ImageButton getImageButton(String texture) {
-		Texture textureFor = getTextureFor(texture);
+		Texture textureFor = loadTexture(texture);
 		TextureRegion region = new TextureRegion(textureFor);
 		TextureRegionDrawable imageUp = new TextureRegionDrawable(region);
 		ImageButton imageButton = new ImageButton(imageUp);
 		imageButton.getImage().setScaling(Scaling.fit);
 		imageButton.getImage().setColor(Color.DARK_GRAY);
 		return imageButton;
+	}
+
+	public TextFieldStyle getTfs() {
+		TextFieldStyle tfs = new TextFieldStyle(getSkin().get(TextFieldStyle.class));
+		tfs.font=Fonts.Medium.get();
+		return tfs;
+	}
+
+	public UIDialog getSlotEditDialog(final SlotInfo info) {
+		return getSlotEditDialog(info, null);
+	}
+	public UIDialog getSlotEditDialog(final SlotInfo info, final Runnable whenDone) {
+		
+		TextButtonStyle tbs = getTbs();
+		TextFieldStyle tfs = getTfs();
+		
+		info.validate();
+		if (info.lastrun!=0) {
+			info.settings.name = (StringUtils.isBlank(info.settings.name)) ? "ᏐᏈᎵ ᏂᏧᏙᎥᎾ"
+					: info.settings.name;
+		}
+		
+		final TextField name = new TextField(info.settings.name, tfs);
+		name.setDisabled(true);
+		name.setTouchable(Touchable.enabled);
+		name.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				name.setTouchable(Touchable.disabled);
+				TextInputListener listener = new TextInputListener() {
+					@Override
+					public void input(String text) {
+						name.setText(text);
+						name.setTouchable(Touchable.enabled);
+					}
+
+					@Override
+					public void canceled() {
+						name.setTouchable(Touchable.enabled);
+					}
+				};
+				if (App.getGame().pInput == null) {
+					Gdx.input.getTextInput(listener, "Profile Name?",
+							name.getText(), "");
+				} else {
+					App.getGame().pInput.getTextInput(listener,
+							"Profile Name?", name.getText(), "");
+				}
+				return true;
+			}
+		});
+		
+		final TextButton mode = new TextButton(
+				info.settings.display.toString(), tbs);
+		mode.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				info.settings.display = DisplayMode
+						.getNext(info.settings.display);
+				mode.setText(info.settings.display.toString());
+				return true;
+			}
+		});
+		final TextButton muted = new TextButton(info.settings.muted ? "Yes"
+				: "No", tbs);
+		muted.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				info.settings.muted = !info.settings.muted;
+				muted.setText(info.settings.muted ? "Yes" : "No");
+				return true;
+			}
+		});
+
+		final TextButton ok = new TextButton("OK", tbs);
+		final TextButton cancel = new TextButton("CANCEL", tbs);
+
+		UIDialog dialog = new UIDialog("Settings", this) {
+			protected void result(Object object) {
+				if (ok.equals(object)) {
+					if (whenDone!=null) {
+						info.settings.name = name.getText();
+						Gdx.app.postRunnable(whenDone);
+					}
+				}				
+			};
+
+			@Override
+			public Dialog show(Stage stage) {
+				super.show(stage);
+				stage.setKeyboardFocus(name);
+				stage.setScrollFocus(name);
+				name.setCursorPosition(name.getText().length());
+				return this;
+			}
+		};
+		
+		LabelStyle ls = getLs();
+		final Table contentTable = dialog.getContentTable();
+		dialog.setFillParent(true);
+		contentTable.clearChildren();
+		contentTable.row();
+		contentTable.add(new Label("Name: ", ls)).left().fillX();
+		contentTable.add(name).expand().fillX().left();
+		contentTable.row();
+		contentTable.add(new Label("Display: ", ls)).left().fillX();
+		contentTable.add(mode).expand().fillX().left();
+
+		contentTable.row();
+		contentTable.add(new Label("Mute by default: ", ls)).left().fillX();
+		contentTable.add(muted).expand().fillX().left();
+		contentTable.row();
+
+		dialog.button(ok, ok);
+		dialog.button(cancel, cancel);
+
+		return dialog;
+	}
+
+	public UIDialog getYesNoDialog(String msg, final Runnable ifYes,
+			final Runnable ifNo) {
+		TextButton yes = new TextButton("Yes", getTbs());
+		TextButton no = new TextButton("No", getTbs());
+		msg = WordUtils.wrap(msg, 60, "\n", true);
+		Label msglabel = new Label(msg, getLs());
+		UIDialog dialog = new UIDialog("Please Choose", this) {
+			@Override
+			protected void result(Object object) {
+				if (object==null) {
+					return;
+				}
+				if (object.equals(ifYes)) {
+					Gdx.app.postRunnable(ifYes);
+					return;
+				}
+				if (object.equals(ifNo)) {
+					Gdx.app.postRunnable(ifNo);
+					return;
+				}
+			}
+		};
+		dialog.getStyle().stageBackground=new TextureRegionDrawable(new TextureRegion(loadTexture(DIM)));
+		dialog.setStyle(dialog.getStyle());
+		dialog.text(msglabel);
+		dialog.button(yes, ifYes);
+		dialog.button(no, ifNo);
+		return dialog;
+	}
+	
+	public UIDialog getReadyDialog(final Runnable whenDone) {
+		TextButton Yes = new TextButton("OK", getTbs());
+		UIDialog dialog = new UIDialog("", this) {
+			@Override
+			protected void result(Object object) {
+				if (whenDone!=null) {
+					Gdx.app.postRunnable(whenDone);
+				}
+			}
+		};
+		dialog.getStyle().stageBackground=new TextureRegionDrawable(new TextureRegion(loadTexture(DIM)));
+		dialog.getStyle().background.setTopHeight(0f);
+		dialog.setStyle(dialog.getStyle());
+		dialog.text(new Label("Begin!", getLsLarge()));
+		dialog.button(Yes);
+		return dialog;
 	}
 }

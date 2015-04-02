@@ -5,6 +5,8 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class SlotInfo implements Serializable {
 	
+	public int slot=0;
+	
 	public static final int FULLY_LEARNED_BOX = 10;
 	public static final int JUST_LEARNED_BOX = 1;
 	public static final int PROFICIENT_BOX = 5;
@@ -75,6 +77,8 @@ public class SlotInfo implements Serializable {
 
 	private int version;
 
+	private float elapsed_secs;
+
 	public SlotInfo() {
 	}
 
@@ -116,5 +120,13 @@ public class SlotInfo implements Serializable {
 			settings = new Settings();
 		}
 		settings.validate();
+	}
+
+	public float getElapsed_secs() {
+		return elapsed_secs;
+	}
+
+	public void setElapsed_secs(float elapsed_secs) {
+		this.elapsed_secs = elapsed_secs;
 	}
 }

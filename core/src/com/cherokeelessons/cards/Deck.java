@@ -67,4 +67,12 @@ public class Deck {
 		}
 		return sm2_intervals.get(box);
 	}
+	public Card getCardByAnswer(String answer) {
+		for(Card card: cards) {
+			if (card.answer.equals(answer)) {
+				return card;
+			}
+		}
+		return null;
+	}
 }

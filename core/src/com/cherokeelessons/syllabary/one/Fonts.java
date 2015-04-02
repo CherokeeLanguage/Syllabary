@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 
 public enum Fonts {
 
-	Small(36), Medium(42), Large(58), LLarge(72), XLarge(96);
+	Small(34), Medium(40), Large(56), LLarge(70), XLarge(94);
 
 	public final int size;
 	

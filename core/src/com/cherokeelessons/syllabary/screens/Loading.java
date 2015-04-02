@@ -24,7 +24,7 @@ public class Loading extends ChildScreen {
 	@Override
 	public void show() {
 		for (int ix = 0; ix < 8; ix++) {
-			loading[ix % 4][ix / 4] = ui.getTextureFor("images/loading/p_loading_" + ix + ".png");
+			loading[ix % 4][ix / 4] = ui.loadTexture("images/loading/p_loading_" + ix + ".png");
 		}
 		stage.clear();
 		img.clear();

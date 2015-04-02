@@ -7,11 +7,11 @@ import com.cherokeelessons.cards.Card;
 import com.cherokeelessons.cards.Deck;
 
 public class Syllabary {
-
+	
 	private static Map<String, String> hex2syllabary = null;
 	private static Map<Character, String> tmap;
-	
 	private static Deck deck;
+	
 	public static Deck getDeck(){
 		if (deck==null) {
 			deck = new Deck();

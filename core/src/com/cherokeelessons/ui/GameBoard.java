@@ -3,6 +3,7 @@ package com.cherokeelessons.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -21,7 +22,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.cherokeelessons.cards.Card;
 import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.ui.UI.UIProgressBar;
 
 public class GameBoard extends Table {
@@ -29,7 +32,7 @@ public class GameBoard extends Table {
 	public static final int width = 7;
 	private Texture bar = null;
 	private List<Cell<Image>> cell;
-	private List<String> glyph;
+	private List<String> file;
 	private Label challenge_latin;
 	private Image challenge_pic;
 	private Cell<Image> challenge;
@@ -51,6 +54,7 @@ public class GameBoard extends Table {
 	private boolean paused;
 	private final GameSound gs;
 	private final UI ui;
+	private boolean doElapsed=true;
 
 	public boolean isPaused() {
 		return paused;
@@ -61,11 +65,11 @@ public class GameBoard extends Table {
 		if (paused) {
 			blocks.setVisible(false);
 			blocks.setTouchable(Touchable.disabled);
-			overlay_pause=ui.getImageFor(UI.PAUSED);
+			overlay_pause=ui.loadImage(UI.PAUSED);
 			overlay_pause.setPosition(blocks.getX(), blocks.getY());
 			overlay_pause.setWidth(blocks.getWidth());
 			overlay_pause.setHeight(blocks.getHeight());
-			overlay_pause.setScaling(Scaling.fit);
+			overlay_pause.setScaling(Scaling.none);
 			getStage().addActor(overlay_pause);
 		} else {
 			blocks.setVisible(true);
@@ -73,6 +77,17 @@ public class GameBoard extends Table {
 			overlay_pause.remove();
 			overlay_pause.clear();
 		}
+	}
+	
+	public void showNewLetter(Card card){
+		this.setDoElapsed(false);
+		UIDialog dialog = new UIDialog("A New Letter", ui) {
+			@Override
+			protected void result(Object object) {
+				GameBoard.this.paused=false;
+			}
+		};
+		dialog.show(getStage());
 	}
 
 	public static class Res {
@@ -88,19 +103,15 @@ public class GameBoard extends Table {
 		this.ui=ui;
 		this.gs=gs;
 		stage.addActor(this);
-		question = ui.getTextureFor(Res.question);
+		question = ui.loadTexture(Res.question);
 
 		setFillParent(true);
 		defaults().expandX().fill();
 		
-		Texture t = ui.getTextureFor(UI.BG);
+		Texture t = ui.loadTexture(UI.BG);
 		TextureRegion tr = new TextureRegion(t);
 		TiledDrawable background = new TiledDrawable(tr);
-		Table btable = new Table();
-		btable.setFillParent(true);
-		btable.setBackground(background);
-		btable.addAction(Actions.alpha(.5f));
-		addActor(btable);
+		setBackground(background);
 
 		LabelStyle ls = ui.getLs();
 		TextButtonStyle tbs = ui.getTbs();
@@ -117,17 +128,17 @@ public class GameBoard extends Table {
 		blocks.setTouchable(Touchable.childrenOnly);
 		blocks.defaults().pad(8);
 		cell = new ArrayList<>();
-		glyph = new ArrayList<>();
+		file = new ArrayList<>();
 		Image i = new Image();
 		for (int iy = 0; iy < height; iy++) {
 			blocks.row();
 			for (int ix = 0; ix < width; ix++) {
 				Cell<Image> image_cell = blocks.add(i).expand().fill();
 				cell.add(image_cell);
-				glyph.add("");
+				file.add(null);
 			}
 		}
-		bar = ui.getTextureFor(Res.bar);
+		bar = ui.loadTexture(Res.bar);
 		final Image topFillerBar = new Image(bar);
 		topFillerBar.setScaling(Scaling.fit);
 		final Image bottomFillerBar = new Image(bar);
@@ -138,9 +149,9 @@ public class GameBoard extends Table {
 		challenge_latin = new Label("GWA", ls);
 		challenge_pic = new Image(question);
 		challenge_pic.setScaling(Scaling.fit);
-		mainMenu = new TextButton("Menu", tbs);
-		mute = new TextButton("Mute", tbs);
-		pause = new TextButton("Pause", tbs);
+		mainMenu = new TextButton("BACK", tbs);
+		mute = new TextButton("MUTE", tbs);
+		pause = new TextButton("PAUSE", tbs);
 		pause.addListener(new ClickListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y,
@@ -150,8 +161,8 @@ public class GameBoard extends Table {
 				return true;
 			}
 		});
-		p_bg = ui.getTextureFor(Res.p_bg);
-		p_fg = ui.getTextureFor(Res.p_fg);
+		p_bg = ui.loadTexture(Res.p_bg);
+		p_fg = ui.loadTexture(Res.p_fg);
 		remaining = new UIProgressBar(p_bg, p_fg);
 		remaining.setValue(0, false, 0f);
 		row();
@@ -291,32 +302,63 @@ public class GameBoard extends Table {
 	}
 
 	public Image getImageAt(int x, int y) {
-		x %= width;
-		y %= height;
-		if (x < 0)
-			x = width + x;
-		if (y < 0)
-			y = height + y;
-		return cell.get(x + y * width).getActor();
+		return cell.get(getIndex(x, y)).getActor();
 	}
 
 	public Cell<Image> getCellAt(int x, int y) {
-		x %= width;
-		y %= height;
-		if (x < 0)
-			x = width + x;
-		if (y < 0)
-			y = height + y;
-		return cell.get(x + y * width);
+		return cell.get(getIndex(x, y));
 	}
 
+	public void setColorAt(int x, int y, Color color) {
+		Image actor = cell.get(getIndex(x, y)).getActor();
+		if (actor!=null) {
+			actor.setColor(color);
+		}
+	}
+	
 	public void setImageAt(int x, int y, Image img) {
+		cell.get(getIndex(x, y)).setActor(img);
+	}
+	
+	public void setImageAt(int x, int y, String name) {
+		int i = getIndex(x, y);
+		cell.get(i).clearActor();
+		if (file.get(i)!=null) {
+			ui.unloadTexture(file.get(i));
+			file.set(i, null);
+		}
+		if (name==null) {
+			return;
+		}
+		Image img = ui.loadImage(name);
+		img.setScaling(Scaling.fit);
+		cell.get(i).setActor(img);
+	}
+
+	private static int getIndex(int x, int y) {
 		x %= width;
 		y %= height;
 		if (x < 0)
 			x = width + x;
 		if (y < 0)
 			y = height + y;
-		cell.get(x + y * width).setActor(img);
+		int i = x+y*width;
+		return i;
+	}
+	
+	public void clearImages(){
+		for (int x=0; x<width; x++) {
+			for (int y=0; y<height; y++) {
+				setImageAt(x, y, (String)null);
+			}
+		}
+	}
+
+	public boolean isDoElapsed() {
+		return doElapsed;
+	}
+
+	public void setDoElapsed(boolean doElapsed) {
+		this.doElapsed = doElapsed;
 	}
 }

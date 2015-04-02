@@ -2,6 +2,7 @@ package com.cherokeelessons.syllabary.one;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -139,10 +140,13 @@ public class App {
 		FileHandle json_file = folder.child("info.json");
 		if (!json_file.exists()) {
 			SlotInfo info = new SlotInfo();
+			info.slot=ix;
 			toJson(info, json_file);
 			return info;
 		}
-		return fromJson(json_file, SlotInfo.class);
+		SlotInfo fromJson = fromJson(json_file, SlotInfo.class);
+		fromJson.slot=ix;
+		return fromJson;
 	}
 	
 	public static void saveSlotInfo(int ix, SlotInfo info) {
@@ -151,5 +155,10 @@ public class App {
 			folder.mkdirs();
 		}
 		toJson(info, folder.child("info.json"));
+	}
+	
+	public static interface PlatformTextInput {
+		public void getTextInput(final TextInputListener listener,
+				final String title, final String text, final String hint);
 	}
 }
