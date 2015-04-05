@@ -43,7 +43,6 @@ public class GameBoard extends Table {
 	private TextButton pause;
 
 	private Label lbl_score;
-	private Label points_value;
 
 	private UIProgressBar remaining;
 	private Texture p_fg;
@@ -140,7 +139,6 @@ public class GameBoard extends Table {
 		bottomFillerBar.setScaling(Scaling.fit);
 
 		lbl_score = new Label("000000000", ls);
-		points_value = new Label("5", ls);
 		challenge_latin = new Label("gwa", ui.getLsXLarge());
 		challenge_pic = new Image(ui.loadTextureRegionDrawable(Res.question));
 		challenge_pic.setScaling(Scaling.fit);
@@ -200,8 +198,6 @@ public class GameBoard extends Table {
 		rightColumn.add(challenge_pic);
 		rightColumn.row();
 		rightColumn.add(challenge_latin);
-//		rightColumn.row();
-//		rightColumn.add(points_value);
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
