@@ -59,6 +59,8 @@ public class UI {
 	public static final String IMG_SETTINGS = "images/misc/gear.png";
 	public static final String IMG_ERASE = "images/misc/trash.png";
 	public static final String IMG_SYNC = "images/misc/refresh.png";
+	public static final String HEAVYX = "images/misc/2718_5.png";
+	public static final String CHECKMARK = "images/misc/2714_5.png";
 	
 	private final AssetManager manager;
 

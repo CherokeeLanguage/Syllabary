@@ -6,8 +6,12 @@ import java.util.Random;
 import java.util.Set;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.cherokeelessons.cards.Card;
 import com.cherokeelessons.cards.Deck;
 import com.cherokeelessons.cards.SlotInfo;
@@ -71,105 +75,6 @@ public class GameScreen extends ChildScreen {
 	final int slot;
 	private float total_elapsed = 0f;
 
-	// private RunnableAction updateBoard = new RunnableAction(){
-	// public void run() {
-	// App.log(this, "updateBoard");
-	// for (int iy = 0; iy < GameBoard.height; iy++) {
-	// for (int ix = 0; ix < GameBoard.width; ix++) {
-	// final String img = UI.DISC;
-	// Color img_color;
-	// do {
-	// img_color = new Color(new Random().nextFloat(),
-	// new Random().nextFloat(), new Random().nextFloat(),
-	// 1f);
-	// } while (UI.luminance(img_color) < .6);
-	// gameboard.setImageAt(ix, iy, img);
-	// gameboard.setColorAt(ix, iy, img_color);
-	// }
-	// }
-	// gameboard.setImageAt(0, 0, UI.IMG_SYNC);
-	// gameboard.setChallenge_latin(deck.getCardByAnswer(Card.answer).challenge);
-	// };
-	// };
-
-	// private RunnableAction nextCard = new RunnableAction(){
-	// private Card previousCard;
-	// public void run() {
-	// App.log(this, "nextCard");
-	// do {
-	// Card = getNextCard();
-	// if (Card == null) {
-	// break;
-	// }
-	// if (!Card.equals(previousCard)) {
-	// break;
-	// }
-	// if (current_discards.deck.size() == 0
-	// && current_active.deck.size() == 0) {
-	// break;
-	// }
-	// Card.show_again_ms = Deck.getNextInterval(Card
-	// .correct_in_a_row + 1);
-	// previousCard = null;
-	// } while (true);
-	// if (Card == null) {
-	// App.log(this, "Card==null");
-	// if (total_elapsed < BOARD_TICK) {
-	// App.log(this, "session time is not up");
-	// if (current_discards.deck.size()+current_active.deck.size()==0) {
-	// Card newCard = nextCardForUse();
-	// App.log(this, "adding card to deck: "+newCard.answer);
-	// current_active.deck.add(newCard);
-	// stage.addAction(nextCard);
-	// return;
-	// }
-	// long shift_by_ms = getMinShiftTimeOf(current_discards);
-	// App.log(this, "shifting discards to zero point: "
-	// + (shift_by_ms / ONE_SECOND_ms));
-	// if (shift_by_ms >= 15l * ONE_SECOND_ms) {
-	// current_active.deck.add(nextCardForUse());
-	// }
-	// current_discards.updateTime(shift_by_ms);
-	// stage.addAction(nextCard);
-	// return;
-	// }
-	// /*
-	// * Session time is up, force time shift cards into active show
-	// * range...
-	// */
-	// if (total_elapsed > BOARD_TICK && current_discards.deck.size() > 0) {
-	// long shift_by_ms = getMinShiftTimeOf(current_discards);
-	// App.log(this, "shifting discards to zero point: "
-	// + (shift_by_ms / ONE_SECOND_ms));
-	// current_discards.updateTime(shift_by_ms);
-	// stage.addAction(nextCard);
-	// return;
-	// }
-	// if (total_elapsed > BOARD_TICK) {
-	// ready=false;
-	// App.log(this, "no cards remaining");
-	// info.activeDeck.deck.clear();
-	// info.activeDeck.deck.addAll(current_active.deck);
-	// info.activeDeck.deck.addAll(current_due.deck);
-	// info.activeDeck.deck.addAll(current_discards.deck);
-	// info.activeDeck.deck.addAll(current_done.deck);
-	// info.setElapsed_secs(total_elapsed);
-	// info.lastrun=System.currentTimeMillis();
-	// App.saveSlotInfo(slot, info);
-	// ui.getReadyDialog(new Runnable() {
-	// @Override
-	// public void run() {
-	// goodBye();
-	// }
-	// });
-	// return;
-	// }
-	// } else {
-	// stage.addAction(updateBoard);
-	// }
-	// };
-	// };
-
 	/**
 	 * holding area for cards that are "due" but deck size says don't show yet
 	 */
@@ -203,6 +108,9 @@ public class GameScreen extends ChildScreen {
 			gameboard.setRemaining(
 					sinceLastNextPendingCard_elapsed / CARD_TICK, 1f);
 			super.act(delta);
+			if (totalRight==0) {
+				gameboard.setActive(false);
+			}
 			return;
 		}
 		if (pending.cards.size() == 0) {
@@ -279,6 +187,7 @@ public class GameScreen extends ChildScreen {
 
 	private boolean bonus_round = false;
 
+	private int totalRight=0;
 	private void loadGameboardWith(Card card) {
 		gameboard.setChallenge_latin(card.challenge);
 		if (card.box==0 && card.correct_in_a_row==0) {
@@ -289,15 +198,39 @@ public class GameScreen extends ChildScreen {
 		}
 		boolean valid = false;
 		do {
+			totalRight=0;
 			for (int ix = 0; ix < GameBoard.width; ix++) {
 				for (int iy = 0; iy < GameBoard.height; iy++) {
 					int letter = r.nextInt('Ᏼ' - 'Ꭰ') + 'Ꭰ';
-					if (card.answer.equals(String.valueOf((char) letter))) {
+					final boolean isCorrect = card.answer.equals(String.valueOf((char) letter));
+					if (isCorrect) {
 						valid = true;
+						totalRight++;
 					}
 					StringBuilder img = getGlyphFilename(letter, true);
 					gameboard.setImageAt(ix, iy, img.toString());
 					gameboard.setColorAt(ix, iy, UI.randomBrightColor());
+					final int score = (card.box)+5+card.correct_in_a_row;
+					final int img_ix=ix;
+					final int img_iy=iy;
+					gameboard.getImageAt(ix, iy).addCaptureListener(new ClickListener(){
+						@Override
+						public boolean touchDown(InputEvent event, float x,
+								float y, int pointer, int button) {
+							event.getListenerActor().setTouchable(Touchable.disabled);
+							if (isCorrect) {
+								totalRight--;
+								gameboard.addToScore(score);
+								gameboard.setImageAt(img_ix, img_iy, UI.CHECKMARK);
+								gameboard.setColorAt(img_ix, img_iy, Color.GREEN);
+							} else {
+								gameboard.addToScore(-score);
+								gameboard.setImageAt(img_ix, img_iy, UI.HEAVYX);
+								gameboard.setColorAt(img_ix, img_iy, Color.RED);
+							}
+							return true;
+						}
+					});
 				}
 			}
 		} while (!valid);

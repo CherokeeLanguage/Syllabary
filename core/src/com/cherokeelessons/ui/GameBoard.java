@@ -23,13 +23,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.ui.UI.UIProgressBar;
 
 public class GameBoard extends Table {
-	public static final int height = 5;
-	public static final int width = 7;
+	public static final int height = 3;
+	public static final int width = 4;
 	private List<Cell<Image>> cell;
 	private List<String> file;
 	private Label challenge_latin;
@@ -91,7 +92,9 @@ public class GameBoard extends Table {
 		public static final String bar = "images/misc/bar.png";
 		public static final String p_bg = "images/misc/progress_bg.png";
 		public static final String p_fg = "images/misc/progress_fg.png";
+		public static final String disc = "images/misc/25cf_4.png";
 	}
+
 
 	private Table blocks;
 	private Image overlay_pause;
@@ -124,11 +127,11 @@ public class GameBoard extends Table {
 		blocks.defaults().pad(8);
 		cell = new ArrayList<>();
 		file = new ArrayList<>();
-		Image i = new Image();
+		Image disc = ui.loadImage(Res.disc);
 		for (int iy = 0; iy < height; iy++) {
 			blocks.row();
 			for (int ix = 0; ix < width; ix++) {
-				Cell<Image> image_cell = blocks.add(i).expand().fill();
+				Cell<Image> image_cell = blocks.add(disc);
 				cell.add(image_cell);
 				file.add(null);
 			}
@@ -181,7 +184,7 @@ public class GameBoard extends Table {
 		leftColumn.row();
 		leftTopCell = leftColumn.add(new Actor()).center().expandY();
 		leftColumn.row();
-		leftColumn.add(blocks).pad(15);
+		leftColumn.add(blocks).pad(15).expand().fill();
 		leftColumn.row();
 		leftBottomCell = leftColumn.add(new Actor()).center().expandY();
 
@@ -307,10 +310,6 @@ public class GameBoard extends Table {
 		if (actor!=null) {
 			actor.setColor(color);
 		}
-	}
-	
-	public void setImageAt(int x, int y, Image img) {
-		cell.get(getIndex(x, y)).setActor(img);
 	}
 	
 	public void setImageAt(int x, int y, String name) {

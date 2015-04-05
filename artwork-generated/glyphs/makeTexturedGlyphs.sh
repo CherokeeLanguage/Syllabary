@@ -14,16 +14,16 @@ mkdir "${DEST}"
 
 #inkscape -z -e "test.png" -d 90 -D test.svg
 
-for x in 63 0x25CF $(seq 5024 5108); do
+for x in 0x003f 0x2714 0x2718 0x25CF $(seq 5024 5108); do
 	h=$(printf "%04x" "$x")
 	i=$(printf "%04x" "$(($x+1))")
 	glyph="$(echo -e '\u'${h})"
 	ix=0
 	for svg in "textured-svg-src"/*.svg; do
 		cat "${svg}" | sed "s/Ꮝ/${glyph}/g" > "${DEST}/${h}_${ix}.svg"
-		inkscape -z -e "${DEST}/${h}_${ix}.png" -d 90 -D "${DEST}/${h}_${ix}.svg"
+		inkscape -z -e "${DEST}/${h}_${ix}.png" -d 180 -D "${DEST}/${h}_${ix}.svg"
 		rm "${DEST}/${h}_${ix}.svg"
-		gm mogrify -trim -scale 128x128 "${DEST}/${h}_${ix}.png"
+		gm mogrify -trim -scale 256x256 "${DEST}/${h}_${ix}.png"
 		ix=$(($ix+1))
 	done
 done
