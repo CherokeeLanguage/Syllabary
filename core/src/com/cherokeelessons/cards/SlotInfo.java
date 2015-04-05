@@ -12,25 +12,25 @@ public class SlotInfo implements Serializable {
 	public static final int PROFICIENT_BOX = 5;
 	private static final int StatsVersion = 1;
 	public static void calculateStatsFor(SlotInfo info) {
-		ActiveDeck activeDeck = info.activeDeck;
+		Deck activeDeck = info.deck;
 		/*
 		 * Set "level" to ceil(average box value) found in active deck. Negative
 		 * box values are ignored.
 		 */
 
 		int boxsum = 0;
-		for (ActiveCard card : activeDeck.deck) {
+		for (Card card : activeDeck.cards) {
 			boxsum += (card.box > 0 ? card.box : 0);
 		}
 		info.level = LevelName.forLevel((int) Math.ceil((double) (boxsum)
-				/ (double) activeDeck.deck.size()));
+				/ (double) activeDeck.cards.size()));
 
 		/*
 		 * How many are "fully learned" out of the active deck?
 		 */
 
 		info.longTerm = 0;
-		for (ActiveCard card : activeDeck.deck) {
+		for (Card card : activeDeck.cards) {
 			if (card.box >= FULLY_LEARNED_BOX) {
 				info.longTerm++;
 			}
@@ -39,14 +39,14 @@ public class SlotInfo implements Serializable {
 		/*
 		 * count all active cards that aren't "fully learned"
 		 */
-		info.activeCards = activeDeck.deck.size() - info.longTerm;
+		info.activeCards = activeDeck.cards.size() - info.longTerm;
 
 		/*
 		 * How many are "well known" out of the active deck? (excluding full
 		 * learned ones)
 		 */
 		info.mediumTerm = 0;
-		for (ActiveCard card : activeDeck.deck) {
+		for (Card card : activeDeck.cards) {
 			if (card.box >= PROFICIENT_BOX && card.box < FULLY_LEARNED_BOX) {
 				info.mediumTerm++;
 			}
@@ -57,14 +57,14 @@ public class SlotInfo implements Serializable {
 		 * full learned ones)
 		 */
 		info.shortTerm = 0;
-		for (ActiveCard card : activeDeck.deck) {
+		for (Card card : activeDeck.cards) {
 			if (card.box >= JUST_LEARNED_BOX && card.box < PROFICIENT_BOX) {
 				info.shortTerm++;
 			}
 		}
 	}
 	public int activeCards = 0;
-	public ActiveDeck activeDeck=new ActiveDeck();
+	public Deck deck=new Deck();
 	public long lastrun;
 	public int lastScore;
 	public LevelName level;
@@ -84,7 +84,7 @@ public class SlotInfo implements Serializable {
 
 	public SlotInfo(SlotInfo info) {
 		this.activeCards = info.activeCards;
-		this.activeDeck=new ActiveDeck(info.activeDeck);
+		this.deck=new Deck(info.deck);
 		this.lastrun=info.lastrun;
 		this.lastScore=info.lastScore;
 		this.level = info.level;

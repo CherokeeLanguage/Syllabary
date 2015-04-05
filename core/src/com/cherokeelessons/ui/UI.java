@@ -1,5 +1,7 @@
 package com.cherokeelessons.ui;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.assets.AssetManager;
@@ -236,6 +238,10 @@ public class UI {
 		return new Image(loadTexture(name));
 	}
 	
+	public TextureRegionDrawable loadTextureRegionDrawable(String name) {
+		return new TextureRegionDrawable(new TextureRegion(loadTexture(name)));
+	}
+	
 	public Texture loadTexture(String name) {
 		TextureParameter tp = new TextureParameter();
 		tp.magFilter = TextureFilter.Linear;
@@ -253,7 +259,7 @@ public class UI {
 	 * Customized window style for dialogs that has a "dimmed" stage background.
 	 * Really needs to use a nine-path for the direct background to have proper borders.
 	 */
-	public WindowStyle getDialogStyle() {
+	public WindowStyle getDialogStyle(boolean dim) {
 		WindowStyle ws = getWs();
 		ws.titleFont=Fonts.Large.get();
 		TiledDrawable td = new TiledDrawable(new TextureRegion(loadTexture(BG)));
@@ -261,12 +267,18 @@ public class UI {
 		td.setMinWidth(0);
 		td.setTopHeight(ws.titleFont.getCapHeight()+20);
 		ws.background=td;
+		if (dim) {
+			ws.stageBackground=new TextureRegionDrawable(new TextureRegion(loadTexture(DIM)));
+		}
 		return ws;
 	}
 	
 	public static class UIDialog extends Dialog {
 		public UIDialog(String title, UI ui) {
-			super(title, ui.getDialogStyle());
+			this(title, false, ui);
+		}
+		public UIDialog(String title, boolean dim, UI ui) {
+			super(title, ui.getDialogStyle(dim));
 		}
 	}
 	
@@ -548,5 +560,21 @@ public class UI {
 		dialog.text(new Label("Begin!", getLsLarge()));
 		dialog.button(Yes);
 		return dialog;
+	}
+
+	public static Color randomBrightColor() {
+		Random r = new Random();
+		Color img_color;
+		do {
+			img_color = new Color(r.nextFloat(), r.nextFloat(),
+					r.nextFloat(), 1f);
+		} while (UI.luminance(img_color) < .6);
+		return img_color;
+	}
+
+	public LabelStyle getLsXLarge() {
+		LabelStyle style = new LabelStyle(getSkin().get(LabelStyle.class));
+		style.font = Fonts.XLarge.get();
+		return style;
 	}
 }

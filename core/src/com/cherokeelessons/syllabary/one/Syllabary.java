@@ -20,6 +20,16 @@ public class Syllabary {
 				card.answer=String.valueOf(syll);
 				card.challenge=getLatinFor(syll);
 				card.id=syll;
+				
+				card.box=0;
+				card.correct_in_a_row=0;
+				card.newCard=true;
+				card.noErrors=true;
+				card.show_again_ms=0;
+				card.showCount=0;
+				card.showTime=0f;
+				card.tries_remaining=0;
+				
 				deck.cards.add(card);
 			}
 		}

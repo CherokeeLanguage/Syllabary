@@ -30,12 +30,10 @@ import com.cherokeelessons.ui.UI.UIProgressBar;
 public class GameBoard extends Table {
 	public static final int height = 5;
 	public static final int width = 7;
-	private Texture bar = null;
 	private List<Cell<Image>> cell;
 	private List<String> file;
 	private Label challenge_latin;
 	private Image challenge_pic;
-	private Cell<Image> challenge;
 	private Cell<Actor> leftBottomCell;
 
 	private Cell<Actor> leftTopCell;
@@ -44,7 +42,6 @@ public class GameBoard extends Table {
 
 	private TextButton pause;
 
-	private Texture question = null;
 	private Label lbl_score;
 	private Label points_value;
 
@@ -103,7 +100,6 @@ public class GameBoard extends Table {
 		this.ui=ui;
 		this.gs=gs;
 		stage.addActor(this);
-		question = ui.loadTexture(Res.question);
 
 		setFillParent(true);
 		defaults().expandX().fill();
@@ -138,16 +134,15 @@ public class GameBoard extends Table {
 				file.add(null);
 			}
 		}
-		bar = ui.loadTexture(Res.bar);
-		final Image topFillerBar = new Image(bar);
+		final Image topFillerBar = ui.loadImage(Res.bar);
 		topFillerBar.setScaling(Scaling.fit);
-		final Image bottomFillerBar = new Image(bar);
+		final Image bottomFillerBar = ui.loadImage(Res.bar);
 		bottomFillerBar.setScaling(Scaling.fit);
 
 		lbl_score = new Label("000000000", ls);
 		points_value = new Label("5", ls);
-		challenge_latin = new Label("GWA", ls);
-		challenge_pic = new Image(question);
+		challenge_latin = new Label("gwa", ui.getLsXLarge());
+		challenge_pic = new Image(ui.loadTextureRegionDrawable(Res.question));
 		challenge_pic.setScaling(Scaling.fit);
 		mainMenu = new TextButton("BACK", tbs);
 		mute = new TextButton("MUTE", tbs);
@@ -202,11 +197,11 @@ public class GameBoard extends Table {
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
+		rightColumn.add(challenge_pic);
+		rightColumn.row();
 		rightColumn.add(challenge_latin);
-		rightColumn.row();
-		challenge = rightColumn.add(challenge_pic);
-		rightColumn.row();
-		rightColumn.add(points_value);
+//		rightColumn.row();
+//		rightColumn.add(points_value);
 		rightColumn.row();
 		rightColumn.add().expandY();
 		rightColumn.row();
@@ -222,6 +217,8 @@ public class GameBoard extends Table {
 		return remaining.getValue();
 	}
 
+	private float percent_prev = -1f;
+	
 	public void setRemaining(float percent, float interval) {
 		setRemaining(percent, true, interval);
 	}
@@ -231,7 +228,11 @@ public class GameBoard extends Table {
 			percent = 1f;
 		if (percent < 0f)
 			percent = 0f;
-		remaining.setValue(percent, animate, interval);
+		percent = Math.round(percent);
+		if (percent != percent_prev) {
+			remaining.setValue(percent, animate, interval);
+			percent_prev=percent;
+		}
 	}
 
 	public String getChallenge_latin() {
@@ -297,10 +298,6 @@ public class GameBoard extends Table {
 		lbl_score.layout();
 	}
 
-	public Image getChallenge_image() {
-		return challenge.getActor();
-	}
-
 	public Image getImageAt(int x, int y) {
 		return cell.get(getIndex(x, y)).getActor();
 	}
@@ -360,5 +357,30 @@ public class GameBoard extends Table {
 
 	public void setDoElapsed(boolean doElapsed) {
 		this.doElapsed = doElapsed;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	private boolean active=false;
+	public void setActive(boolean b) {
+		active=b;
+	}
+
+	private String challenge_img;
+	public void setChallenge_img(String file) {
+		if (challenge_img!=null) {
+			ui.unloadTexture(challenge_img);
+		}
+		challenge_img=file;
+		if (challenge_img!=null) {
+			challenge_pic.setDrawable(ui.loadTextureRegionDrawable(file));
+		} else {
+			challenge_pic.setDrawable(null);
+		}
 	}
 }
