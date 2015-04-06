@@ -158,6 +158,9 @@ public class Deck implements Serializable {
 		while (istat.hasNext()) {
 			Card next = istat.next();
 			next.show_again_ms -= ms;
+			if (next.show_again_ms<0l) {
+				next.show_again_ms=0l;
+			}
 		}
 	}
 	
@@ -169,7 +172,7 @@ public class Deck implements Serializable {
 	 */
 	public long getMinShiftTimeOf() {
 		if (cards.size() == 0) {
-			return 0;
+			return 0l;
 		}
 		long by = Long.MAX_VALUE;
 		Iterator<Card> icard = cards.iterator();
@@ -185,7 +188,7 @@ public class Deck implements Serializable {
 		if (by == Long.MAX_VALUE) {
 			by = ONE_MINUTE_ms;
 		}
-		return by;
+		return by>0l?by:0l;
 	}
 
 	/**

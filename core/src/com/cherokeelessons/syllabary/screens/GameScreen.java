@@ -25,7 +25,7 @@ public class GameScreen extends ChildScreen {
 
 	private static final float BOARD_TICK = 120f;
 	private static final float CARD_TICK = 15f;
-	private static final int MinCardsInPlay = 7;
+	private static final int MinCardsInPlay = 3;
 	private static final long ONE_DAY_ms;
 	private static final long ONE_HOUR_ms;
 	private static final long ONE_MINUTE_ms;
@@ -41,31 +41,36 @@ public class GameScreen extends ChildScreen {
 
 	private float challenge_elapsed = 0f;
 	private boolean dialogShowing = false;
-	/**
-	 * holding area for cards that have just been displayed
-	 */
-	private final Deck discards = new Deck();
-
-	/**
-	 * holding area for cards with no more scheduled showings for this session
-	 */
-	private final Deck finished = new Deck();
 
 	private GameBoard gameboard;
 
 	private SlotInfo info;
 
-	/**
-	 * master copy of all cards
-	 */
-	private Deck master_deck = null;
 
 	private final Set<String> nodupes = new HashSet<String>();
 
-	/**
-	 * currently being looped through for display
-	 */
-	private final Deck pending = new Deck();
+	public static class Decks {
+		/**
+		 * master copy of all cards
+		 */
+		public Deck master = null;
+		/**
+		 * the deck we are starting out with
+		 */
+		public Deck starting = null;
+		/**
+		 * currently being looped through for display
+		 */
+		public final Deck pending = new Deck();
+		/**
+		 * holding area for cards that have just been displayed
+		 */
+		public final Deck discards = new Deck();
+		/**
+		 * holding area for cards with no more scheduled showings for this session
+		 */
+		public final Deck finished = new Deck();
+	}
 
 	/**
 	 * time since last "shuffle"
@@ -74,20 +79,17 @@ public class GameScreen extends ChildScreen {
 
 	final int slot;
 	private float total_elapsed = 0f;
-
-	/**
-	 * holding area for cards that are "due" but deck size says don't show yet
-	 */
-	private Deck user_deck = null;
+	private Decks decks;
 
 	public GameScreen(Screen caller, int slot) {
 		super(caller);
 		this.slot = slot;
+		this.decks = new Decks();
 	}
 
 	@Override
 	public void act(float delta) {
-		if (master_deck == null) {
+		if (decks.master == null) {
 			loadMasterdeck();
 			return;
 		}
@@ -113,12 +115,12 @@ public class GameScreen extends ChildScreen {
 			}
 			return;
 		}
-		if (pending.cards.size() == 0) {
+		if (decks.pending.cards.size() == 0) {
 			shuffle();
 			return;
 		}
 		Card card = getNextPendingCard();
-		discards.cards.add(card);
+		decks.discards.cards.add(card);
 		if (card.newCard) {
 			newCardDialog(card);
 			card.show_again_ms = Deck.getNextInterval(0);
@@ -130,24 +132,23 @@ public class GameScreen extends ChildScreen {
 	}
 
 	private Card getNextPendingCard() {
-		pending.updateTime(sinceLastNextPendingCard_elapsed);
+		decks.pending.updateTime(sinceLastNextPendingCard_elapsed);
 		sinceLastNextPendingCard_elapsed = 0f;
-		if (pending.getMinShiftTimeOf() > 10l * ONE_SECOND_ms) {
-			pending.updateTime(pending.getMinShiftTimeOf());
+		long minShiftTimeOf = decks.pending.getMinShiftTimeOf()/ONE_SECOND_ms;
+		App.log(this, "Min Shift Time Of: " + minShiftTimeOf);
+		if (minShiftTimeOf > 60l) {
+			decks.pending.updateTime(minShiftTimeOf);
 			Card nextAvailableCard = getNextAvailableCard();
 			App.log(this, "Adding '" + nextAvailableCard.answer
 					+ "' to pending deck.");
-			pending.cards.add(nextAvailableCard);
-			pending.shuffle();
-			pending.sortByShowTime();
+			return nextAvailableCard;
 		}
-		;
-		return pending.cards.remove(0);
+		return decks.pending.cards.remove(0);
 	}
 
 	private void endSession() {
 		// TODO Auto-generated method stub
-
+		App.log(this, "Session Complete: "+total_elapsed);
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class GameScreen extends ChildScreen {
 	 * @return
 	 */
 	private Card getNextAvailableCard() {
-		Iterator<Card> ideck = master_deck.cards.iterator();
+		Iterator<Card> ideck = decks.master.cards.iterator();
 		while (ideck.hasNext()) {
 			Card next = ideck.next();
 			if (nodupes.contains(next.answer)) {
@@ -170,14 +171,10 @@ public class GameScreen extends ChildScreen {
 			nodupes.add(card.answer);
 			return card;
 		}
-		finished.clampToMinutes();
-		finished.shuffle();
-		finished.sortByShowTime();
-		ideck = finished.cards.iterator();
-		Card card = ideck.next();
-		ideck.remove();
-		card.reset();
-		return card;
+		decks.finished.clampToMinutes();
+		decks.finished.shuffle();
+		decks.finished.sortByShowTime();
+		return decks.finished.cards.remove(0);
 	}
 
 	@Override
@@ -188,7 +185,7 @@ public class GameScreen extends ChildScreen {
 	private boolean bonus_round = false;
 
 	private int totalRight=0;
-	private void loadGameboardWith(Card card) {
+	private void loadGameboardWith(final Card card) {
 		gameboard.setChallenge_latin(card.challenge);
 		if (card.box==0 && card.correct_in_a_row==0) {
 			String answer_img = getGlyphFilename(card.answer.charAt(0), false).toString();
@@ -223,10 +220,21 @@ public class GameScreen extends ChildScreen {
 								gameboard.addToScore(score);
 								gameboard.setImageAt(img_ix, img_iy, UI.CHECKMARK);
 								gameboard.setColorAt(img_ix, img_iy, Color.GREEN);
+								card.correct_in_a_row++;
 							} else {
 								gameboard.addToScore(-score);
 								gameboard.setImageAt(img_ix, img_iy, UI.HEAVYX);
 								gameboard.setColorAt(img_ix, img_iy, Color.RED);
+								card.correct_in_a_row=0;
+								card.tries_remaining++;
+								card.noErrors=false;
+							}
+							card.show_again_ms=Deck.getNextInterval(card.correct_in_a_row);
+							card.tries_remaining--;
+							if (card.tries_remaining==0) {
+								decks.finished.cards.add(card);
+								decks.discards.cards.remove(card);
+								decks.pending.cards.remove(card);
 							}
 							return true;
 						}
@@ -258,36 +266,36 @@ public class GameScreen extends ChildScreen {
 	}
 
 	private void loadMasterdeck() {
-		master_deck = Syllabary.getDeck();
+		decks.master = Syllabary.getDeck();
 	}
 
 	private void loadUserdeck() {
 		info = App.getSlotInfo(slot);
-		user_deck = new Deck(info.deck);
-		user_deck.updateTime(ONE_DAY_ms + ONE_HOUR_ms);
+		decks.starting = new Deck(info.deck);
+		decks.starting.updateTime(ONE_DAY_ms + ONE_HOUR_ms);
 		/*
 		 * Make sure we don't have active cards pointing to no longer existing
 		 * master deck cards
 		 */
-		Iterator<Card> ipending = user_deck.cards.iterator();
+		Iterator<Card> ipending = decks.starting.cards.iterator();
 		while (ipending.hasNext()) {
 			Card active = ipending.next();
-			if (master_deck.cards.contains(active)) {
+			if (decks.master.cards.contains(active)) {
 				continue;
 			}
 			ipending.remove();
 			App.log(this, "Removed no longer valid entry: " + active.answer);
 		}
-		user_deck.resetScoring();
-		user_deck.resetCorrectInARow();
-		user_deck.resetRetriesCount();
-		user_deck.resetErrorMarker();
-		user_deck.clampBoxes();
-		user_deck.clampToMinutes();
-		user_deck.shuffle();
-		user_deck.sortByShowTime();
-		trackAlreadyCards(user_deck);
-		retireNotYetCards(user_deck);
+		decks.starting.resetScoring();
+		decks.starting.resetCorrectInARow();
+		decks.starting.resetRetriesCount();
+		decks.starting.resetErrorMarker();
+		decks.starting.clampBoxes();
+		decks.starting.clampToMinutes();
+		decks.starting.shuffle();
+		decks.starting.sortByShowTime();
+		trackAlreadyCards(decks.starting);
+		retireNotYetCards(decks.starting);
 	}
 
 	private void newCardDialog(Card card) {
@@ -309,13 +317,13 @@ public class GameScreen extends ChildScreen {
 	}
 
 	private void reinsertCard(Card card) {
-		if (pending.size()<2) {
-			pending.cards.add(card);
+		if (decks.pending.size()<2) {
+			decks.pending.cards.add(card);
 		} else {
-			pending.cards.add(1, card);
+			decks.pending.cards.add(1, card);
 		}
-		discards.cards.remove(card);
-		finished.cards.remove(card);
+		decks.discards.cards.remove(card);
+		decks.finished.cards.remove(card);
 	}
 
 	private void retireNotYetCards(Deck deck) {
@@ -326,10 +334,10 @@ public class GameScreen extends ChildScreen {
 					&& card.box < SlotInfo.PROFICIENT_BOX) {
 				continue;
 			}
-			finished.cards.add(card);
+			decks.finished.cards.add(card);
 			icard.remove();
 		}
-		App.log(this, "Moved " + finished.cards.size() + " future pending"
+		App.log(this, "Moved " + decks.finished.cards.size() + " future pending"
 				+ " or fully learned cards into the 'finished' deck.");
 	}
 
@@ -343,14 +351,17 @@ public class GameScreen extends ChildScreen {
 	 * Loads pending with discards, user_deck, and deck
 	 */
 	private void shuffle() {
-		discards.shuffle();
-		pending.loadAll(discards);
-		while (pending.size() < MinCardsInPlay) {
+		decks.discards.shuffle();
+		decks.pending.loadAll(decks.discards);
+		decks.pending.sortByShowTime();
+		/*
+		 * add new cards to the end of the current deck
+		 */
+		while (decks.pending.size() < MinCardsInPlay) {
 			Card nextAvailableCard = getNextAvailableCard();
 			App.log(this, "Added card: '" + nextAvailableCard.answer + "'");
-			pending.cards.add(nextAvailableCard);
+			decks.pending.cards.add(nextAvailableCard);
 		}
-		pending.sortByShowTime();
 	}
 
 	/**

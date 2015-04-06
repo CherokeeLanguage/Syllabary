@@ -23,14 +23,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.ui.UI.UIProgressBar;
 
 public class GameBoard extends Table {
-	public static final int height = 3;
-	public static final int width = 4;
+	public static final int height = 2;
+	public static final int width = 3;
 	private List<Cell<Image>> cell;
 	private List<String> file;
 	private Label challenge_latin;
@@ -95,7 +94,6 @@ public class GameBoard extends Table {
 		public static final String disc = "images/misc/25cf_4.png";
 	}
 
-
 	private Table blocks;
 	private Image overlay_pause;
 	public GameBoard(Stage stage, UI ui, GameSound gs) {
@@ -104,7 +102,6 @@ public class GameBoard extends Table {
 		stage.addActor(this);
 
 		setFillParent(true);
-		defaults().expandX().fill();
 		
 		Texture t = ui.loadTexture(UI.BG);
 		TextureRegion tr = new TextureRegion(t);
@@ -124,16 +121,21 @@ public class GameBoard extends Table {
 			}
 		};
 		blocks.setTouchable(Touchable.childrenOnly);
-		blocks.defaults().pad(8);
+		blocks.defaults().pad(8).uniform().fill().expand();
 		cell = new ArrayList<>();
 		file = new ArrayList<>();
-		Image disc = ui.loadImage(Res.disc);
 		for (int iy = 0; iy < height; iy++) {
 			blocks.row();
 			for (int ix = 0; ix < width; ix++) {
-				Cell<Image> image_cell = blocks.add(disc);
+				Cell<Image> image_cell = blocks.add((Image)null);
 				cell.add(image_cell);
 				file.add(null);
+			}
+		}
+		for (int ix=0; ix<width;ix++) {
+			for (int iy=0; iy<height;iy++) {
+				setImageAt(ix, iy, Res.disc);
+				setColorAt(ix, iy, UI.randomBrightColor());
 			}
 		}
 		final Image topFillerBar = ui.loadImage(Res.bar);
@@ -182,11 +184,11 @@ public class GameBoard extends Table {
 		leftColumn.defaults().pad(0).space(0).center();
 		add(leftColumn).fill().expand();
 		leftColumn.row();
-		leftTopCell = leftColumn.add(new Actor()).center().expandY();
+		leftTopCell = leftColumn.add((Actor)null).center().expandY();
 		leftColumn.row();
 		leftColumn.add(blocks).pad(15).expand().fill();
 		leftColumn.row();
-		leftBottomCell = leftColumn.add(new Actor()).center().expandY();
+		leftBottomCell = leftColumn.add((Actor)null).center().expandY();
 
 		Table rightColumn = new Table();
 		rightColumn.defaults().pad(0).space(0).center();
@@ -260,7 +262,7 @@ public class GameBoard extends Table {
 		float delay = 0f;
 		final boolean whip = amount < 0;
 		do  {
-			amount /= 7;
+			amount /= 6;
 			Action u1 = null;
 			final int tmp = amount;
 			u1 = Actions.run(new Runnable() {
