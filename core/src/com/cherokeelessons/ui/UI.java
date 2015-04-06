@@ -597,7 +597,7 @@ public class UI {
 		do {
 			img_color = new Color(r.nextFloat(), r.nextFloat(),
 					r.nextFloat(), 1f);
-		} while (UI.luminance(img_color) < .6);
+		} while (UI.luminance(img_color) < .4);
 		return img_color;
 	}
 

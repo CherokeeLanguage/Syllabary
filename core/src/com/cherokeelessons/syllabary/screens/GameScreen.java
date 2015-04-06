@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
 import com.cherokeelessons.cards.Deck;
+import com.cherokeelessons.cards.DisplayMode;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Syllabary;
@@ -250,7 +251,11 @@ public class GameScreen extends ChildScreen {
 	}
 
 	private void loadGameboardWith(final Card card) {
-		gameboard.setChallenge_latin(card.challenge);
+		if (info.settings.display.equals(DisplayMode.Latin)){
+			gameboard.setChallenge_latin(card.challenge);
+		} else {
+			gameboard.setChallenge_latin("");
+		}
 		if (card.box == 0 && card.correct_in_a_row == 0) {
 			String answer_img = getGlyphFilename(card.answer.charAt(0), 1)
 					.toString();

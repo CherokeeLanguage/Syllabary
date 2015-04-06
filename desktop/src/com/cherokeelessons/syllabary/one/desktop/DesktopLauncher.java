@@ -13,8 +13,8 @@ public class DesktopLauncher {
 				.getDefaultScreenDevice();
 		int width = (70 * gd.getDisplayMode().getWidth()) / 100;
 		int height = (70 * gd.getDisplayMode().getHeight()) / 100;
-//		width=2048/2;
-//		height=1536/2;
+		width=2048/2;
+		height=1536/2;
 //		width=1280;
 //		height=720;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
