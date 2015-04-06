@@ -9,6 +9,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -35,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
@@ -61,6 +63,8 @@ public class UI {
 	public static final String IMG_SYNC = "images/misc/refresh.png";
 	public static final String HEAVYX = "images/misc/2718_5.png";
 	public static final String CHECKMARK = "images/misc/2714_5.png";
+	
+	public static final String DIALOG9 = "images/ninepatch/dialog-9patch.png";
 	
 	private final AssetManager manager;
 
@@ -93,6 +97,16 @@ public class UI {
 				TextButtonStyle.class));
 		tbs.font = Fonts.Small.get();
 		return tbs;
+	}
+	
+	public NinePatch getDialog9(){
+		Texture t9 = loadTexture(DIALOG9);
+		int left=40;
+		int right=40;
+		int top=40;
+		int bottom=40;
+		NinePatch p9 = new NinePatch(t9, left, right, top, bottom);
+		return p9;
 	}
 
 	public WindowStyle getWs() {
@@ -210,9 +224,9 @@ public class UI {
 
 		@Override
 		protected void sizeChanged() {
+			super.sizeChanged();
 			f_img.setWidth(getWidth());
 			b_img.setWidth(getWidth());
-			super.sizeChanged();
 		}
 	}
 
@@ -275,12 +289,25 @@ public class UI {
 		return ws;
 	}
 	
+	public WindowStyle getDialogStyle9(boolean dim) {
+		NinePatch dialog9 = getDialog9();
+		NinePatchDrawable background = new NinePatchDrawable(dialog9);
+		WindowStyle ws = getWs();
+		ws.titleFont=Fonts.Large.get();
+		background.setTopHeight(ws.titleFont.getCapHeight()+48);
+		ws.background=background;
+		if (dim) {
+			ws.stageBackground=new TextureRegionDrawable(new TextureRegion(loadTexture(DIM)));
+		}
+		return ws;
+	}
+	
 	public static class UIDialog extends Dialog {
 		public UIDialog(String title, UI ui) {
-			this(title, false, ui);
+			this(title, false, false, ui);
 		}
-		public UIDialog(String title, boolean dim, UI ui) {
-			super(title, ui.getDialogStyle(dim));
+		public UIDialog(String title, boolean dim, boolean nine, UI ui) {
+			super(title, nine?ui.getDialogStyle9(dim):ui.getDialogStyle(dim));
 		}
 	}
 	

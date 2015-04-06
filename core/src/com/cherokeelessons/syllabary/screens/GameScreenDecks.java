@@ -46,4 +46,14 @@ public class GameScreenDecks {
 		}
 		return letter;
 	}
+	/**
+	 * Remove this card from all decks.
+	 * @param card
+	 */
+	public void remove(Card card) {
+		this.discards.cards.remove(card);
+		this.finished.cards.remove(card);
+		this.pending.cards.remove(card);
+		this.reserved.cards.remove(card);
+	}
 }

@@ -235,9 +235,9 @@ public class GameBoard extends Table {
 			percent = 1f;
 		if (percent < 0f)
 			percent = 0f;
-		int ipercent = (int) (percent*100);
+		int ipercent = (int) (percent*1000);
 		if (ipercent != percent_prev) {
-			remaining.setValue(ipercent/100f, animate, interval);
+			remaining.setValue(ipercent/1000f, animate, interval);
 			percent_prev=ipercent;
 		}
 	}
@@ -266,7 +266,7 @@ public class GameBoard extends Table {
 	public synchronized void addToScore(int amount) {
 		score += amount;
 		float delay = 0f;
-		final boolean whip = amount < 0;
+		final boolean lost_points = amount < 0;
 		do  {
 			amount /= 6;
 			Action u1 = null;
@@ -274,10 +274,10 @@ public class GameBoard extends Table {
 			u1 = Actions.run(new Runnable() {
 				@Override
 				public void run() {
-					if (whip) {
-						gs.whip_pop();
+					if (lost_points) {
+						gs.pointsDeducted();
 					} else {
-						gs.ding();
+						gs.pointsAdded();
 					}
 					updateScoreDisplay(score - tmp);
 				}
