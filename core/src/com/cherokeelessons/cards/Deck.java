@@ -11,8 +11,21 @@ public class Deck implements Serializable {
 	private static Comparator<Card> byShowTime = new Comparator<Card>() {
 		@Override
 		public int compare(Card o1, Card o2) {
-			if (o1.show_again_ms != o2.show_again_ms) {
-				return o1.show_again_ms > o2.show_again_ms ? 1 : -1;
+			long a = o1.show_again_ms;
+			long b = o2.show_again_ms;
+			if (a != b) {
+				return a > b ? 1 : -1;
+			}
+			return o1.box - o2.box;
+		}
+	};
+	private static Comparator<Card> byShowTimeMinutes = new Comparator<Card>() {
+		@Override
+		public int compare(Card o1, Card o2) {
+			long a = o1.show_again_ms/ONE_MINUTE_ms;
+			long b = o2.show_again_ms/ONE_MINUTE_ms;
+			if (a != b) {
+				return a > b ? 1 : -1;
 			}
 			return o1.box - o2.box;
 		}
@@ -136,6 +149,9 @@ public class Deck implements Serializable {
 	public void shuffle() {
 		Collections.shuffle(cards);
 	}
+	public void sortByShowTimeMinutes() {
+		Collections.sort(cards, byShowTimeMinutes);
+	}
 	public void sortByShowTime() {
 		Collections.sort(cards, byShowTime);
 	}
@@ -188,7 +204,7 @@ public class Deck implements Serializable {
 		if (by == Long.MAX_VALUE) {
 			by = ONE_MINUTE_ms;
 		}
-		return by>0l?by:0l;
+		return by;
 	}
 
 	/**

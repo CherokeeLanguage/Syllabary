@@ -92,6 +92,7 @@ public class GameBoard extends Table {
 		public static final String p_bg = "images/misc/progress_bg.png";
 		public static final String p_fg = "images/misc/progress_fg.png";
 		public static final String disc = "images/misc/25cf_4.png";
+		public static final String vbar = "images/misc/vbar.png";;
 	}
 
 	private Table blocks;
@@ -100,7 +101,7 @@ public class GameBoard extends Table {
 		this.ui=ui;
 		this.gs=gs;
 		stage.addActor(this);
-
+		setTransform(true);
 		setFillParent(true);
 		
 		Texture t = ui.loadTexture(UI.BG);
@@ -164,7 +165,7 @@ public class GameBoard extends Table {
 		remaining = new UIProgressBar(p_bg, p_fg);
 		remaining.setValue(0, false, 0f);
 		row();
-		final Table leftColumn = new Table() {
+		final Table rightColumn = new Table() {
 			@Override
 			public void layout() {
 				super.layout();
@@ -181,37 +182,42 @@ public class GameBoard extends Table {
 				}
 			}
 		};
-		leftColumn.defaults().pad(0).space(0).center();
-		add(leftColumn).fill().expand();
-		leftColumn.row();
-		leftTopCell = leftColumn.add((Actor)null).center().expandY();
-		leftColumn.row();
-		leftColumn.add(blocks).pad(15).expand().fill();
-		leftColumn.row();
-		leftBottomCell = leftColumn.add((Actor)null).center().expandY();
-
-		Table rightColumn = new Table();
 		rightColumn.defaults().pad(0).space(0).center();
-		add(rightColumn).right();
+		
 		rightColumn.row();
-		rightColumn.add(remaining).fillX().pad(10).padTop(15).padBottom(0);
+		leftTopCell = rightColumn.add((Actor)null).center().expandY();
 		rightColumn.row();
-		rightColumn.add(lbl_score);
+		rightColumn.add(blocks).pad(15).expand().fill();
 		rightColumn.row();
-		rightColumn.add().expandY();
-		rightColumn.row();
-		rightColumn.add(challenge_pic);
-		rightColumn.row();
-		rightColumn.add(challenge_latin);
-		rightColumn.row();
-		rightColumn.add().expandY();
-		rightColumn.row();
-		rightColumn.add(pause).fillX();
-		rightColumn.row();
-		rightColumn.add(mute).fillX();
-		rightColumn.row();
-		rightColumn.add(mainMenu).fillX();
-		leftColumn.toFront();
+		leftBottomCell = rightColumn.add((Actor)null).center().expandY();
+
+		Table leftColumn = new Table();
+		leftColumn.defaults().pad(0).space(0).center();
+		leftColumn.row();
+		leftColumn.add(remaining).fillX().pad(10).padTop(15).padBottom(0);
+		leftColumn.row();
+		leftColumn.add(lbl_score);
+		leftColumn.row();
+		leftColumn.add().expandY();
+		leftColumn.row();
+		leftColumn.add(challenge_pic);
+		leftColumn.row();
+		leftColumn.add(challenge_latin);
+		leftColumn.row();
+		leftColumn.add().expandY();
+		leftColumn.row();
+		leftColumn.add(pause).fillX();
+		leftColumn.row();
+		leftColumn.add(mute).fillX();
+		leftColumn.row();
+		leftColumn.add(mainMenu).fillX();
+		add(leftColumn);
+		Image sep = ui.loadImage(Res.vbar);
+		sep.setScaling(Scaling.fit);
+		add(sep).padLeft(4f).padRight(4f);
+		add(rightColumn).fill().expand();
+		
+		rightColumn.toFront();
 	}
 
 	public float getRemaining() {

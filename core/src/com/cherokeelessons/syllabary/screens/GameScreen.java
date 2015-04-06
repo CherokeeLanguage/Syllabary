@@ -2,6 +2,7 @@ package com.cherokeelessons.syllabary.screens;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -23,9 +24,9 @@ import com.cherokeelessons.ui.UI.UIDialog;
 
 public class GameScreen extends ChildScreen {
 
-	private static final float BOARD_TICK = 120f;
+	private static final float BOARD_TICK = 2f * 60f + 30f;
 	private static final float CARD_TICK = 15f;
-	private static final int MinCardsInPlay = 3;
+	private static final int MinCardsInPlay = 7;
 	private static final long ONE_DAY_ms;
 	private static final long ONE_HOUR_ms;
 	private static final long ONE_MINUTE_ms;
@@ -46,45 +47,21 @@ public class GameScreen extends ChildScreen {
 
 	private SlotInfo info;
 
-
 	private final Set<String> nodupes = new HashSet<String>();
-
-	public static class Decks {
-		/**
-		 * master copy of all cards
-		 */
-		public Deck master = null;
-		/**
-		 * the deck we are starting out with
-		 */
-		public Deck starting = null;
-		/**
-		 * currently being looped through for display
-		 */
-		public final Deck pending = new Deck();
-		/**
-		 * holding area for cards that have just been displayed
-		 */
-		public final Deck discards = new Deck();
-		/**
-		 * holding area for cards with no more scheduled showings for this session
-		 */
-		public final Deck finished = new Deck();
-	}
 
 	/**
 	 * time since last "shuffle"
 	 */
-	private float sinceLastNextPendingCard_elapsed = 0f;
+	private float currentCard_elapsed = 0f;
 
 	final int slot;
 	private float total_elapsed = 0f;
-	private Decks decks;
+	private GameScreenDecks decks;
 
 	public GameScreen(Screen caller, int slot) {
 		super(caller);
 		this.slot = slot;
-		this.decks = new Decks();
+		this.decks = new GameScreenDecks();
 	}
 
 	@Override
@@ -101,42 +78,44 @@ public class GameScreen extends ChildScreen {
 			super.act(delta);
 			return;
 		}
-		if (total_elapsed > BOARD_TICK) {
-			endSession();
-			return;
-		}
 		if (gameboard.isActive()) {
 			updateTimes(delta);
-			gameboard.setRemaining(
-					sinceLastNextPendingCard_elapsed / CARD_TICK, 1f);
+			gameboard.setRemaining(currentCard_elapsed / CARD_TICK, 1f);
 			super.act(delta);
-			if (totalRight==0) {
+			if (totalRight == 0) {
 				gameboard.setActive(false);
 			}
+			return;
+		}
+		if (total_elapsed > BOARD_TICK) {
+			endSession();
 			return;
 		}
 		if (decks.pending.cards.size() == 0) {
 			shuffle();
 			return;
 		}
-		Card card = getNextPendingCard();
-		decks.discards.cards.add(card);
-		if (card.newCard) {
-			newCardDialog(card);
-			card.show_again_ms = Deck.getNextInterval(0);
-			reinsertCard(card);
-			return;
+		currentCard = getNextPendingCard();
+		decks.discards.cards.add(currentCard);
+		if (currentCard.newCard) {
+			// newCardDialog(currentCard);
+			currentCard.show_again_ms = Deck.getNextInterval(0);
+			// reinsertCard(currentCard);
+			// return;
 		}
-		loadGameboardWith(card);
+		loadGameboardWith(currentCard);
 		gameboard.setActive(true);
 	}
 
+	private Card currentCard = null;
+
 	private Card getNextPendingCard() {
-		decks.pending.updateTime(sinceLastNextPendingCard_elapsed);
-		sinceLastNextPendingCard_elapsed = 0f;
-		long minShiftTimeOf = decks.pending.getMinShiftTimeOf()/ONE_SECOND_ms;
+		decks.pending.updateTime(currentCard_elapsed);
+		currentCard_elapsed = 0f;
+		float minShiftTimeOf = (float) decks.pending.getMinShiftTimeOf()
+				/ (float) ONE_SECOND_ms;
 		App.log(this, "Min Shift Time Of: " + minShiftTimeOf);
-		if (minShiftTimeOf > 60l) {
+		if (minShiftTimeOf > 120f) {
 			decks.pending.updateTime(minShiftTimeOf);
 			Card nextAvailableCard = getNextAvailableCard();
 			App.log(this, "Adding '" + nextAvailableCard.answer
@@ -148,15 +127,30 @@ public class GameScreen extends ChildScreen {
 
 	private void endSession() {
 		// TODO Auto-generated method stub
-		App.log(this, "Session Complete: "+total_elapsed);
+		App.log(this, "Session Complete: " + total_elapsed);
+		info.deck.cards.clear();
+		info.deck.loadAll(decks.pending);
+		info.deck.loadAll(decks.discards);
+		info.deck.loadAll(decks.reserved);
+		info.deck.loadAll(decks.finished);
+		info.deck.sortByShowTimeMinutes();
+		info.recalculateStats();
+		info.lastScore = gameboard.getScore();
+		info.lastrun = System.currentTimeMillis();
+		App.saveSlotInfo(slot, info);
+		dialogShowing = true;
 	}
 
 	/**
-	 * Retrieve either next unseen card, or if all seen, oldest "finished" card.
+	 * Retrieve either next reserved discard, or next new card, or next
+	 * "finished" card.
 	 * 
 	 * @return
 	 */
 	private Card getNextAvailableCard() {
+		if (decks.reserved.size() > 0) {
+			return decks.reserved.cards.remove(0);
+		}
 		Iterator<Card> ideck = decks.master.cards.iterator();
 		while (ideck.hasNext()) {
 			Card next = ideck.next();
@@ -167,13 +161,13 @@ public class GameScreen extends ChildScreen {
 			card.reset();
 			card.box = 0;
 			card.newCard = true;
-			card.show_again_ms = 0;
+			card.show_again_ms = Deck.getNextInterval(0);
 			nodupes.add(card.answer);
 			return card;
 		}
 		decks.finished.clampToMinutes();
 		decks.finished.shuffle();
-		decks.finished.sortByShowTime();
+		decks.finished.sortByShowTimeMinutes();
 		return decks.finished.cards.remove(0);
 	}
 
@@ -184,22 +178,28 @@ public class GameScreen extends ChildScreen {
 
 	private boolean bonus_round = false;
 
-	private int totalRight=0;
+	private int totalRight = 0;
+
 	private void loadGameboardWith(final Card card) {
 		gameboard.setChallenge_latin(card.challenge);
-		if (card.box==0 && card.correct_in_a_row==0) {
-			String answer_img = getGlyphFilename(card.answer.charAt(0), false).toString();
+		if (card.box + card.correct_in_a_row < 2) {
+			String answer_img = getGlyphFilename(card.answer.charAt(0), false)
+					.toString();
 			gameboard.setChallenge_img(answer_img);
 		} else {
 			gameboard.setChallenge_img("images/misc/003f_4.png");
 		}
 		boolean valid = false;
+		char lastLetter = decks.getLastLetter();
+		App.log(this, "Current Letter: '"+card.answer+"'");
+		App.log(this, "Last Letter: '"+lastLetter+"'");
 		do {
-			totalRight=0;
+			totalRight = 0;
 			for (int ix = 0; ix < GameBoard.width; ix++) {
 				for (int iy = 0; iy < GameBoard.height; iy++) {
-					int letter = r.nextInt('Ᏼ' - 'Ꭰ') + 'Ꭰ';
-					final boolean isCorrect = card.answer.equals(String.valueOf((char) letter));
+					int letter = r.nextInt(lastLetter - 'Ꭰ' + 1) + 'Ꭰ';
+					final boolean isCorrect = card.answer.equals(String
+							.valueOf((char) letter));
 					if (isCorrect) {
 						valid = true;
 						totalRight++;
@@ -207,46 +207,72 @@ public class GameScreen extends ChildScreen {
 					StringBuilder img = getGlyphFilename(letter, true);
 					gameboard.setImageAt(ix, iy, img.toString());
 					gameboard.setColorAt(ix, iy, UI.randomBrightColor());
-					final int score = (card.box)+5+card.correct_in_a_row;
-					final int img_ix=ix;
-					final int img_iy=iy;
-					gameboard.getImageAt(ix, iy).addCaptureListener(new ClickListener(){
-						@Override
-						public boolean touchDown(InputEvent event, float x,
-								float y, int pointer, int button) {
-							event.getListenerActor().setTouchable(Touchable.disabled);
-							if (isCorrect) {
-								totalRight--;
-								gameboard.addToScore(score);
-								gameboard.setImageAt(img_ix, img_iy, UI.CHECKMARK);
-								gameboard.setColorAt(img_ix, img_iy, Color.GREEN);
-								card.correct_in_a_row++;
-							} else {
-								gameboard.addToScore(-score);
-								gameboard.setImageAt(img_ix, img_iy, UI.HEAVYX);
-								gameboard.setColorAt(img_ix, img_iy, Color.RED);
-								card.correct_in_a_row=0;
-								card.tries_remaining++;
-								card.noErrors=false;
-							}
-							card.show_again_ms=Deck.getNextInterval(card.correct_in_a_row);
-							card.tries_remaining--;
-							if (card.tries_remaining==0) {
-								decks.finished.cards.add(card);
-								decks.discards.cards.remove(card);
-								decks.pending.cards.remove(card);
-							}
-							return true;
-						}
-					});
+					final int score = card.box * 5 + 5 + card.correct_in_a_row;
+					final int img_ix = ix;
+					final int img_iy = iy;
+					gameboard.getImageAt(ix, iy).addCaptureListener(
+							new ClickListener() {
+								@Override
+								public boolean touchDown(InputEvent event,
+										float x, float y, int pointer,
+										int button) {
+									event.getListenerActor().setTouchable(
+											Touchable.disabled);
+									int amt = card.noErrors ? score : score / 2;
+									if (isCorrect) {
+										totalRight--;
+										gameboard.addToScore(amt);
+										gameboard.setImageAt(img_ix, img_iy,
+												UI.CHECKMARK);
+										gameboard.setColorAt(img_ix, img_iy,
+												Color.GREEN);
+									} else {
+										gameboard.addToScore(-amt);
+										gameboard.setImageAt(img_ix, img_iy,
+												UI.HEAVYX);
+										gameboard.setColorAt(img_ix, img_iy,
+												Color.RED);
+										if (card.correct_in_a_row > 0) {
+											card.tries_remaining++;
+											card.correct_in_a_row = 0;
+										}
+										card.noErrors = false;
+									}
+									if (totalRight <= 0) {
+										if (card.noErrors) {
+											card.correct_in_a_row++;
+										}
+										card.showCount++;
+										card.showTime += currentCard_elapsed;
+										card.tries_remaining--;
+									}
+									card.show_again_ms += Deck
+											.getNextInterval(card.correct_in_a_row);
+									if (card.tries_remaining <= 0) {
+										card.tries_remaining = -1;
+										App.log(this, "=== Retiring card: '"
+												+ card.answer + "'");
+										decks.finished.cards.add(card);
+										decks.discards.cards.remove(card);
+										decks.pending.cards.remove(card);
+										if (card.sendToNextBox()) {
+											card.box++;
+										} else {
+											card.box--;
+										}
+										card.show_again_ms += Deck
+												.getNextSessionInterval(card.box);
+									}
+									return true;
+								}
+							});
 				}
 			}
 		} while (!valid);
 	}
 
 	private StringBuilder getGlyphFilename(int letter, boolean random) {
-		StringBuilder img = new StringBuilder(
-				Integer.toHexString(letter));
+		StringBuilder img = new StringBuilder(Integer.toHexString(letter));
 		while (img.length() < 4) {
 			img.insert(0, "0");
 		}
@@ -271,13 +297,12 @@ public class GameScreen extends ChildScreen {
 
 	private void loadUserdeck() {
 		info = App.getSlotInfo(slot);
-		decks.starting = new Deck(info.deck);
-		decks.starting.updateTime(ONE_DAY_ms + ONE_HOUR_ms);
+		info.deck.updateTime(ONE_DAY_ms + ONE_HOUR_ms);
 		/*
 		 * Make sure we don't have active cards pointing to no longer existing
 		 * master deck cards
 		 */
-		Iterator<Card> ipending = decks.starting.cards.iterator();
+		Iterator<Card> ipending = info.deck.cards.iterator();
 		while (ipending.hasNext()) {
 			Card active = ipending.next();
 			if (decks.master.cards.contains(active)) {
@@ -286,42 +311,47 @@ public class GameScreen extends ChildScreen {
 			ipending.remove();
 			App.log(this, "Removed no longer valid entry: " + active.answer);
 		}
-		decks.starting.resetScoring();
-		decks.starting.resetCorrectInARow();
-		decks.starting.resetRetriesCount();
-		decks.starting.resetErrorMarker();
-		decks.starting.clampBoxes();
-		decks.starting.clampToMinutes();
-		decks.starting.shuffle();
-		decks.starting.sortByShowTime();
-		trackAlreadyCards(decks.starting);
-		retireNotYetCards(decks.starting);
+		trackAlreadyCards(info.deck);
+		retireNotYetCards(info.deck);
+		decks.discards.loadAll(info.deck);
+		decks.discards.resetScoring();
+		decks.discards.resetCorrectInARow();
+		decks.discards.resetRetriesCount();
+		decks.discards.resetErrorMarker();
+		decks.discards.clampBoxes();
+		decks.discards.shuffle();
+		decks.discards.sortByShowTimeMinutes();
+
+		int size = decks.discards.size();
+		int end = MinCardsInPlay < size ? MinCardsInPlay : size;
+		List<Card> subList = decks.discards.cards.subList(0, end);
+		decks.pending.cards.addAll(subList);
+		subList.clear();
+		decks.reserved.loadAll(decks.discards);
 	}
 
 	private void newCardDialog(Card card) {
-		dialogShowing=true;
-		UIDialog d = new UIDialog("New Letter", true, ui) {
+		dialogShowing = true;
+		UIDialog d = new UIDialog("New Letter", false, ui) {
 			@Override
 			protected void result(Object object) {
-				dialogShowing=false;
+				dialogShowing = false;
 			}
 		};
+		d.setFillParent(true);
 		Label l1 = new Label("Memorize The Following:", ui.getLs());
-		Label l2 = new Label(card.answer+" - "+card.challenge, ui.getLsLarge());
+		Label l2 = new Label(card.answer + " - " + card.challenge,
+				ui.getLsLarge());
 		TextButton ready = new TextButton("READY", ui.getTbs());
-		d.text(l1);
-		d.text(l2);
+		d.text(l1).row();
+		d.text(l2).row();
 		d.button(ready);
 		d.show(stage);
-		card.newCard=false;
+		card.newCard = false;
 	}
 
 	private void reinsertCard(Card card) {
-		if (decks.pending.size()<2) {
-			decks.pending.cards.add(card);
-		} else {
-			decks.pending.cards.add(1, card);
-		}
+		decks.pending.cards.add(0, card);
 		decks.discards.cards.remove(card);
 		decks.finished.cards.remove(card);
 	}
@@ -337,7 +367,8 @@ public class GameScreen extends ChildScreen {
 			decks.finished.cards.add(card);
 			icard.remove();
 		}
-		App.log(this, "Moved " + decks.finished.cards.size() + " future pending"
+		App.log(this, "Moved " + decks.finished.cards.size()
+				+ " future pending"
 				+ " or fully learned cards into the 'finished' deck.");
 	}
 
@@ -351,17 +382,24 @@ public class GameScreen extends ChildScreen {
 	 * Loads pending with discards, user_deck, and deck
 	 */
 	private void shuffle() {
-		decks.discards.shuffle();
+		App.log(this, "Shuffle");
 		decks.pending.loadAll(decks.discards);
-		decks.pending.sortByShowTime();
-		/*
-		 * add new cards to the end of the current deck
-		 */
-		while (decks.pending.size() < MinCardsInPlay) {
+		decks.pending.shuffle();
+		decks.pending.sortByShowTimeMinutes();
+		if (decks.pending.size() < MinCardsInPlay) {
 			Card nextAvailableCard = getNextAvailableCard();
-			App.log(this, "Added card: '" + nextAvailableCard.answer + "'");
+			App.log(this, "\tAdded card: '" + nextAvailableCard.answer + "'");
 			decks.pending.cards.add(nextAvailableCard);
 		}
+		App.log(this, "\tPending size: " + decks.pending.size());
+		Card firstCard = decks.pending.cards.get(0);
+		if (firstCard.equals(currentCard)) {
+			decks.pending.cards.remove(0);
+			decks.pending.cards.add(firstCard);
+			currentCard = null;
+		}
+		decks.pending.updateTime(decks.pending.getMinShiftTimeOf());
+		currentCard = null;
 	}
 
 	/**
@@ -381,6 +419,6 @@ public class GameScreen extends ChildScreen {
 	private void updateTimes(float delta) {
 		total_elapsed += delta;
 		challenge_elapsed += delta;
-		sinceLastNextPendingCard_elapsed += delta;
+		currentCard_elapsed += delta;
 	}
 }

@@ -3,13 +3,17 @@ package com.cherokeelessons.cards;
 
 public class Card implements Comparable<Card> {
 
-	public static final int SendToNextBoxThreshold = 3;
+	public static final int SendToNextBoxThreshold = 7;
 	
 	public boolean sendToNextBox(){
-		return correct_in_a_row>=SendToNextBoxThreshold;
+		return correct_in_a_row>=SendToNextBoxThreshold && noErrors;
 	}
 	
 	public Card() {
+	}
+	
+	public float showAgainDays(){
+		return (10l*show_again_ms/(1000l*60l*60l*24l))/10f;
 	}
 
 	public Card(Card card) {
