@@ -224,7 +224,7 @@ public class GameBoard extends Table {
 		return remaining.getValue();
 	}
 
-	private float percent_prev = -1f;
+	private int percent_prev = 0;
 	
 	public void setRemaining(float percent, float interval) {
 		setRemaining(percent, true, interval);
@@ -235,10 +235,10 @@ public class GameBoard extends Table {
 			percent = 1f;
 		if (percent < 0f)
 			percent = 0f;
-		percent = Math.round(percent);
-		if (percent != percent_prev) {
-			remaining.setValue(percent, animate, interval);
-			percent_prev=percent;
+		int ipercent = (int) (percent*100);
+		if (ipercent != percent_prev) {
+			remaining.setValue(ipercent/100f, animate, interval);
+			percent_prev=ipercent;
 		}
 	}
 

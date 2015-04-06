@@ -1,5 +1,7 @@
 package com.cherokeelessons.syllabary.screens;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +66,7 @@ public class GameScreen extends ChildScreen {
 		this.decks = new GameScreenDecks();
 	}
 
+	private float updateRemainingTick=0f;
 	@Override
 	public void act(float delta) {
 		if (decks.master == null) {
@@ -80,7 +83,11 @@ public class GameScreen extends ChildScreen {
 		}
 		if (gameboard.isActive()) {
 			updateTimes(delta);
-			gameboard.setRemaining(currentCard_elapsed / CARD_TICK, 1f);
+			updateRemainingTick += delta;
+			if (updateRemainingTick>1f) {
+				gameboard.setRemaining(challenge_elapsed / CARD_TICK, 1f);
+				updateRemainingTick-=1f;
+			}
 			super.act(delta);
 			if (totalRight == 0) {
 				gameboard.setActive(false);
@@ -105,6 +112,8 @@ public class GameScreen extends ChildScreen {
 		}
 		loadGameboardWith(currentCard);
 		gameboard.setActive(true);
+		updateRemainingTick=0f;
+		gameboard.setRemaining(0f, 0f);
 	}
 
 	private Card currentCard = null;
@@ -112,6 +121,7 @@ public class GameScreen extends ChildScreen {
 	private Card getNextPendingCard() {
 		decks.pending.updateTime(currentCard_elapsed);
 		currentCard_elapsed = 0f;
+		challenge_elapsed = 0f;
 		float minShiftTimeOf = (float) decks.pending.getMinShiftTimeOf()
 				/ (float) ONE_SECOND_ms;
 		App.log(this, "Min Shift Time Of: " + minShiftTimeOf);
@@ -180,6 +190,8 @@ public class GameScreen extends ChildScreen {
 
 	private int totalRight = 0;
 
+	private final List<ClickListener> wrongAnswers = new ArrayList<>();
+	
 	private void loadGameboardWith(final Card card) {
 		gameboard.setChallenge_latin(card.challenge);
 		if (card.box + card.correct_in_a_row < 2) {
@@ -195,6 +207,7 @@ public class GameScreen extends ChildScreen {
 		App.log(this, "Last Letter: '"+lastLetter+"'");
 		do {
 			totalRight = 0;
+			wrongAnswers.clear();
 			for (int ix = 0; ix < GameBoard.width; ix++) {
 				for (int iy = 0; iy < GameBoard.height; iy++) {
 					int letter = r.nextInt(lastLetter - 'Ꭰ' + 1) + 'Ꭰ';
@@ -210,65 +223,69 @@ public class GameScreen extends ChildScreen {
 					final int score = card.box * 5 + 5 + card.correct_in_a_row;
 					final int img_ix = ix;
 					final int img_iy = iy;
-					gameboard.getImageAt(ix, iy).addCaptureListener(
-							new ClickListener() {
-								@Override
-								public boolean touchDown(InputEvent event,
-										float x, float y, int pointer,
-										int button) {
-									event.getListenerActor().setTouchable(
-											Touchable.disabled);
-									int amt = card.noErrors ? score : score / 2;
-									if (isCorrect) {
-										totalRight--;
-										gameboard.addToScore(amt);
-										gameboard.setImageAt(img_ix, img_iy,
-												UI.CHECKMARK);
-										gameboard.setColorAt(img_ix, img_iy,
-												Color.GREEN);
-									} else {
-										gameboard.addToScore(-amt);
-										gameboard.setImageAt(img_ix, img_iy,
-												UI.HEAVYX);
-										gameboard.setColorAt(img_ix, img_iy,
-												Color.RED);
-										if (card.correct_in_a_row > 0) {
-											card.tries_remaining++;
-											card.correct_in_a_row = 0;
-										}
-										card.noErrors = false;
-									}
-									if (totalRight <= 0) {
-										if (card.noErrors) {
-											card.correct_in_a_row++;
-										}
-										card.showCount++;
-										card.showTime += currentCard_elapsed;
-										card.tries_remaining--;
-									}
-									card.show_again_ms += Deck
-											.getNextInterval(card.correct_in_a_row);
-									if (card.tries_remaining <= 0) {
-										card.tries_remaining = -1;
-										App.log(this, "=== Retiring card: '"
-												+ card.answer + "'");
-										decks.finished.cards.add(card);
-										decks.discards.cards.remove(card);
-										decks.pending.cards.remove(card);
-										if (card.sendToNextBox()) {
-											card.box++;
-										} else {
-											card.box--;
-										}
-										card.show_again_ms += Deck
-												.getNextSessionInterval(card.box);
-									}
-									return true;
+					ClickListener listener = new ClickListener() {
+						@Override
+						public boolean touchDown(InputEvent event,
+								float x, float y, int pointer,
+								int button) {
+							event.getListenerActor().setTouchable(
+									Touchable.disabled);
+							int amt = card.noErrors ? score : score / 2;
+							if (isCorrect) {
+								totalRight--;
+								gameboard.addToScore(amt);
+								gameboard.setImageAt(img_ix, img_iy,
+										UI.CHECKMARK);
+								gameboard.setColorAt(img_ix, img_iy,
+										Color.GREEN);
+							} else {
+								gameboard.addToScore(-amt);
+								gameboard.setImageAt(img_ix, img_iy,
+										UI.HEAVYX);
+								gameboard.setColorAt(img_ix, img_iy,
+										Color.RED);
+								if (card.correct_in_a_row > 0) {
+									card.tries_remaining++;
+									card.correct_in_a_row = 0;
 								}
-							});
+								card.noErrors = false;
+							}
+							if (totalRight <= 0) {
+								if (card.noErrors) {
+									card.correct_in_a_row++;
+								}
+								card.showCount++;
+								card.showTime += currentCard_elapsed;
+								card.tries_remaining--;
+							}
+							card.show_again_ms += Deck
+									.getNextInterval(card.correct_in_a_row);
+							if (card.tries_remaining <= 0) {
+								card.tries_remaining = -1;
+								App.log(this, "=== Retiring card: '"
+										+ card.answer + "'");
+								decks.finished.cards.add(card);
+								decks.discards.cards.remove(card);
+								decks.pending.cards.remove(card);
+								if (card.sendToNextBox()) {
+									card.box++;
+								} else {
+									card.box--;
+								}
+								card.show_again_ms += Deck
+										.getNextSessionInterval(card.box);
+							}
+							return true;
+						}
+					};
+					if (!isCorrect) {
+						wrongAnswers.add(listener);
+					}
+					gameboard.getImageAt(ix, iy).addCaptureListener(listener);
 				}
 			}
 		} while (!valid);
+		Collections.shuffle(wrongAnswers);
 	}
 
 	private StringBuilder getGlyphFilename(int letter, boolean random) {
@@ -348,12 +365,6 @@ public class GameScreen extends ChildScreen {
 		d.button(ready);
 		d.show(stage);
 		card.newCard = false;
-	}
-
-	private void reinsertCard(Card card) {
-		decks.pending.cards.add(0, card);
-		decks.discards.cards.remove(card);
-		decks.finished.cards.remove(card);
 	}
 
 	private void retireNotYetCards(Deck deck) {
