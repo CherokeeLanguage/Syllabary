@@ -77,4 +77,8 @@ public class GameSound {
 		});
 		audio.play();
 	}
+
+	public void cashOut() {
+		play(CASH);		
+	}
 }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -28,26 +29,28 @@ import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Syllabary;
 import com.cherokeelessons.ui.GameBoard;
+import com.cherokeelessons.ui.GameBoard.GameboardHandler;
 import com.cherokeelessons.ui.UI;
 import com.cherokeelessons.ui.UI.UIDialog;
 
-public class GameScreen extends ChildScreen {
+public class GameScreen extends ChildScreen implements GameboardHandler {
 
 	private static final float BOARD_TICK = 2f * 60f;
-	private static final float CARD_TICK = 8f;
+	private static final float CARD_TICK = 4f;
 	private static final int MinCardsInPlay = 7;
 	private static final long ONE_DAY_ms;
 	private static final long ONE_HOUR_ms;
 	private static final long ONE_MINUTE_ms;
 	private static final long ONE_SECOND_ms;
 	private static final Random r = new Random();
-
 	static {
 		ONE_SECOND_ms = 1000l;
 		ONE_MINUTE_ms = 60l * ONE_SECOND_ms;
 		ONE_HOUR_ms = 60l * ONE_MINUTE_ms;
 		ONE_DAY_ms = 24l * ONE_HOUR_ms;
 	}
+	private boolean audio1_done = false;
+	private boolean audio2_done = false;
 
 	private float challenge_elapsed = 0f;
 
@@ -66,13 +69,20 @@ public class GameScreen extends ChildScreen {
 	private SlotInfo info;
 	private final Set<String> nodupes = new HashSet<String>();
 
+	private int perfectCount = 0;
+
+	private boolean perfectStage = true;
 	final int slot;
 
+	private int stageCount = 0;
+
 	private float total_elapsed = 0f;
+
 	private int totalRight = 0;
 
-	private float updateRemainingTick = 0f;
+	private boolean updateChallengeElapsed = true;
 
+	private float updateRemainingTick = 0f;
 	private final List<ClickListener> wrongAnswers = new ArrayList<>();
 
 	public GameScreen(Screen caller, int slot) {
@@ -97,30 +107,30 @@ public class GameScreen extends ChildScreen {
 		}
 		if (gameboard.isActive()) {
 			if (!audio1_done) {
-				audio1_done=true;
-				updateChallengeElapsed=false;
-				Runnable whenDone=new Runnable() {
+				audio1_done = true;
+				updateChallengeElapsed = false;
+				Runnable whenDone = new Runnable() {
 					@Override
 					public void run() {
-						updateChallengeElapsed=true;
+						updateChallengeElapsed = true;
 					}
 				};
 				gs.playGlyph(currentCard.answer.charAt(0), whenDone);
 			}
-			if (challenge_elapsed > CARD_TICK/2f && !audio2_done) {
-				audio2_done=true;
-				updateChallengeElapsed=false;
-				Runnable whenDone=new Runnable() {
+			if (challenge_elapsed > CARD_TICK / 2f && !audio2_done) {
+				audio2_done = true;
+				updateChallengeElapsed = false;
+				Runnable whenDone = new Runnable() {
 					@Override
 					public void run() {
-						updateChallengeElapsed=true;
+						updateChallengeElapsed = true;
 					}
 				};
 				gs.playGlyph(currentCard.answer.charAt(0), whenDone);
 			}
 			if (challenge_elapsed > CARD_TICK) {
-				audio1_done=false;
-				audio2_done=false;
+				audio1_done = false;
+				audio2_done = false;
 				challenge_elapsed = 0;
 				gameboard.setRemaining(0, 0);
 				if (wrongAnswers.size() > 0) {
@@ -154,24 +164,20 @@ public class GameScreen extends ChildScreen {
 			return;
 		}
 		currentCard = getNextPendingCard();
-		audio1_done=false;
-		audio2_done=false;
+		audio1_done = false;
+		audio2_done = false;
 		decks.discards.cards.add(currentCard);
 		if (currentCard.newCard) {
 			newCardDialog(currentCard);
-			audio1_done=true;
+			audio1_done = true;
 		}
 		loadGameboardWith(currentCard);
 		gameboard.setActive(true);
 		updateRemainingTick = 0f;
 		gameboard.setRemaining(0f, 0f);
 	}
-	
-	private boolean audio1_done=false;
-	private boolean audio2_done=false;
 
 	private void endSession() {
-		// TODO Auto-generated method stub
 		App.log(this, "Session Complete: " + total_elapsed);
 		info.deck.cards.clear();
 		info.deck.loadAll(decks.pending);
@@ -180,9 +186,63 @@ public class GameScreen extends ChildScreen {
 		info.deck.loadAll(decks.finished);
 		info.deck.sortByShowTimeMinutes();
 		info.recalculateStats();
-		info.lastScore = gameboard.getScore();
 		info.lastrun = System.currentTimeMillis();
 		App.saveSlotInfo(slot, info);
+
+		UIDialog finished = new UIDialog("Stage " + getStageCount()
+				+ " Complete!", true, true, ui) {
+			@Override
+			protected void result(Object object) {
+				if (object != null) {
+					if (object.equals(true)) {
+						GameScreen nextScreen = new GameScreen(
+								GameScreen.this.caller, GameScreen.this.slot);
+						nextScreen.setStageCount(stageCount + 1);
+						App.getGame().setScreen(nextScreen);
+						GameScreen.this.dispose();
+						return;
+					}
+					if (object.equals(false)) {
+						GameScreen.this.goodBye();
+						return;
+					}
+				}
+			}
+		};
+
+		StringBuilder sb = new StringBuilder();
+		if (perfectStage) {
+			int extra = getStageCount() * 1000;
+			sb.append("A PERFECT STAGE!\n");
+			sb.append("You get " + extra + " bonus points!\n");
+			sb.append("You get to advance to the next stage!\n");
+			gameboard.addToScore(extra);
+			gameboard.act(1f);
+			gs.cashOut();
+		}
+		info.lastScore = gameboard.getScore();
+		sb.append("Score: ");
+		sb.append(info.lastScore);
+		sb.append("\n");
+		sb.append(info.activeCards);
+		sb.append(" letters: ");
+		sb.append(info.shortTerm);
+		sb.append(" short, ");
+		sb.append(info.mediumTerm);
+		sb.append(" medium, ");
+		sb.append(info.longTerm);
+		sb.append(" long");
+		sb.append("\n");
+
+		finished.getContentTable().defaults();
+		finished.textCenter(sb.toString());
+
+		if (perfectStage) {
+			finished.button("NEXT STAGE", true);
+		}
+		finished.button("MAIN MENU", false);
+
+		finished.show(stage);
 		dialogShowing = true;
 	}
 
@@ -245,13 +305,21 @@ public class GameScreen extends ChildScreen {
 		return decks.pending.cards.remove(0);
 	}
 
+	public int getPerfectCount() {
+		return perfectCount;
+	}
+
+	public int getStageCount() {
+		return stageCount;
+	}
+
 	@Override
 	public void hide() {
 		super.hide();
 	}
 
 	private void loadGameboardWith(final Card card) {
-		if (info.settings.display.equals(DisplayMode.Latin)){
+		if (info.settings.display.equals(DisplayMode.Latin)) {
 			gameboard.setChallenge_latin(card.challenge);
 		} else {
 			gameboard.setChallenge_latin("");
@@ -294,6 +362,9 @@ public class GameScreen extends ChildScreen {
 							img_actor.setTouchable(Touchable.disabled);
 							int amt = card.noErrors ? score : score / 2;
 							if (isCorrect) {
+								challenge_elapsed=0f;
+								audio1_done=true;
+								audio2_done=false;
 								totalRight--;
 								gameboard.addToScore(amt);
 								gameboard.setImageAt(img_ix, img_iy,
@@ -302,6 +373,7 @@ public class GameScreen extends ChildScreen {
 										Color.GREEN);
 							} else {
 								wrongAnswers.remove(this);
+								perfectStage = false;
 								gameboard.addToScore(-amt);
 								gameboard.setImageAt(img_ix, img_iy, UI.HEAVYX);
 								gameboard.setColorAt(img_ix, img_iy, Color.RED);
@@ -329,6 +401,7 @@ public class GameScreen extends ChildScreen {
 								decks.finished.cards.add(card);
 								if (card.sendToNextBox()) {
 									card.box++;
+									gameboard.addToScore(card.box * 100);
 								} else {
 									card.box--;
 								}
@@ -394,48 +467,59 @@ public class GameScreen extends ChildScreen {
 			@Override
 			protected void result(Object object) {
 				cancel();
+				getButtonTable().setTouchable(Touchable.disabled);
 				addAction(dialogDone[0]);
 			}
 		};
-		dialogDone[0] = new RunnableAction(){
+		dialogDone[0] = new RunnableAction() {
 			@Override
 			public void run() {
-				dialogShowing = false;
 				gs.dingding();
-				d.hide(null);
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						d.hide(null);
+						dialogShowing = false;
+					}
+				};
+				SequenceAction sequence = Actions.sequence(Actions.delay(1f),
+						Actions.run(runnable));
+				d.addAction(sequence);
 			}
 		};
-		Label l1 = new Label(card.challenge,ui.getLsXLarge());
+		Label l1 = new Label(card.challenge, ui.getLsXLarge());
 		TextButton ready = new TextButton("SKIP", ui.getTbs());
 		Table content = d.getContentTable();
 		Table pix = new Table();
 		pix.defaults().pad(8);
 		final List<RunnableAction> actions = new ArrayList<>();
-		int startFont=0;
-		int endFont=4;
-		for (int ix=startFont; ix<=endFont; ix++) {
-			String file = getGlyphFilename(card.answer.charAt(0), ix).toString();
+		int startFont = 0;
+		int endFont = 4;
+		for (int ix = startFont; ix <= endFont; ix++) {
+			String file = getGlyphFilename(card.answer.charAt(0), ix)
+					.toString();
 			final Image glyph = ui.loadImage(file);
 			glyph.setScaling(Scaling.fit);
 			pix.add(glyph).width(192f).height(192f);
 			glyph.setColor(UI.randomBrightColor());
 			glyph.addAction(Actions.alpha(0f));
-			actions.add(new RunnableAction(){
+			actions.add(new RunnableAction() {
 				public void run() {
-					Runnable whenDone=new Runnable() {
+					Runnable whenDone = new Runnable() {
 						public void run() {
-							if (actions.size()>0) {
+							if (actions.size() > 0) {
 								Action delay = Actions.delay(.7f);
-								d.addAction(Actions.sequence(delay, actions.remove(0)));
+								d.addAction(Actions.sequence(delay,
+										actions.remove(0)));
 							}
 						};
 					};
 					glyph.addAction(Actions.alpha(1f, .3f));
 					gs.playGlyph(card.answer.charAt(0), whenDone);
 				};
-				
+
 			});
-		}		
+		}
 		actions.add(dialogDone[0]);
 		content.clearChildren();
 		content.row();
@@ -446,8 +530,6 @@ public class GameScreen extends ChildScreen {
 		d.setModal(true);
 		d.setMovable(false);
 		d.show(stage, null);
-		d.setPosition((stage.getWidth() - d.getWidth()) / 2,
-				(stage.getHeight() - d.getHeight()) / 2);
 		card.newCard = false;
 		d.addAction(actions.remove(0));
 	}
@@ -468,10 +550,19 @@ public class GameScreen extends ChildScreen {
 				+ " or fully learned cards into the 'finished' deck.");
 	}
 
+	public void setPerfectCount(int perfectCount) {
+		this.perfectCount = perfectCount;
+	}
+
+	public void setStageCount(int stageCount) {
+		this.stageCount = stageCount;
+	}
+
 	@Override
 	public void show() {
 		super.show();
 		gameboard = ui.getGameBoard(stage, ui, gs);
+		gameboard.setHandler(this);
 	}
 
 	/**
@@ -512,12 +603,21 @@ public class GameScreen extends ChildScreen {
 		}
 	}
 
-	private boolean updateChallengeElapsed = true;
 	private void updateTimes(float delta) {
 		total_elapsed += delta;
 		if (updateChallengeElapsed) {
 			challenge_elapsed += delta;
 		}
 		currentCard_elapsed += delta;
+	}
+
+	@Override
+	public void mainmenu() {
+		goodBye();
+	}
+
+	@Override
+	public void mute() {
+		
 	}
 }

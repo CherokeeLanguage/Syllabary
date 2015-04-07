@@ -69,13 +69,13 @@ public enum LevelName {
 		return level;
 	}
 
-	public String getEngrish() {
+	public String getEnglish() {
 		return engrish;
 	}
 
 	@Override
 	public String toString() {
-		return getEngrish();
+		return getEnglish();
 	}
 
 }

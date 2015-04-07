@@ -3,11 +3,14 @@ package com.cherokeelessons.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -59,10 +62,11 @@ public class GameBoard extends Table {
 	public void setPaused(boolean paused) {
 		this.paused = paused;
 		if (paused) {
+			Vector2 btmleft = blocks.localToStageCoordinates(new Vector2(0, 0));
 			blocks.setVisible(false);
 			blocks.setTouchable(Touchable.disabled);
 			overlay_pause=ui.loadImage(UI.PAUSED);
-			overlay_pause.setPosition(blocks.getX(), blocks.getY());
+			overlay_pause.setPosition(btmleft.x, btmleft.y);
 			overlay_pause.setWidth(blocks.getWidth());
 			overlay_pause.setHeight(blocks.getHeight());
 			overlay_pause.setScaling(Scaling.none);
@@ -97,6 +101,24 @@ public class GameBoard extends Table {
 
 	private Table blocks;
 	private Image overlay_pause;
+	private final ClickListener doMainMenu=new ClickListener() {
+		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			if (handler==null) {
+				return false;
+			}
+			handler.mainmenu();
+			return true;
+		};
+	};
+	private final ClickListener doMute=new ClickListener(){
+		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			if (handler==null) {
+				return false;
+			}
+			handler.mute();
+			return true;
+		};
+	};
 	public GameBoard(Stage stage, UI ui, GameSound gs) {
 		this.ui=ui;
 		this.gs=gs;
@@ -149,7 +171,9 @@ public class GameBoard extends Table {
 		challenge_pic = new Image(ui.loadTextureRegionDrawable(Res.question));
 		challenge_pic.setScaling(Scaling.fit);
 		mainMenu = new TextButton("BACK", tbs);
+		mainMenu.addListener(doMainMenu);
 		mute = new TextButton("MUTE", tbs);
+		mute.addListener(doMute);
 		pause = new TextButton("PAUSE", tbs);
 		pause.addListener(new ClickListener(){
 			@Override
@@ -200,7 +224,7 @@ public class GameBoard extends Table {
 		leftColumn.row();
 		leftColumn.add().expandY();
 		leftColumn.row();
-		leftColumn.add(challenge_pic);
+		leftColumn.add(challenge_pic).width(128f).height(128f);
 		leftColumn.row();
 		leftColumn.add(challenge_latin);
 		leftColumn.row();
@@ -375,6 +399,7 @@ public class GameBoard extends Table {
 	}
 
 	private String challenge_img;
+	private GameboardHandler handler;
 	public void setChallenge_img(String file) {
 		if (challenge_img!=null) {
 			ui.unloadTexture(challenge_img);
@@ -382,8 +407,18 @@ public class GameBoard extends Table {
 		challenge_img=file;
 		if (challenge_img!=null) {
 			challenge_pic.setDrawable(ui.loadTextureRegionDrawable(file));
+			challenge_pic.setScaling(Scaling.fit);
 		} else {
 			challenge_pic.setDrawable(null);
 		}
+	}
+
+	public void setHandler(GameboardHandler handler) {
+		this.handler=handler;
+	}
+	
+	public static interface GameboardHandler {
+		public void mainmenu();
+		public void mute();
 	}
 }

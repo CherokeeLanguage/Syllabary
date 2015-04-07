@@ -56,7 +56,9 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 
 	@Override
 	public void play(final int slot) {
-		App.getGame().setScreen(new GameScreen(caller, slot));
+		GameScreen screen = new GameScreen(caller, slot);
+		screen.setStageCount(1);
+		App.getGame().setScreen(screen);
 		this.dispose();
 	}
 

@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -35,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -303,11 +305,41 @@ public class UI {
 	}
 	
 	public static class UIDialog extends Dialog {
+		private final UI ui;
 		public UIDialog(String title, UI ui) {
 			this(title, false, false, ui);
 		}
 		public UIDialog(String title, boolean dim, boolean nine, UI ui) {
 			super(title, nine?ui.getDialogStyle9(dim):ui.getDialogStyle(dim));
+			this.ui=ui;
+		}
+		public Dialog textCenter(String text) {
+			Label lbl = new Label(text, ui.getLs());
+			lbl.setAlignment(Align.center);
+			return text(lbl);
+		}
+		@Override
+		public Dialog text(String text) {
+			Label lbl = new Label(text, ui.getLs());
+			return text(lbl);
+		}
+		@Override
+		public Dialog button(String text) {
+			TextButton tb = new TextButton(text, ui.getTbs());
+			return button(tb);
+		}
+		
+		@Override
+		public Dialog button(String text, Object object) {
+			TextButton tb = new TextButton(text, ui.getTbs());
+			return button(tb, object);
+		}
+		
+		@Override
+		public Dialog show(Stage stage, Action action) {
+			super.show(stage, action);
+			setPosition(Math.round((stage.getWidth() - getWidth()) / 2), Math.round((stage.getHeight() - getHeight()) / 2));
+			return this;
 		}
 	}
 	
@@ -337,7 +369,7 @@ public class UI {
 				isBlank=true;
 			}
 			StringBuilder sb = new StringBuilder();
-			sb.append(info.level.getEngrish());
+			sb.append(info.level.getEnglish());
 			sb.append(" ");
 			sb.append(StringUtils.isBlank(displayName)?"ᎤᏲᏒ ᏥᏍᏕᏥ!":displayName);
 //			sb.append(" - ");
@@ -549,7 +581,7 @@ public class UI {
 		TextButton no = new TextButton("No", getTbs());
 		msg = WordUtils.wrap(msg, 60, "\n", true);
 		Label msglabel = new Label(msg, getLs());
-		UIDialog dialog = new UIDialog("Please Choose", this) {
+		UIDialog dialog = new UIDialog("Please Choose", true, true, this) {
 			@Override
 			protected void result(Object object) {
 				if (object==null) {
@@ -565,8 +597,6 @@ public class UI {
 				}
 			}
 		};
-		dialog.getStyle().stageBackground=new TextureRegionDrawable(new TextureRegion(loadTexture(DIM)));
-		dialog.setStyle(dialog.getStyle());
 		dialog.text(msglabel);
 		dialog.button(yes, ifYes);
 		dialog.button(no, ifNo);
