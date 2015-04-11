@@ -21,6 +21,12 @@ public class MainMenu extends ChildScreen {
 			return true;
 		};
 	};
+	private ClickListener showLeader=new ClickListener(){
+		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			App.getGame().setScreen(new Leaderboard(MainMenu.this));
+			return true;
+		};
+	};
 
 	public MainMenu() {
 		super(null);
@@ -59,6 +65,7 @@ public class MainMenu extends ChildScreen {
 		
 		button = new TextButton("High Scores", bstyle);
 		container.add(button);
+		button.addCaptureListener(showLeader);
 		
 		button = new TextButton("Settings", bstyle);
 		container.row();

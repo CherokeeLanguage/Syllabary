@@ -5,12 +5,14 @@ import org.robovm.apple.uikit.UIApplication;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import com.cherokeelessons.syllabary.one.SyllabaryApp;
+import com.cherokeelessons.play.GameServices;
+import com.cherokeelessons.play.Platform;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        App.services=new GameServices(new Platform());
         return new IOSApplication(new SyllabaryApp(), config);
     }
 

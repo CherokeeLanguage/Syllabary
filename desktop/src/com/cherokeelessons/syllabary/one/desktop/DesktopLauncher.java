@@ -5,6 +5,9 @@ import java.awt.GraphicsEnvironment;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.cherokeelessons.play.GameServices;
+import com.cherokeelessons.play.Platform;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.SyllabaryApp;
 
 public class DesktopLauncher {
@@ -26,5 +29,6 @@ public class DesktopLauncher {
 //		config.addIcon("icons/icon-32.png", FileType.Internal);
 //		config.addIcon("icons/icon-16.png", FileType.Internal);
 		new LwjglApplication(new SyllabaryApp(), config);
+		App.services=new GameServices(new Platform());
 	}
 }

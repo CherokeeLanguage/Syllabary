@@ -32,10 +32,12 @@ import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.GameBoard.GameboardHandler;
 import com.cherokeelessons.ui.UI;
 import com.cherokeelessons.ui.UI.UIDialog;
+import com.cherokeelessons.util.GooglePlayGameServices.Callback;
+import com.cherokeelessons.util.WordUtils;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
-	private static final float BOARD_TICK = 2f * 60f;
+	private static final float BOARD_TICK = 5f;// 2f * 60f;
 	private static final float CARD_TICK = 4f;
 	private static final int MinCardsInPlay = 7;
 	private static final long ONE_DAY_ms;
@@ -89,6 +91,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		super(caller);
 		this.slot = slot;
 		this.decks = new GameScreenDecks();
+		gameboard = ui.getGameBoard(stage, ui, gs);
+		gameboard.setHandler(this);
 	}
 
 	@Override
@@ -129,6 +133,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gs.playGlyph(currentCard.answer.charAt(0), whenDone);
 			}
 			if (challenge_elapsed > CARD_TICK) {
+				gameboard.addToScore(-(currentCard.box * 5 + 1));
+				perfectStage = false;
 				audio1_done = false;
 				audio2_done = false;
 				challenge_elapsed = 0;
@@ -177,8 +183,28 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		gameboard.setRemaining(0f, 0f);
 	}
 
+	private enum Choices {
+		NextStage, MainMenu, Leaderboard;
+	}
+
+	private enum YesNo {
+		Yes, No;
+	}
+
+	private Callback<Void> viewScoresAfterSubmit = new Callback<Void>() {
+		@Override
+		public void success(Void result) {
+			App.getGame().setScreen(new Leaderboard(GameScreen.this));
+		}
+		public void error(Exception exception) {
+			UIDialog error = new UIDialog("ERROR!", true, true, ui);
+			error.text(WordUtils.wrap(exception.getMessage(), 60, "\n", true));
+			error.button("OK");
+			error.show(stage);
+		};
+	};
+
 	private void endSession() {
-		App.log(this, "Session Complete: " + total_elapsed);
 		info.deck.cards.clear();
 		info.deck.loadAll(decks.pending);
 		info.deck.loadAll(decks.discards);
@@ -189,21 +215,49 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		info.lastrun = System.currentTimeMillis();
 		App.saveSlotInfo(slot, info);
 
-		UIDialog finished = new UIDialog("Stage " + getStageCount()
-				+ " Complete!", true, true, ui) {
+		final UIDialog finished = new UIDialog("Stage Complete!", true, true,
+				ui) {
 			@Override
 			protected void result(Object object) {
 				if (object != null) {
-					if (object.equals(true)) {
+					if (object.equals(Choices.NextStage)) {
 						GameScreen nextScreen = new GameScreen(
 								GameScreen.this.caller, GameScreen.this.slot);
-						nextScreen.setStageCount(stageCount + 1);
+						if (perfectStage) {
+							nextScreen.setStageCount(stageCount + 1);
+						} else {
+							nextScreen.setStageCount(1);
+						}
 						App.getGame().setScreen(nextScreen);
 						GameScreen.this.dispose();
 						return;
 					}
-					if (object.equals(false)) {
+					if (object.equals(Choices.MainMenu)) {
 						GameScreen.this.goodBye();
+						return;
+					}
+					if (object.equals(Choices.Leaderboard)) {
+						cancel();
+						if (App.isLoggedIn()) {
+							App.getGame().setScreen(
+									new Leaderboard(GameScreen.this));
+							return;
+						} else {
+							UIDialog logind = new UIDialog(
+									"Google Play Services", true, true, ui) {
+								protected void result(Object object) {
+									if (object.equals(YesNo.Yes)) {
+										submitScore(viewScoresAfterSubmit);
+									}
+								};
+							};
+							logind.text("Leaderboard support requires that\n"
+									+ "you to log in to Google Play Services.\n"
+									+ "Would you like to login now?");
+							logind.button("YES", YesNo.Yes);
+							logind.button("NO", YesNo.No);
+							logind.show(stage);
+						}
 						return;
 					}
 				}
@@ -212,10 +266,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 
 		StringBuilder sb = new StringBuilder();
 		if (perfectStage) {
-			int extra = getStageCount() * 1000;
+			int sc = getStageCount();
+			int extra = sc * 1000;
 			sb.append("A PERFECT STAGE!\n");
+			if (sc > 1) {
+				sb.append("THAT'S " + sc + " PERFECT STAGES IN A ROW!\n");
+			}
 			sb.append("You get " + extra + " bonus points!\n");
-			sb.append("You get to advance to the next stage!\n");
 			gameboard.addToScore(extra);
 			gameboard.act(1f);
 			gs.cashOut();
@@ -237,13 +294,48 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		finished.getContentTable().defaults();
 		finished.textCenter(sb.toString());
 
-		if (perfectStage) {
-			finished.button("NEXT STAGE", true);
-		}
-		finished.button("MAIN MENU", false);
-
+		finished.button("NEXT STAGE", Choices.NextStage);
+		finished.button("MAIN MENU", Choices.MainMenu);
+		finished.button("VIEW TOP SCORES", Choices.Leaderboard);
 		finished.show(stage);
 		dialogShowing = true;
+
+		if (App.isLoggedIn()) {
+			finished.getButtonTable().setVisible(false);
+			stage.addAction(Actions.sequence(Actions.delay(10f),
+					Actions.run(new Runnable() {
+						@Override
+						public void run() {
+							finished.getButtonTable().setVisible(true);
+						}
+					})));
+			Callback<Void> enableButtons = new Callback<Void>() {
+				@Override
+				public void success(Void result) {
+					finished.getButtonTable().setVisible(true);
+				}
+			};
+			submitScore(enableButtons);
+		}
+	}
+
+	private void submitScore(final Callback<Void> callback) {
+		Callback<Void> do_submit = new Callback<Void>() {
+			@Override
+			public void success(Void result) {
+				App.setLoggedIn(true);
+				App.services.lb_submit(Leaderboard.BoardId, info.lastScore,
+						info.level.getEnglish(), callback);
+			}
+
+			@Override
+			public void error(Exception exception) {
+				App.setLoggedIn(false);
+				App.log(this, exception.getMessage());
+				callback.error(exception);
+			}
+		};
+		App.services.login(do_submit);
 	}
 
 	private StringBuilder getGlyphFilename(int letter, int font) {
@@ -313,11 +405,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		return stageCount;
 	}
 
-	@Override
-	public void hide() {
-		super.hide();
-	}
-
 	private void loadGameboardWith(final Card card) {
 		if (info.settings.display.equals(DisplayMode.Latin)) {
 			gameboard.setChallenge_latin(card.challenge);
@@ -362,9 +449,9 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 							img_actor.setTouchable(Touchable.disabled);
 							int amt = card.noErrors ? score : score / 2;
 							if (isCorrect) {
-								challenge_elapsed=0f;
-								audio1_done=true;
-								audio2_done=false;
+								challenge_elapsed = 0f;
+								audio1_done = true;
+								audio2_done = false;
 								totalRight--;
 								gameboard.addToScore(amt);
 								gameboard.setImageAt(img_ix, img_iy,
@@ -558,13 +645,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		this.stageCount = stageCount;
 	}
 
-	@Override
-	public void show() {
-		super.show();
-		gameboard = ui.getGameBoard(stage, ui, gs);
-		gameboard.setHandler(this);
-	}
-
 	/**
 	 * Loads pending with discards, user_deck, and deck
 	 */
@@ -618,6 +698,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 
 	@Override
 	public void mute() {
-		
+
 	}
 }

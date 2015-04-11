@@ -1,15 +1,15 @@
 package com.cherokeelessons.cards;
 
 public enum LevelName {
-	Newbie("Newbie", 0, "CgkIy7GTtc0TEAIQBg"), Novice("Novice", 1,
-			"CgkIy7GTtc0TEAIQBw"), Rookie("Rookie", 2, "CgkIy7GTtc0TEAIQCA"), Beginner(
-			"Beginner", 3, "CgkIy7GTtc0TEAIQCQ"), Apprentice("Apprentice",
-			4, "CgkIy7GTtc0TEAIQCg"), Intermediate("Intermediate", 5,
-			"CgkIy7GTtc0TEAIQCw"), Advanced("Advanced", 6,
-			"CgkIy7GTtc0TEAIQDA"), Proficient("Proficient", 7,
-			"CgkIy7GTtc0TEAIQDQ"), Expert("Expert", 8, "CgkIy7GTtc0TEAIQDg"), Master(
-			"Master", 9, "CgkIy7GTtc0TEAIQDw"), GrandMaster("Grandmaster",
-			10, "CgkIy7GTtc0TEAIQEA");
+	Newbie("Newbie", 0, "CgkI4-75m_EMEAIQAQ"), Novice("Novice", 1,
+			"CgkI4-75m_EMEAIQAg"), Rookie("Rookie", 2, "CgkI4-75m_EMEAIQAw"), Beginner(
+			"Beginner", 3, "CgkI4-75m_EMEAIQBA"), Apprentice("Apprentice",
+			4, "CgkI4-75m_EMEAIQBQ"), Intermediate("Intermediate", 5,
+			"CgkI4-75m_EMEAIQBw"), Advanced("Advanced", 6,
+			"CgkI4-75m_EMEAIQCA"), Proficient("Proficient", 7,
+			"CgkI4-75m_EMEAIQCg"), Expert("Expert", 8, "CgkI4-75m_EMEAIQCw"), Master(
+			"Master", 9, "CgkI4-75m_EMEAIQDA"), GrandMaster("Grandmaster",
+			10, "CgkI4-75m_EMEAIQDQ");
 	
 	public LevelName next() {
 		LevelName[] values = LevelName.values();

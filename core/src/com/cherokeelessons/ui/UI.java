@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -634,6 +633,12 @@ public class UI {
 	public LabelStyle getLsXLarge() {
 		LabelStyle style = new LabelStyle(getSkin().get(LabelStyle.class));
 		style.font = Fonts.XLarge.get();
+		return style;
+	}
+
+	public LabelStyle getLsSmall() {
+		LabelStyle style = new LabelStyle(getSkin().get(LabelStyle.class));
+		style.font = Fonts.Small.get();
 		return style;
 	}
 }

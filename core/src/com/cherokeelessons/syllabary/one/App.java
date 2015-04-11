@@ -111,6 +111,8 @@ public class App {
 	}
 	
 	private static Json _json;
+
+	public static GooglePlayGameServices services;
 	public static Json json() {
 		if (_json!=null) {
 			return _json;
@@ -160,5 +162,14 @@ public class App {
 	public static interface PlatformTextInput {
 		public void getTextInput(final TextInputListener listener,
 				final String title, final String text, final String hint);
+	}
+
+	public static boolean isLoggedIn() {
+		return App.getPrefs().getBoolean("isLoggedIn", false);
+	}
+
+	public static void setLoggedIn(boolean b) {
+		App.getPrefs().putBoolean("isLoggedIn", b);
+		App.getPrefs().flush();
 	}
 }
