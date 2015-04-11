@@ -33,7 +33,8 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java"
-
+	
+	archivesBaseName = 'Syllabary'
 
     dependencies {
         compile project(":core")
