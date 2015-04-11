@@ -37,7 +37,7 @@ import com.cherokeelessons.util.WordUtils;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
-	private static final float BOARD_TICK = 5f;// 2f * 60f;
+	private static final float BOARD_TICK = 2f * 60f;
 	private static final float CARD_TICK = 4f;
 	private static final int MinCardsInPlay = 7;
 	private static final long ONE_DAY_ms;
