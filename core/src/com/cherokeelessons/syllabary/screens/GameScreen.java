@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -85,7 +86,28 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private boolean updateChallengeElapsed = true;
 
 	private float updateRemainingTick = 0f;
-	private final List<ClickListener> wrongAnswers = new ArrayList<>();
+	private static class ImgBoxObject {
+		public String img_name;
+//		public ImgBoxObject(Image image, ClickListener listener) {
+//			this();
+//			this.image = image;
+//			this.listener = listener;
+//		}
+		public ImgBoxObject() {
+		}
+//		public ImgBoxObject(String img_name, ClickListener listener) {
+//			this.img_name = img_name;
+//			this.listener=listener;
+//		}
+		public Image image;
+		public ClickListener listener;
+		public Color color;
+		public int ix;
+		public int iy;
+	}
+	private final List<ImgBoxObject> wrongAnswers = new ArrayList<>();
+	private final List<ImgBoxObject> xboxes = new ArrayList<>();
+	private final List<ImgBoxObject> correctAnswers = new ArrayList<>();
 
 	public GameScreen(Screen caller, int slot) {
 		super(caller);
@@ -141,7 +163,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gameboard.setRemaining(0, 0);
 				if (wrongAnswers.size() > 0) {
 					Collections.shuffle(wrongAnswers);
-					wrongAnswers.remove(0).touchDown(null, 0, 0, 0, 0);
+					wrongAnswers.remove(0).listener.touchDown(null, 0, 0, 0, 0);
 					gs.badSound();
 				} else {
 					if (total_elapsed > BOARD_TICK) {
@@ -158,6 +180,34 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			super.act(delta);
 			if (totalRight == 0) {
 				gameboard.setActive(false);
+				dialogShowing=true;
+				for (ImgBoxObject x: wrongAnswers) {
+					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f),Actions.alpha(0f, .3f));
+					Image img = gameboard.getImageAt(x.ix, x.iy);
+					img.addAction(ap);
+					img.setLayoutEnabled(false);
+					img.setOrigin(img.getWidth()/2f, img.getHeight()/2f);
+				}
+				for (ImgBoxObject x: xboxes) {
+					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f),Actions.alpha(0f, .3f));
+					Image img = gameboard.getImageAt(x.ix, x.iy);
+					img.addAction(ap);
+					img.setLayoutEnabled(false);
+					img.setOrigin(img.getWidth()/2f, img.getHeight()/2f);
+				}
+				for (ImgBoxObject x: correctAnswers) {
+					gameboard.setImageAt(x.ix, x.iy, x.img_name);
+					gameboard.setColorAt(x.ix, x.iy, x.color);
+				}
+				Action delay=Actions.delay(.5f);
+				Action run=Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						dialogShowing=false;
+					}
+				});
+				SequenceAction as = Actions.sequence(delay,run);
+				gameboard.addAction(as);
 			}
 			return;
 		}
@@ -425,6 +475,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		do {
 			totalRight = 0;
 			wrongAnswers.clear();
+			xboxes.clear();
+			correctAnswers.clear();
 			for (int ix = 0; ix < GameBoard.width; ix++) {
 				for (int iy = 0; iy < GameBoard.height; iy++) {
 					int letter = r.nextInt(lastLetter - 'Ꭰ' + 1) + 'Ꭰ';
@@ -437,11 +489,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 					int font = r.nextInt(5);
 					StringBuilder img = getGlyphFilename(letter, font);
 					gameboard.setImageAt(ix, iy, img.toString());
-					gameboard.setColorAt(ix, iy, UI.randomBrightColor());
+					Color color = UI.randomBrightColor();
+					gameboard.setColorAt(ix, iy, color);
 					final int score = card.box * 5 + 5 + card.correct_in_a_row;
 					final int img_ix = ix;
 					final int img_iy = iy;
 					final Image img_actor = gameboard.getImageAt(ix, iy);
+					final ImgBoxObject ibo = new ImgBoxObject();
 					ClickListener listener = new ClickListener() {
 						@Override
 						public boolean touchDown(InputEvent event, float x,
@@ -459,7 +513,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								gameboard.setColorAt(img_ix, img_iy,
 										Color.GREEN);
 							} else {
-								wrongAnswers.remove(this);
+								wrongAnswers.remove(ibo);
+								xboxes.add(ibo);
 								perfectStage = false;
 								gameboard.addToScore(-amt);
 								gameboard.setImageAt(img_ix, img_iy, UI.HEAVYX);
@@ -498,14 +553,21 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 							return true;
 						}
 					};
-					if (!isCorrect) {
-						wrongAnswers.add(listener);
-					}
 					gameboard.getImageAt(ix, iy).addCaptureListener(listener);
+					ibo.image=img_actor;
+					ibo.color=new Color(color);
+					ibo.img_name=img.toString();
+					ibo.listener=listener;
+					ibo.ix=ix;
+					ibo.iy=iy;
+					if (isCorrect) {
+						correctAnswers.add(ibo);
+					} else {
+						wrongAnswers.add(ibo);
+					}
 				}
 			}
 		} while (!valid);
-		Collections.shuffle(wrongAnswers);
 	}
 
 	private void loadMasterdeck() {
@@ -586,10 +648,10 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			String file = getGlyphFilename(card.answer.charAt(0), ix)
 					.toString();
 			final Image glyph = ui.loadImage(file);
-			glyph.setScaling(Scaling.fit);
 			pix.add(glyph).width(192f).height(192f);
+			glyph.setScaling(Scaling.fit);
 			glyph.setColor(UI.randomBrightColor());
-			glyph.addAction(Actions.alpha(0f));
+			glyph.getColor().a=0f;
 			actions.add(new RunnableAction() {
 				public void run() {
 					Runnable whenDone = new Runnable() {
