@@ -86,25 +86,29 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private boolean updateChallengeElapsed = true;
 
 	private float updateRemainingTick = 0f;
+
 	private static class ImgBoxObject {
 		public String img_name;
-//		public ImgBoxObject(Image image, ClickListener listener) {
-//			this();
-//			this.image = image;
-//			this.listener = listener;
-//		}
+
+		// public ImgBoxObject(Image image, ClickListener listener) {
+		// this();
+		// this.image = image;
+		// this.listener = listener;
+		// }
 		public ImgBoxObject() {
 		}
-//		public ImgBoxObject(String img_name, ClickListener listener) {
-//			this.img_name = img_name;
-//			this.listener=listener;
-//		}
+
+		// public ImgBoxObject(String img_name, ClickListener listener) {
+		// this.img_name = img_name;
+		// this.listener=listener;
+		// }
 		public Image image;
 		public ClickListener listener;
 		public Color color;
 		public int ix;
 		public int iy;
 	}
+
 	private final List<ImgBoxObject> wrongAnswers = new ArrayList<>();
 	private final List<ImgBoxObject> xboxes = new ArrayList<>();
 	private final List<ImgBoxObject> correctAnswers = new ArrayList<>();
@@ -180,33 +184,35 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			super.act(delta);
 			if (totalRight == 0) {
 				gameboard.setActive(false);
-				dialogShowing=true;
-				for (ImgBoxObject x: wrongAnswers) {
-					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f),Actions.alpha(0f, .3f));
+				dialogShowing = true;
+				for (ImgBoxObject x : wrongAnswers) {
+					ParallelAction ap = Actions.parallel(
+							Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
 					Image img = gameboard.getImageAt(x.ix, x.iy);
 					img.addAction(ap);
 					img.setLayoutEnabled(false);
-					img.setOrigin(img.getWidth()/2f, img.getHeight()/2f);
+					img.setOrigin(img.getWidth() / 2f, img.getHeight() / 2f);
 				}
-				for (ImgBoxObject x: xboxes) {
-					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f),Actions.alpha(0f, .3f));
+				for (ImgBoxObject x : xboxes) {
+					ParallelAction ap = Actions.parallel(
+							Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
 					Image img = gameboard.getImageAt(x.ix, x.iy);
 					img.addAction(ap);
 					img.setLayoutEnabled(false);
-					img.setOrigin(img.getWidth()/2f, img.getHeight()/2f);
+					img.setOrigin(img.getWidth() / 2f, img.getHeight() / 2f);
 				}
-				for (ImgBoxObject x: correctAnswers) {
+				for (ImgBoxObject x : correctAnswers) {
 					gameboard.setImageAt(x.ix, x.iy, x.img_name);
 					gameboard.setColorAt(x.ix, x.iy, x.color);
 				}
-				Action delay=Actions.delay(.5f);
-				Action run=Actions.run(new Runnable() {
+				Action delay = Actions.delay(.5f);
+				Action run = Actions.run(new Runnable() {
 					@Override
 					public void run() {
-						dialogShowing=false;
+						dialogShowing = false;
 					}
 				});
-				SequenceAction as = Actions.sequence(delay,run);
+				SequenceAction as = Actions.sequence(delay, run);
 				gameboard.addAction(as);
 			}
 			return;
@@ -246,6 +252,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		public void success(Void result) {
 			App.getGame().setScreen(new Leaderboard(GameScreen.this));
 		}
+
 		public void error(Exception exception) {
 			UIDialog error = new UIDialog("ERROR!", true, true, ui);
 			error.text(WordUtils.wrap(exception.getMessage(), 60, "\n", true));
@@ -554,12 +561,12 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						}
 					};
 					gameboard.getImageAt(ix, iy).addCaptureListener(listener);
-					ibo.image=img_actor;
-					ibo.color=new Color(color);
-					ibo.img_name=img.toString();
-					ibo.listener=listener;
-					ibo.ix=ix;
-					ibo.iy=iy;
+					ibo.image = img_actor;
+					ibo.color = new Color(color);
+					ibo.img_name = img.toString();
+					ibo.listener = listener;
+					ibo.ix = ix;
+					ibo.iy = iy;
 					if (isCorrect) {
 						correctAnswers.add(ibo);
 					} else {
@@ -631,9 +638,16 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						dialogShowing = false;
 					}
 				};
+				Runnable runnable2 = new Runnable() {
+					@Override
+					public void run() {
+						audio1_done = false;
+					}
+				};
 				SequenceAction sequence = Actions.sequence(Actions.delay(1f),
-						Actions.run(runnable));
-				d.addAction(sequence);
+						Actions.run(runnable), Actions.delay(.25f),
+						Actions.run(runnable2));
+				gameboard.addAction(sequence);
 			}
 		};
 		Label l1 = new Label(card.challenge, ui.getLsXLarge());
@@ -651,7 +665,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			pix.add(glyph).width(192f).height(192f);
 			glyph.setScaling(Scaling.fit);
 			glyph.setColor(UI.randomBrightColor());
-			glyph.getColor().a=0f;
+			glyph.getColor().a = 0f;
 			actions.add(new RunnableAction() {
 				public void run() {
 					Runnable whenDone = new Runnable() {
