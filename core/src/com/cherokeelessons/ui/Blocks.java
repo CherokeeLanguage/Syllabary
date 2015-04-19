@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.utils.Align;
 
 public class Blocks<T extends Actor> extends WidgetGroup {
 	private int width;
