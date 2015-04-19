@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
