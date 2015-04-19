@@ -13,9 +13,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.security.auth.callback.Callback;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
 import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
@@ -309,7 +312,25 @@ public class GameServices implements GooglePlayGameServices {
 					Scores.List scores = g.scores().list(boardId,
 							collection.name(), ts.toString());
 					scores.setMaxResults(30);
-					LeaderboardScores result = scores.execute();
+					LeaderboardScores result;
+					try {
+						result = scores.execute();
+					} catch (Exception e1) {
+						final Callback<Void> cb_login = new Callback<Void>(){
+							@Override
+							public void success(Void result) {
+								lb_getListFor(boardId,collection,ts,success);
+							}
+						};
+						Callback<Void> cb_logout = new Callback<Void>() {
+							@Override
+							public void success(Void result) {
+								login(cb_login);
+							}
+						};
+						logout(cb_logout);
+						return;
+					}
 					List<LeaderboardEntry> list = result.getItems();
 					if (list == null) {
 						postRunnable(success.with(gscores));
@@ -343,7 +364,13 @@ public class GameServices implements GooglePlayGameServices {
 				}
 			}
 		};
-		platform.runTask(runnable);
+		login(new Callback<Void>() {
+			@Override
+			public void success(Void result) {
+				App.log(this, "login done");
+				platform.runTask(runnable);
+			}
+		});
 	}
 
 	@Override
