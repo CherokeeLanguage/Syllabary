@@ -16,7 +16,6 @@ import java.util.List;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
 import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
@@ -136,13 +135,7 @@ public class GameServices implements GooglePlayGameServices {
 			public void run() {
 				try {
 					init();
-					Callback<Credential> callback = new Callback<Credential>() {
-						@Override
-						public void success(Credential result) {
-							credential = result;
-						}
-					};
-					credential = authorize(callback);
+					credential = authorize();
 					postRunnable(success.withNull());
 				} catch (RuntimeException e) {
 					postRunnable(success.with(e));
@@ -158,16 +151,10 @@ public class GameServices implements GooglePlayGameServices {
 
 	private void _login() throws GeneralSecurityException, IOException {
 		init();
-		Callback<Credential> callback = new Callback<Credential>() {
-			@Override
-			public void success(Credential result) {
-				credential = result;
-			}
-		};
-		credential = authorize(callback);
+		credential = authorize();
 	}
 
-	private Credential authorize(final Callback<Credential> callback) throws IOException {
+	private Credential authorize() throws IOException {
 		try {
 			return platform.getCredential(getFlow());
 		} catch (IOException e) {
@@ -207,7 +194,7 @@ public class GameServices implements GooglePlayGameServices {
 		final Callback<Void> retry = new Callback<Void>() {
 			@Override
 			public void success(Void result) {
-				new Thread(r).start();
+				platform.runTask(r);
 			}
 		};
 		final Callback<Void> back_in = new Callback<Void>() {
@@ -221,8 +208,9 @@ public class GameServices implements GooglePlayGameServices {
 
 	@Override
 	public void lb_submit(final String boardId, final long score,
-			final String label, final Callback<Void> success) {
-		platform.runTask(new Runnable() {
+			final String label, final Callback<Void> callback) {
+		final Runnable runnable = new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -231,29 +219,28 @@ public class GameServices implements GooglePlayGameServices {
 					String tag = URLEncoder.encode(label, "UTF-8");
 					submit.setScoreTag(tag);
 					submit.execute();
-					postRunnable(success.withNull());
+					postRunnable(callback.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								lb_submit(boardId, score, label, success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
-			}
-		});
+			} 
+		};
+		platform.runTask(runnable);
 	}
 
 	@Override
 	public void lb_getScoresFor(final String boardId,
 			final Callback<GameScores> success) {
 		final Runnable runnable = new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				GameScores gscores = new GameScores();
@@ -276,17 +263,14 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(success.with(gscores));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								lb_getScoresFor(boardId, success);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(success.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(success.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		};
@@ -296,42 +280,25 @@ public class GameServices implements GooglePlayGameServices {
 	@Override
 	public void lb_getListFor(final String boardId,
 			final Collection collection, final TimeSpan ts,
-			final Callback<GameScores> success) {
+			final Callback<GameScores> callback) {
 		final Runnable runnable = new Runnable() {
+			private final Runnable _self = this;
 			@Override
 			public void run() {
 				GameScores gscores = new GameScores();
 				try {
-					Gdx.app.log(TAG, "Loading Leaderboard: "
-							+ collection.name() + " - " + ts.name() + " - "
-							+ boardId);
+					Gdx.app.log(TAG,
+							"Loading Leaderboard: " + collection.name() + " - "
+									+ ts.name() + " - " + boardId);
 
 					Games g = _getGamesObject();
 					Scores.List scores = g.scores().list(boardId,
 							collection.name(), ts.toString());
 					scores.setMaxResults(30);
-					LeaderboardScores result;
-					try {
-						result = scores.execute();
-					} catch (Exception e1) {
-						final Callback<Void> cb_login = new Callback<Void>(){
-							@Override
-							public void success(Void result) {
-								lb_getListFor(boardId,collection,ts,success);
-							}
-						};
-						Callback<Void> cb_logout = new Callback<Void>() {
-							@Override
-							public void success(Void result) {
-								login(cb_login);
-							}
-						};
-						logout(cb_logout);
-						return;
-					}
+					LeaderboardScores result = scores.execute();
 					List<LeaderboardEntry> list = result.getItems();
 					if (list == null) {
-						postRunnable(success.with(gscores));
+						postRunnable(callback.with(gscores));
 						return;
 					}
 					for (LeaderboardEntry e : list) {
@@ -339,43 +306,35 @@ public class GameServices implements GooglePlayGameServices {
 						gs.rank = e.getFormattedScoreRank();
 						gs.tag = URLDecoder.decode(e.getScoreTag(), "UTF-8");
 						gs.value = e.getFormattedScore();
-						gs.user = e.getPlayer().getDisplayName();						
+						gs.user = e.getPlayer().getDisplayName();
 						gs.imgUrl = e.getPlayer().getAvatarImageUrl();
 						gscores.list.add(gs);
 					}
 					gscores.collection = collection;
 					gscores.ts = ts;
-					postRunnable(success.with(gscores));
+					postRunnable(callback.with(gscores));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								lb_getListFor(boardId, collection, ts, success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				} catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		};
-		login(new Callback<Void>() {
-			@Override
-			public void success(Void result) {
-				App.log(this, "login done");
-				platform.runTask(runnable);
-			}
-		});
+		platform.runTask(runnable);
 	}
 
 	@Override
 	public void lb_getListWindowFor(final String boardId,
 			final Collection collection, final TimeSpan ts,
-			final Callback<GameScores> success) {
+			final Callback<GameScores> callback) {
 		final Runnable runnable = new Runnable() {
+			private final Runnable _self = this;
 			@Override
 			public void run() {
 				GameScores gscores = new GameScores();
@@ -397,21 +356,17 @@ public class GameServices implements GooglePlayGameServices {
 					}
 					gscores.collection = collection;
 					gscores.ts = ts;
-					postRunnable(success.with(gscores));
+					postRunnable(callback.with(gscores));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								lb_getListWindowFor(boardId, collection, ts,
-										success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		};
@@ -429,64 +384,61 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	@Override
-	public void ach_reveal(final String id, final Callback<Void> success) {
+	public void ach_reveal(final String id, final Callback<Void> callback) {
 		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
 					Games g = _getGamesObject();
 					Achievements ac = g.achievements();
 					ac.reveal(id).execute();
-					postRunnable(success.withNull());
+					postRunnable(callback.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								ach_reveal(id, success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		});
 	}
 
 	@Override
-	public void ach_unlocked(final String id, final Callback<Void> success) {
+	public void ach_unlocked(final String id, final Callback<Void> callback) {
 		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
 					Games g = _getGamesObject();
 					Achievements ac = g.achievements();
 					ac.unlock(id).execute();
-					postRunnable(success.withNull());
+					postRunnable(callback.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								ach_unlocked(id, success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		});
 	}
 
 	@Override
-	public void ach_list(final Callback<GameAchievements> success) {
+	public void ach_list(final Callback<GameAchievements> callback) {
 		final Runnable runnable = new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				GameAchievements results = new GameAchievements();
@@ -502,20 +454,17 @@ public class GameServices implements GooglePlayGameServices {
 						a.state = pa.getAchievementState();
 						results.list.add(a);
 					}
-					postRunnable(success.with(results));
+					postRunnable(callback.with(results));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								ach_list(success);
-							}
-						});
+						retry(_self);
 					} else {
-						postRunnable(success.with(e));
+						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
 		};
@@ -528,7 +477,8 @@ public class GameServices implements GooglePlayGameServices {
 		Callback<FileMetaList> meta_cb = new Callback<FileMetaList>() {
 			@Override
 			public void success(final FileMetaList result) {
-				new Thread(new Runnable() {
+				platform.runTask(new Runnable() {
+					private final Runnable _self=this;
 					@Override
 					public void run() {
 						if (result.files.size() == 0) {
@@ -547,6 +497,8 @@ public class GameServices implements GooglePlayGameServices {
 							postRunnable(callback.with(result));
 						} catch (IOException e) {
 							postRunnable(callback.with(e));
+						} catch (NullPointerException e) {
+							retry(_self);
 						}
 					}
 				});
@@ -595,7 +547,8 @@ public class GameServices implements GooglePlayGameServices {
 	@Override
 	public void drive_getFileMetaById(final String id,
 			final Callback<FileMeta> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -612,20 +565,17 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(fm));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_getFileMetaById(id, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
@@ -633,7 +583,8 @@ public class GameServices implements GooglePlayGameServices {
 	 */
 	@Override
 	public void drive_list(final Callback<FileMetaList> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -658,20 +609,17 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(afs));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_list(callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
@@ -684,7 +632,8 @@ public class GameServices implements GooglePlayGameServices {
 	 */
 	@Override
 	public void drive_deleteById(final String id, final Callback<Void> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -695,18 +644,15 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(e));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_deleteById(id, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
@@ -798,7 +744,8 @@ public class GameServices implements GooglePlayGameServices {
 			_title = title;
 		}
 
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -814,26 +761,24 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(inserted.getId()));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_put(file, _title, description, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	@Override
 	public void drive_getFileById(final String id,
 			final Callback<String> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -849,26 +794,24 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(result));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_getFileById(id, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	@Override
 	public void drive_getFileById(final String id, final FileHandle file,
 			final Callback<Void> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -882,26 +825,24 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_getFileById(id, file, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
 				} catch (GeneralSecurityException e) {
 					postRunnable(callback.with(e));
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	@Override
 	public void drive_getFileByUrl(final String url, final FileHandle file,
 			final Callback<Void> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -912,24 +853,22 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_getFileByUrl(url, file, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
+				} catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	@Override
 	public void drive_getFileByUrl(final String url,
 			final Callback<String> callback) {
-		new Thread(new Runnable() {
+		platform.runTask(new Runnable() {
+			private final Runnable _self=this;
 			@Override
 			public void run() {
 				try {
@@ -942,18 +881,15 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(callback.with(result));
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
-						retry(new Runnable() {
-							@Override
-							public void run() {
-								drive_getFileByUrl(url, callback);
-							}
-						});
+						retry(_self);
 					} else {
 						postRunnable(callback.with(e));
 					}
+				}  catch (NullPointerException e) {
+					retry(_self);
 				}
 			}
-		}).start();
+		});
 	}
 
 	private Drive _getDriveObject() throws GeneralSecurityException,
