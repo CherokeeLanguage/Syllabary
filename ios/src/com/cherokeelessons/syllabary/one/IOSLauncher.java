@@ -12,7 +12,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        App.services=new GameServices(new Platform());
+        App.services=new GameServices(App.CredentialsFolder, new Platform());
         return new IOSApplication(new SyllabaryApp(), config);
     }
 

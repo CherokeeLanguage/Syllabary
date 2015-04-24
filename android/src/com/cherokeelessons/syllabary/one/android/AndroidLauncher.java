@@ -16,6 +16,6 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new SyllabaryApp(), config);
 		Platform.application=this;
-		App.services=new GameServices(new Platform());
+		App.services=new GameServices(App.CredentialsFolder, new Platform());
 	}
 }

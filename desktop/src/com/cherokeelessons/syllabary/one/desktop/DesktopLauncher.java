@@ -29,6 +29,6 @@ public class DesktopLauncher {
 //		config.addIcon("icons/icon-32.png", FileType.Internal);
 //		config.addIcon("icons/icon-16.png", FileType.Internal);
 		new LwjglApplication(new SyllabaryApp(), config);
-		App.services=new GameServices(new Platform());
+		App.services=new GameServices(App.CredentialsFolder, new Platform());
 	}
 }

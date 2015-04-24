@@ -68,6 +68,8 @@ public class App {
 	private final static Rectangle targetScreenSize = new Rectangle(0, 0, 1280,
 			720);
 
+	public static final String CredentialsFolder = ".config/CherokeeSyllabary/GooglePlayGameServices/";
+
 	private static Rectangle fittedSize() {
 		int h = Gdx.graphics.getHeight();
 		int w = Gdx.graphics.getWidth();

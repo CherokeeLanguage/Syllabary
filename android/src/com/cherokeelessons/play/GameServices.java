@@ -16,6 +16,7 @@ import java.util.List;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
 import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
@@ -51,13 +52,13 @@ import com.google.api.services.games.model.PlayerLeaderboardScoreListResponse;
 public class GameServices implements GooglePlayGameServices {
 
 	public static interface PlatformInterface {
-		Credential getCredential(GoogleAuthorizationCodeFlow flow)
+		public Credential getCredential(GoogleAuthorizationCodeFlow flow)
 				throws IOException;
 
-		HttpTransport getTransport() throws GeneralSecurityException,
+		public HttpTransport getTransport() throws GeneralSecurityException,
 				IOException;
 
-		void runTask(Runnable runnable);
+		public void runTask(Runnable runnable);
 	}
 
 	private FileHandle DATA_STORE_DIR;
@@ -80,9 +81,11 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	private final PlatformInterface platform;
+	private final String googlePlayServicesFolder;
 
-	public GameServices(PlatformInterface platform) {
+	public GameServices(String credentialsFolder, PlatformInterface platform) {
 		this.platform = platform;
+		this.googlePlayServicesFolder = credentialsFolder;
 	}
 
 	private void init() throws GeneralSecurityException, IOException {
@@ -90,11 +93,10 @@ public class GameServices implements GooglePlayGameServices {
 			if (initdone) {
 				return;
 			}
-			String path0 = ".config/CherokeeBoundPronouns/GooglePlayGameServices/";
 			if (Gdx.app.getType().equals(ApplicationType.Desktop)) {
-				p0 = Gdx.files.external(path0);
+				p0 = Gdx.files.external(googlePlayServicesFolder);
 			} else {
-				p0 = Gdx.files.local(path0);
+				p0 = Gdx.files.local(googlePlayServicesFolder);
 			}
 			p0.mkdirs();
 			DATA_STORE_DIR = p0;
@@ -179,6 +181,7 @@ public class GameServices implements GooglePlayGameServices {
 					postRunnable(success.withNull());
 				} catch (IOException e) {
 					if (e instanceof TokenResponseException) {
+						App.log(this, e.getMessage());
 					} else {
 						postRunnable(success.with(e));
 					}
@@ -314,6 +317,7 @@ public class GameServices implements GooglePlayGameServices {
 					gscores.ts = ts;
 					postRunnable(callback.with(gscores));
 				} catch (IOException e) {
+					App.log(this, e.getMessage());
 					if (e instanceof TokenResponseException) {
 						retry(_self);
 					} else {
