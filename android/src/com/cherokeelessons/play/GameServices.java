@@ -49,6 +49,8 @@ import com.google.api.services.games.model.PlayerLeaderboardScoreListResponse;
 
 public class GameServices implements GooglePlayGameServices {
 
+	public static String APP_NAME = "ᏣᎳᎩ ᎦᏬᏂᎯᏍᏗ/1.0";
+
 	public static interface PlatformInterface {
 		public Credential getCredential(GoogleAuthorizationCodeFlow flow)
 				throws IOException;
@@ -333,7 +335,7 @@ public class GameServices implements GooglePlayGameServices {
 		_login();
 		Games.Builder b = new Games.Builder(httpTransport, JSON_FACTORY,
 				credential);
-		b.setApplicationName("Cherokee Bound Pronouns/1.0");
+		b.setApplicationName(APP_NAME);
 		Games g = b.build();
 		return g;
 	}
@@ -766,7 +768,7 @@ public class GameServices implements GooglePlayGameServices {
 		_login();
 		Drive.Builder b = new Drive.Builder(httpTransport, JSON_FACTORY,
 				credential);
-		b.setApplicationName("Cherokee Bound Pronouns/1.0");
+		b.setApplicationName(APP_NAME);
 		Drive drive = b.build();
 		return drive;
 	}
