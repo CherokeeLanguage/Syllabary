@@ -21,7 +21,6 @@ import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
 import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
 import com.cherokeelessons.util.GooglePlayGameServices.GameScores.GameScore;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
