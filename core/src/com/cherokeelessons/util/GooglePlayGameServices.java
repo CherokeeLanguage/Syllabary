@@ -1,5 +1,6 @@
 package com.cherokeelessons.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -144,4 +145,5 @@ public interface GooglePlayGameServices {
 	void drive_replace(FileHandle file, String title, String description,
 			Callback<String> callback);
 	void drive_replace(FileHandle file, Callback<String> callback);
+	boolean isLoggedIn();
 }

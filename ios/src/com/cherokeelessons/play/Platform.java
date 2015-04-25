@@ -217,7 +217,7 @@ public class Platform implements PlatformInterface {
 						.setRedirectUri(redirectUri).execute();
 				return flow.createAndStoreCredential(response, userId);
 			}
-		}.authorize("user");
+		}.authorize(PlatformInterface.USER);
 	}
 
 	private void login(final String url) {

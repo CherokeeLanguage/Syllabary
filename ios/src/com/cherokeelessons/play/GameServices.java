@@ -50,14 +50,12 @@ import com.google.api.services.games.model.PlayerLeaderboardScoreListResponse;
 public class GameServices implements GooglePlayGameServices {
 
 	public static String APP_NAME = "ᏣᎳᎩ ᎦᏬᏂᎯᏍᏗ/1.0";
-
 	public static interface PlatformInterface {
+		public static final String USER = "user";
 		public Credential getCredential(GoogleAuthorizationCodeFlow flow)
 				throws IOException;
-
 		public HttpTransport getTransport() throws GeneralSecurityException,
 				IOException;
-
 		public void runTask(Runnable runnable);
 	}
 
@@ -105,6 +103,21 @@ public class GameServices implements GooglePlayGameServices {
 			initdone = true;
 		}
 	}
+	
+	@Override
+	public boolean isLoggedIn() {
+		try {
+			init();
+			GoogleAuthorizationCodeFlow flow = getFlow();
+			if (flow==null) {
+				return false;
+			}
+			return flow.loadCredential(PlatformInterface.USER)!=null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public GoogleAuthorizationCodeFlow getFlow() throws IOException {
 
@@ -123,11 +136,8 @@ public class GameServices implements GooglePlayGameServices {
 		GoogleAuthorizationCodeFlow.Builder builder = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, JSON_FACTORY, clientSecrets, scopes);
 		builder.setScopes(scopes);
-		GoogleAuthorizationCodeFlow flow = null;
-		flow = builder.setAccessType("offline")
+		return builder.setAccessType("offline")
 				.setDataStoreFactory(dataStoreFactory).build();
-		return flow;
-
 	}
 
 	@Override
@@ -166,10 +176,14 @@ public class GameServices implements GooglePlayGameServices {
 			@Override
 			public void run() {
 				try {
+					Gdx.app.log(this.getClass().getName(), "logout:init");
 					init();
-					GoogleAuthorizationCodeFlow flow;
-					flow = getFlow();
+					Gdx.app.log(this.getClass().getName(), "logout:getflow");
+					GoogleAuthorizationCodeFlow flow = getFlow();
+					Gdx.app.log(this.getClass().getName(), "logout:flow#clear");
 					flow.getCredentialDataStore().clear();
+					Gdx.app.log(this.getClass().getName(), "credential=null");
+					credential=null;
 					postRunnable(success.withNull());
 				} catch (Exception e) {
 					postRunnable(success.with(e));
