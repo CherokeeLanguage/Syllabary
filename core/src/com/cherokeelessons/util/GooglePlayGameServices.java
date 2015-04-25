@@ -81,12 +81,12 @@ public interface GooglePlayGameServices {
 	
 	public static enum TimeSpan {
 		DAILY("Today's Best"), WEEKLY("This Week's Best"), ALL_TIME("Alltime Best");
-		private TimeSpan(String engrish) {
-			this.engrish=engrish;
+		private TimeSpan(String english) {
+			this.english=english;
 		}
-		private final String engrish;
+		private final String english;
 		public String getEngrish() {
-			return engrish;
+			return english;
 		}
 		public TimeSpan next() {
 			TimeSpan[] values = TimeSpan.values();
