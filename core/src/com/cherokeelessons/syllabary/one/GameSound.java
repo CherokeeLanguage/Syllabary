@@ -25,10 +25,10 @@ public class GameSound {
 	private static final String CASH = "sounds/effects/cash_out.wav";
 	private static final String ERROR = "sounds/effects/dialogerror.wav";
 	private static final String DINGDING = "sounds/effects/ding-ding-ding.wav";
-	private static final String CLICK = "sounds/effects/menu-click.wav";
+//	private static final String CLICK = "sounds/effects/menu-click.wav";
 	private static final String[] BAD;
 	static {
-		BAD = new String[] {ALARM, BARK, ERROR };
+		BAD = new String[] {ALARM, BARK, ERROR, BUZZER };
 	}
 	
 	public void pointsAdded() {
