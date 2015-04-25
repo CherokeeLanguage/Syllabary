@@ -16,7 +16,6 @@ import java.util.List;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
 import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
@@ -131,16 +130,16 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	@Override
-	public void login(final Callback<Void> success) {
+	public void login(final Callback<Void> callback) {
 		final Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				try {
 					init();
 					credential = authorize();
-					postRunnable(success.withNull());
+					postRunnable(callback.withNull());
 				} catch (Exception e) {
-					postRunnable(success.with(e));
+					postRunnable(callback.with(e));
 				}
 			}
 		};
@@ -209,17 +208,9 @@ public class GameServices implements GooglePlayGameServices {
 					submit.setScoreTag(tag);
 					submit.execute();
 					postRunnable(callback.withNull());
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
-				}  
+					retry(_self);
+				}
 			} 
 		};
 		platform.runTask(runnable);
@@ -250,14 +241,8 @@ public class GameServices implements GooglePlayGameServices {
 						gscores.list.add(gs);
 					}
 					postRunnable(callback.with(gscores));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				}  catch (Exception e) {
-					postRunnable(callback.with(e));
+				} catch (Exception e) {
+					retry(_self);
 				}
 			}
 		};
@@ -300,17 +285,8 @@ public class GameServices implements GooglePlayGameServices {
 					gscores.collection = collection;
 					gscores.ts = ts;
 					postRunnable(callback.with(gscores));
-				} catch (IOException e) {
-					App.log(this, e.getMessage());
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		};
@@ -345,16 +321,8 @@ public class GameServices implements GooglePlayGameServices {
 					gscores.collection = collection;
 					gscores.ts = ts;
 					postRunnable(callback.with(gscores));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		};
@@ -382,16 +350,8 @@ public class GameServices implements GooglePlayGameServices {
 					Achievements ac = g.achievements();
 					ac.reveal(id).execute();
 					postRunnable(callback.withNull());
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				}  catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -408,16 +368,8 @@ public class GameServices implements GooglePlayGameServices {
 					Achievements ac = g.achievements();
 					ac.unlock(id).execute();
 					postRunnable(callback.withNull());
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -443,16 +395,8 @@ public class GameServices implements GooglePlayGameServices {
 						results.list.add(a);
 					}
 					postRunnable(callback.with(results));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				}  catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		};
@@ -483,12 +427,8 @@ public class GameServices implements GooglePlayGameServices {
 							String result = new String(baos.toByteArray(),
 									"UTF-8").intern();
 							postRunnable(callback.with(result));
-						} catch (IOException e) {
-							postRunnable(callback.with(e));
-						} catch (NullPointerException e) {
+						} catch (Exception e) {
 							retry(_self);
-						}  catch (Exception e) {
-							postRunnable(callback.with(e));
 						}
 					}
 				});
@@ -553,16 +493,8 @@ public class GameServices implements GooglePlayGameServices {
 					fm.title = meta.getTitle();
 					fm.url = meta.getDownloadUrl();
 					postRunnable(callback.with(fm));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				} 
 			}
 		});
@@ -597,16 +529,8 @@ public class GameServices implements GooglePlayGameServices {
 						afs.files.add(af);
 					}
 					postRunnable(callback.with(afs));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -630,18 +554,8 @@ public class GameServices implements GooglePlayGameServices {
 					Drive drive = _getDriveObject();
 					drive.files().delete(id).execute();
 					postRunnable(callback.withNull());
-				} catch (GeneralSecurityException e) {
-					postRunnable(callback.with(e));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}				
 			}
 		});
@@ -751,18 +665,8 @@ public class GameServices implements GooglePlayGameServices {
 					Insert insert = drive.files().insert(meta, content);
 					File inserted = insert.execute();
 					postRunnable(callback.with(inserted.getId()));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (GeneralSecurityException e) {
-					postRunnable(callback.with(e));
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -786,18 +690,8 @@ public class GameServices implements GooglePlayGameServices {
 					String result = new String(baos.toByteArray(), "UTF-8")
 							.intern();
 					postRunnable(callback.with(result));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (GeneralSecurityException e) {
-					postRunnable(callback.with(e));
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -819,18 +713,8 @@ public class GameServices implements GooglePlayGameServices {
 					downloader.download(new GenericUrl(meta.getDownloadUrl()),
 							fos);
 					postRunnable(callback.withNull());
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (GeneralSecurityException e) {
-					postRunnable(callback.with(e));
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -849,16 +733,8 @@ public class GameServices implements GooglePlayGameServices {
 							httpTransport, credential);
 					downloader.download(new GenericUrl(url), fos);
 					postRunnable(callback.withNull());
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				} catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
@@ -879,16 +755,8 @@ public class GameServices implements GooglePlayGameServices {
 					String result = new String(baos.toByteArray(), "UTF-8")
 							.intern();
 					postRunnable(callback.with(result));
-				} catch (IOException e) {
-					if (e instanceof TokenResponseException) {
-						retry(_self);
-					} else {
-						postRunnable(callback.with(e));
-					}
-				}  catch (NullPointerException e) {
-					retry(_self);
 				} catch (Exception e) {
-					postRunnable(callback.with(e));
+					retry(_self);
 				}
 			}
 		});
