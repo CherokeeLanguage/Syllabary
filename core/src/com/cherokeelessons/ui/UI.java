@@ -307,35 +307,41 @@ public class UI {
 		private final UI ui;
 		public UIDialog(String title, UI ui) {
 			this(title, false, false, ui);
+			this.getTitleLabel().setAlignment(Align.center);
 		}
 		public UIDialog(String title, boolean dim, boolean nine, UI ui) {
 			super(title, nine?ui.getDialogStyle9(dim):ui.getDialogStyle(dim));
+			this.getTitleLabel().setAlignment(Align.center);
 			this.ui=ui;
 		}
-		public Dialog textCenter(String text) {
+		public UIDialog textCenter(String text) {
 			Label lbl = new Label(text, ui.getLs());
 			lbl.setAlignment(Align.center);
-			return text(lbl);
+			text(lbl);
+			return this;
 		}
 		@Override
-		public Dialog text(String text) {
+		public UIDialog text(String text) {
 			Label lbl = new Label(text, ui.getLs());
-			return text(lbl);
+			text(lbl);
+			return this;
 		}
 		@Override
-		public Dialog button(String text) {
+		public UIDialog button(String text) {
 			TextButton tb = new TextButton(text, ui.getTbs());
-			return button(tb);
+			button(tb);
+			return this;
 		}
 		
 		@Override
-		public Dialog button(String text, Object object) {
+		public UIDialog button(String text, Object object) {
 			TextButton tb = new TextButton(text, ui.getTbs());
-			return button(tb, object);
+			button(tb, object);
+			return this;
 		}
 		
 		@Override
-		public Dialog show(Stage stage, Action action) {
+		public UIDialog show(Stage stage, Action action) {
 			super.show(stage, action);
 			setPosition(Math.round((stage.getWidth() - getWidth()) / 2), Math.round((stage.getHeight() - getHeight()) / 2));
 			return this;
