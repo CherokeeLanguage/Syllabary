@@ -60,7 +60,8 @@ public class Loading extends ChildScreen {
 		super.dispose();
 	}
 
-	boolean startup=false;
+	private boolean sounddone=false;
+	private boolean startup=false;
 	@Override
 	public void act(float delta) {
 		super.act(delta);
@@ -74,6 +75,7 @@ public class Loading extends ChildScreen {
 				public void onCompletion(Music music) {
 					music.dispose();
 					manager.unload(GameSound.STARTUP);
+					sounddone=true;
 				}
 			});
 			m.play();
@@ -82,7 +84,7 @@ public class Loading extends ChildScreen {
 		if (!Fonts.isLoaded()) {
 			return;
 		}
-		if (manager.update()) {
+		if (manager.update() && sounddone) {
 			App.getGame().setScreen(new MainMenu());
 			this.dispose();
 		}

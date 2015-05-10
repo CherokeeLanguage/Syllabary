@@ -39,6 +39,23 @@ import com.cherokeelessons.util.WordUtils;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
+	private enum Choices {
+		Leaderboard, MainMenu, NextStage;
+	}
+	private static class ImgBoxObject {
+		public Color color;
+
+		public String img_name;
+
+		public int ix;
+		public int iy;
+		public ClickListener listener;
+		public ImgBoxObject() {
+		}
+	}
+	private enum YesNo {
+		No, Yes;
+	}
 	private static final float BOARD_TICK = 2f * 60f;
 	private static final float CARD_TICK = 4f;
 	private static final int MinCardsInPlay = 7;
@@ -47,35 +64,40 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private static final long ONE_MINUTE_ms;
 	private static final long ONE_SECOND_ms;
 	private static final Random r = new Random();
+
 	static {
 		ONE_SECOND_ms = 1000l;
 		ONE_MINUTE_ms = 60l * ONE_SECOND_ms;
 		ONE_HOUR_ms = 60l * ONE_MINUTE_ms;
 		ONE_DAY_ms = 24l * ONE_HOUR_ms;
 	}
+
 	private boolean audio1_done = false;
+
 	private boolean audio2_done = false;
 
 	private float challenge_elapsed = 0f;
 
-	private Card currentCard = null;
+	private final List<ImgBoxObject> correctAnswers = new ArrayList<>();
 
+	private Card currentCard = null;
 	/**
 	 * time since last "shuffle"
 	 */
 	private float currentCard_elapsed = 0f;
-
 	private GameScreenDecks decks;
 
 	private boolean dialogShowing = false;
 
 	private GameBoard gameboard;
 	private SlotInfo info;
+
 	private final Set<String> nodupes = new HashSet<String>();
 
 	private int perfectCount = 0;
 
 	private boolean perfectStage = true;
+
 	final int slot;
 
 	private int stageCount = 0;
@@ -83,26 +105,26 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private float total_elapsed = 0f;
 
 	private int totalRight = 0;
-
 	private boolean updateChallengeElapsed = true;
-
 	private float updateRemainingTick = 0f;
 
-	private static class ImgBoxObject {
-		public String img_name;
-
-		public ImgBoxObject() {
+	private Callback<Void> viewScoresAfterSubmit = new Callback<Void>() {
+		public void error(Exception exception) {
+			UIDialog error = new UIDialog("ERROR!", true, true, ui);
+			error.text(WordUtils.wrap(exception.getMessage(), 60, "\n", true));
+			error.button("OK");
+			error.show(stage);
 		}
 
-		public ClickListener listener;
-		public Color color;
-		public int ix;
-		public int iy;
-	}
+		@Override
+		public void success(Void result) {
+			App.getGame().setScreen(new Leaderboard(GameScreen.this));
+		};
+	};
 
 	private final List<ImgBoxObject> wrongAnswers = new ArrayList<>();
+
 	private final List<ImgBoxObject> xboxes = new ArrayList<>();
-	private final List<ImgBoxObject> correctAnswers = new ArrayList<>();
 
 	public GameScreen(Screen caller, int slot) {
 		super(caller);
@@ -110,6 +132,10 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		this.decks = new GameScreenDecks();
 		gameboard = ui.getGameBoard(stage, ui, gs);
 		gameboard.setHandler(this);
+		SlotInfo info = App.getSlotInfo(slot);
+		App.Volume.challenges=info.getVol_challenges();
+		App.Volume.effects=info.getVol_effects();
+		App.Volume.mute=info.isVol_mute();
 	}
 
 	@Override
@@ -230,28 +256,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		gameboard.setRemaining(0f, 0f);
 	}
 
-	private enum Choices {
-		NextStage, MainMenu, Leaderboard;
-	}
-
-	private enum YesNo {
-		Yes, No;
-	}
-
-	private Callback<Void> viewScoresAfterSubmit = new Callback<Void>() {
-		@Override
-		public void success(Void result) {
-			App.getGame().setScreen(new Leaderboard(GameScreen.this));
-		}
-
-		public void error(Exception exception) {
-			UIDialog error = new UIDialog("ERROR!", true, true, ui);
-			error.text(WordUtils.wrap(exception.getMessage(), 60, "\n", true));
-			error.button("OK");
-			error.show(stage);
-		};
-	};
-
 	private void endSession() {
 		info.deck.cards.clear();
 		info.deck.loadAll(decks.pending);
@@ -275,11 +279,11 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		if (App.services.isLoggedIn()) {
 			FileHandle fh = App.getSlotInfoFileHandle(slot);
 			Callback<String> ifError=new Callback<String>() {
-				@Override
-				public void success(String result) {
-				}
 				public void error(Exception exception) {
 					ui.errorDialog(exception, null);
+				}
+				@Override
+				public void success(String result) {
 				};
 			};
 			App.services.drive_replace(fh, slot+"-"+fh.name(), slot+"-"+fh.name(), ifError);
@@ -387,23 +391,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			};
 			submitScore(enableButtons);
 		}
-	}
-
-	private void submitScore(final Callback<Void> callback) {
-		Callback<Void> do_submit = new Callback<Void>() {
-			@Override
-			public void success(Void result) {
-				App.services.lb_submit(Leaderboard.BoardId, info.lastScore,
-						info.level.getEnglish(), callback);
-			}
-
-			@Override
-			public void error(Exception exception) {
-				App.log(this, exception.getMessage());
-				callback.error(exception);
-			}
-		};
-		App.services.login(do_submit);
 	}
 
 	private StringBuilder getGlyphFilename(int letter, int font) {
@@ -626,6 +613,16 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		decks.reserved.loadAll(decks.discards);
 	}
 
+	@Override
+	public void mainmenu() {
+		goodBye();
+	}
+
+	@Override
+	public void mute() {
+		App.Volume.mute=true;
+	}
+
 	private void newCardDialog(final Card card) {
 		dialogShowing = true;
 		final RunnableAction[] dialogDone = new RunnableAction[1];
@@ -755,6 +752,23 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		currentCard = null;
 	}
 
+	private void submitScore(final Callback<Void> callback) {
+		Callback<Void> do_submit = new Callback<Void>() {
+			@Override
+			public void error(Exception exception) {
+				App.log(this, exception.getMessage());
+				callback.error(exception);
+			}
+
+			@Override
+			public void success(Void result) {
+				App.services.lb_submit(Leaderboard.BoardId, info.lastScore,
+						info.level.getEnglish(), callback);
+			}
+		};
+		App.services.login(do_submit);
+	}
+
 	/**
 	 * record all cards currently "in-play" so that when cards are retrieved
 	 * from the master deck they are new cards
@@ -775,15 +789,5 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			challenge_elapsed += delta;
 		}
 		currentCard_elapsed += delta;
-	}
-
-	@Override
-	public void mainmenu() {
-		goodBye();
-	}
-
-	@Override
-	public void mute() {
-
 	}
 }

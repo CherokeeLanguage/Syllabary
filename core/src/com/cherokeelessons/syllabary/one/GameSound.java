@@ -7,7 +7,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.audio.Sound;
-import com.cherokeelessons.syllabary.one.App.Volume;
 
 public class GameSound {
 	private final AssetManager manager;
@@ -25,7 +24,6 @@ public class GameSound {
 	private static final String CASH = "sounds/effects/cash_out.wav";
 	private static final String ERROR = "sounds/effects/dialogerror.wav";
 	private static final String DINGDING = "sounds/effects/ding-ding-ding.wav";
-//	private static final String CLICK = "sounds/effects/menu-click.wav";
 	private static final String[] BAD;
 	static {
 		BAD = new String[] {ALARM, BARK, ERROR, BUZZER };
@@ -44,7 +42,7 @@ public class GameSound {
 		manager.load(sound_file, Sound.class);
 		manager.finishLoadingAsset(sound_file);
 		Sound sound = manager.get(sound_file, Sound.class);
-		sound.play(App.Volume.effects);
+		sound.play(App.Volume.mute?0f:App.Volume.effects);
 	}
 	
 	public void pointsDeducted() {
@@ -66,7 +64,7 @@ public class GameSound {
 		manager.finishLoadingAsset(glyph_audio);
 		Music audio = manager.get(glyph_audio, Music.class);
 		audio.setLooping(false);
-		audio.setVolume(Volume.challenges);
+		audio.setVolume(App.Volume.mute?0f:App.Volume.challenges);
 		audio.setOnCompletionListener(new OnCompletionListener() {
 			@Override
 			public void onCompletion(Music music) {
