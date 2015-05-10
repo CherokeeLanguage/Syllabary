@@ -164,6 +164,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 				SlotInfo si_info = App.getSlotInfo(slot);
 				if (si_info.lastrun == 0 && tmp.exists()) {
 					tmp.copyTo(info);
+					Gdx.app.postRunnable(whenDone);
 					return;
 				}
 				if (!si_info.signature.equals(si_tmp.signature)) {
@@ -356,5 +357,10 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 		notice.button(new TextButton(download, ui.getTbs()), download);
 		notice.button(new TextButton(cancel, ui.getTbs()), cancel);
 		notice.show(stage);
+	}
+
+	@Override
+	public void reload() {
+		Gdx.app.postRunnable(reload);
 	}
 }

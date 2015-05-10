@@ -20,4 +20,8 @@ public interface SlotsDialogHandler {
 	 * @param slot
 	 */
 	public void sync(int slot, Runnable whenDone);
+	/**
+	 * Reload slots...
+	 */
+	public void reload();
 }

@@ -450,6 +450,7 @@ public class UI {
 						@Override
 						public void run() {
 							busy.hide();
+							handler.reload();
 						}
 					};
 					handler.sync(slot, nobusy);
