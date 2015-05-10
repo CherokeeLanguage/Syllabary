@@ -13,16 +13,13 @@ All audio effects are cc-zero or public domain.
 
 - Fonts Used For Challenge Images -
 Aboriginal Serif - http://www.languagegeek.com/
-Digohweli - http://www.languagegeek.com/
-Nikwasi - Chung deh Tien
+Alewisdodi - Chung deh Tien
 Cherokee Handone - Joseph Erb
+Digohweli - http://www.languagegeek.com/
+Uweyv Nvyu - Chung deh Tien
 
 - Font Used For Game Menus -
 Cherokee Handone - Joseph Erb
-
-- Language Reference -
-Language Assistance - ᏣᎵ ᎡᎵᏂ ᎠᏍᎦᏳᏏᏩᏍᎩ
-Cherokee-English Dictionary (Durbin-Feeling)
 
 - Pictures -
 Commons.Wikimedia.Org

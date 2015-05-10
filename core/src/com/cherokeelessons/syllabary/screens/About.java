@@ -46,6 +46,8 @@ public class About extends ChildScreen {
 		text+="\n\n";
 		
 		text += Gdx.files.internal("text/changelog.txt").readString("UTF-8");
+		
+		text = text.replaceAll("\n\n", "\n \n");
 
 		Label label = new Label(text, ls);
 		label.setWrap(true);
