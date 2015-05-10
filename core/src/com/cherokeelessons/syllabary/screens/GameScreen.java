@@ -90,19 +90,9 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private static class ImgBoxObject {
 		public String img_name;
 
-		// public ImgBoxObject(Image image, ClickListener listener) {
-		// this();
-		// this.image = image;
-		// this.listener = listener;
-		// }
 		public ImgBoxObject() {
 		}
 
-		// public ImgBoxObject(String img_name, ClickListener listener) {
-		// this.img_name = img_name;
-		// this.listener=listener;
-		// }
-		public Image image;
 		public ClickListener listener;
 		public Color color;
 		public int ix;
@@ -561,7 +551,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						}
 					};
 					gameboard.getImageAt(ix, iy).addCaptureListener(listener);
-					ibo.image = img_actor;
 					ibo.color = new Color(color);
 					ibo.img_name = img.toString();
 					ibo.listener = listener;

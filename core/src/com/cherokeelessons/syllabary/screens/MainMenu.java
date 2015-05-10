@@ -58,27 +58,24 @@ public class MainMenu extends ChildScreen {
 		
 		TextButtonStyle bstyle=ui.getTbs();
 		bstyle.font=Fonts.LLarge.get();
+		
+		container.row();
+		
 		button = new TextButton("New Game", bstyle);
 		button.addCaptureListener(gameScreen);
-		container.row();
 		container.add(button);
-		
 		button = new TextButton("High Scores", bstyle);
 		container.add(button);
 		button.addCaptureListener(showLeader);
 		
-		button = new TextButton("Settings", bstyle);
 		container.row();
-		container.add(button);
 		
 		button = new TextButton("About", bstyle);
-		container.add(button).colspan(2);
+		container.add(button);//.colspan(2);
 		button.addCaptureListener(showAbout);
-		
 		button = new TextButton("Quit", bstyle);
 		button.addCaptureListener(exit);
-		container.row();
-		container.add(button).colspan(2);
+		container.add(button);//.colspan(2);
 		
 		setDoBack(goodbye);
 	}

@@ -33,15 +33,27 @@ public class GameScreenDecks {
 	public char getLastLetter() {
 		char letter = 'Ꭰ';
 		for (Card card: this.discards.cards) {
+			if (card.newCard) {
+				continue;
+			}
 			letter = (char) Math.max(card.answer.charAt(0), letter);
 		}
 		for (Card card: this.finished.cards) {
+			if (card.newCard) {
+				continue;
+			}
 			letter = (char) Math.max(card.answer.charAt(0), letter);
 		}
 		for (Card card: this.pending.cards) {
+			if (card.newCard) {
+				continue;
+			}
 			letter = (char) Math.max(card.answer.charAt(0), letter);
 		}
 		for (Card card: this.reserved.cards) {
+			if (card.newCard) {
+				continue;
+			}
 			letter = (char) Math.max(card.answer.charAt(0), letter);
 		}
 		return letter;

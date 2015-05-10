@@ -7,17 +7,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.cherokeelessons.syllabary.one.App;
+import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 import com.cherokeelessons.util.GooglePlayGameServices.Collection;
 import com.cherokeelessons.util.GooglePlayGameServices.GameScores;
@@ -173,15 +172,13 @@ public class Leaderboard extends ChildScreen {
 			} else {
 				button = new TextButton("Logout of Google Play", tbs);
 			}
-			final WindowStyle dws=ui.getWs();
-			final LabelStyle dls=ui.getLsLarge();
 			final TextButton play_button = button;
-			final Dialog login = new Dialog("Google Play Services", dws);
-			login.text(new Label("Connecting to Google Play Services ...", dls));
-			login.button(new TextButton("DISMISS", tbs));
+			final UIDialog login = new UIDialog("Google Play Services", true, true, ui);
+			login.text("Connecting to Google Play Services ...");
+			login.button("DISMISS");
 			
-			final Dialog[] error = new Dialog[1];
-			error[0]=errorDialog(new Exception(""), null);
+			final UIDialog[] error = new UIDialog[1];
+			error[0]=ui.errorDialog(new Exception(""), null);
 			play_button.addListener(new ClickListener(){				
 				Callback<Void> success_in=new Callback<Void>() {							
 					@Override
@@ -197,7 +194,7 @@ public class Leaderboard extends ChildScreen {
 						error[0].hide();
 						login.hide();
 						success_out.withNull().run();
-						error[0] = errorDialog(e, null);
+						error[0] = ui.errorDialog(e, null);
 						error[0].show(stage);
 					}
 				};
@@ -215,7 +212,7 @@ public class Leaderboard extends ChildScreen {
 						error[0].hide();
 						login.hide();
 						success_out.withNull().run();
-						error[0] = errorDialog(exception, null);
+						error[0] = ui.errorDialog(exception, null);
 						error[0].show(stage);
 					}
 				};
@@ -261,32 +258,5 @@ public class Leaderboard extends ChildScreen {
 		} else {
 			Gdx.app.postRunnable(success_show_scores.with(new GameScores()));
 		}
-	}
-	
-	private Dialog errorDialog(final Exception e, final Runnable done) {
-		WindowStyle dws;
-		LabelStyle dls;
-		TextButtonStyle tbs;
-		
-		dws = ui.getDialogStyle9(true);
-		dls = ui.getLsLarge();
-		tbs = ui.getTbsSmall();
-
-		Dialog error = new Dialog("Google Play Services", dws) {
-			@Override
-			protected void result(Object object) {
-				if (done!=null) {
-					Gdx.app.postRunnable(done);
-				}
-			}
-		};
-		error.button(new TextButton("OK", tbs));
-		String msgtxt = e.getMessage();
-		msgtxt = WordUtils.wrap(msgtxt, 45, "\n", true);
-		Label label = new Label(msgtxt, dls);
-		label.setAlignment(Align.center);
-		error.text(label);
-		error.setKeepWithinStage(true);
-		return error;
 	}
 }

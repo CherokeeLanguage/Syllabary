@@ -647,4 +647,21 @@ public class UI {
 		style.font = Fonts.Small.get();
 		return style;
 	}
+	
+	public UIDialog errorDialog(final Exception e, final Runnable done) {
+		UIDialog error = new UIDialog("Google Play Services", true, true, this) {
+			@Override
+			protected void result(Object object) {
+				if (done!=null) {
+					Gdx.app.postRunnable(done);
+				}
+			}
+		};
+		error.button("OK");
+		String msgtxt = e.getMessage();
+		msgtxt = WordUtils.wrap(msgtxt, 45, "\n", true);
+		error.textCenter(msgtxt);
+		error.setKeepWithinStage(true);
+		return error;
+	}
 }
