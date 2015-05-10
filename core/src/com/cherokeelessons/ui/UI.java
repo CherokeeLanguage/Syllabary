@@ -349,7 +349,7 @@ public class UI {
 	}
 	
 	public UIDialog getMainSlotDialog(final SlotsDialogHandler handler){
-		UIDialog dialog = new UIDialog("Select Session", this);
+		final UIDialog dialog = new UIDialog("Select Session", this);
 		dialog.setModal(true);
 		dialog.setFillParent(true);
 		
@@ -377,9 +377,6 @@ public class UI {
 			sb.append(info.level.getEnglish());
 			sb.append(" ");
 			sb.append(StringUtils.isBlank(displayName)?"ᎤᏲᏒ ᏥᏍᏕᏥ!":displayName);
-//			sb.append(" - ");
-//			sb.append("Score: ");
-//			sb.append(info.lastScore);
 			sb.append("\n");
 			sb.append(info.activeCards);
 			sb.append(" letters: ");
@@ -442,7 +439,20 @@ public class UI {
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y,
 						int pointer, int button) {
-					handler.sync(slot);
+					final UIDialog busy = new UIDialog("Google Play Services", true, true, UI.this);
+					busy.text("Device sync in progress...");
+					busy.button("HIDE");
+					Stage stage = dialog.getStage();
+					if (stage!=null) {
+						busy.show(stage);
+					}
+					final Runnable nobusy=new Runnable() {
+						@Override
+						public void run() {
+							busy.hide();
+						}
+					};
+					handler.sync(slot, nobusy);
 					return true;
 				}
 			});

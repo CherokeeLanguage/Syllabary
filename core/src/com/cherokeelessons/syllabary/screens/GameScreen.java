@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -260,7 +261,29 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		info.deck.sortByShowTimeMinutes();
 		info.recalculateStats();
 		info.lastrun = System.currentTimeMillis();
+		if (App.services.isLoggedIn()) {
+			if (info.signature==null || info.signature.length()==0) {
+				String s1 = Long.toString(System.currentTimeMillis(),
+						Character.MAX_RADIX);
+				String s2 = Integer.toString(
+						new Random().nextInt(Integer.MAX_VALUE),
+						Character.MAX_RADIX);
+				info.signature=s1 + "-" + s2;
+			}
+		}
 		App.saveSlotInfo(slot, info);
+		if (App.services.isLoggedIn()) {
+			FileHandle fh = App.getSlotInfoFileHandle(slot);
+			Callback<String> ifError=new Callback<String>() {
+				@Override
+				public void success(String result) {
+				}
+				public void error(Exception exception) {
+					ui.errorDialog(exception, null);
+				};
+			};
+			App.services.drive_replace(fh, slot+"-"+fh.name(), slot+"-"+fh.name(), ifError);
+		}
 
 		final UIDialog finished = new UIDialog("Stage Complete!", true, true,
 				ui) {
@@ -285,7 +308,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 					}
 					if (object.equals(Choices.Leaderboard)) {
 						cancel();
-						if (App.isLoggedIn()) {
+						if (App.services.isLoggedIn()) {
 							App.getGame().setScreen(
 									new Leaderboard(GameScreen.this));
 							return;
@@ -347,7 +370,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		finished.show(stage);
 		dialogShowing = true;
 
-		if (App.isLoggedIn()) {
+		if (App.services.isLoggedIn()) {
 			finished.getButtonTable().setVisible(false);
 			stage.addAction(Actions.sequence(Actions.delay(10f),
 					Actions.run(new Runnable() {
@@ -370,14 +393,12 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		Callback<Void> do_submit = new Callback<Void>() {
 			@Override
 			public void success(Void result) {
-				App.setLoggedIn(true);
 				App.services.lb_submit(Leaderboard.BoardId, info.lastScore,
 						info.level.getEnglish(), callback);
 			}
 
 			@Override
 			public void error(Exception exception) {
-				App.setLoggedIn(false);
 				App.log(this, exception.getMessage());
 				callback.error(exception);
 			}

@@ -19,5 +19,5 @@ public interface SlotsDialogHandler {
 	 * Sync slot with cloud service.
 	 * @param slot
 	 */
-	public void sync(int slot);
+	public void sync(int slot, Runnable whenDone);
 }

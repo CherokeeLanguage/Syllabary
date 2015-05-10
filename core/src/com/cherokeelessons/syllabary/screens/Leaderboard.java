@@ -103,7 +103,7 @@ public class Leaderboard extends ChildScreen {
 				table.add(new Label("", ls)).center();
 			}
 			
-			if (!App.isLoggedIn()) {
+			if (!App.services.isLoggedIn()) {
 				message.setText("You must login to Google Play for Leaderboard Support");
 			}
 		}
@@ -166,7 +166,7 @@ public class Leaderboard extends ChildScreen {
 			LabelStyle ls = ui.getLsSmall();
 			message = new Label("...", ls);
 
-			if (!App.isLoggedIn()) {
+			if (!App.services.isLoggedIn()) {
 				button = new TextButton("Login to Google Play", tbs);
 				message.setText("You must login to Google Play for Leaderboard Support");
 			} else {
@@ -185,7 +185,6 @@ public class Leaderboard extends ChildScreen {
 					public void success(Void result) {
 						error[0].hide();
 						login.hide();
-						App.setLoggedIn(true);
 						requestScores();
 						play_button.setText("Logout of Google Play");
 					}
@@ -203,7 +202,6 @@ public class Leaderboard extends ChildScreen {
 					public void success(Void result) {
 						error[0].hide();
 						login.hide();
-						App.setLoggedIn(false);
 						requestScores();
 						play_button.setText("Login to Google Play");
 					}
@@ -219,7 +217,7 @@ public class Leaderboard extends ChildScreen {
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y,
 						int pointer, int button) {					
-					if (App.isLoggedIn()) {
+					if (App.services.isLoggedIn()) {
 						App.services.logout(success_out);
 					} else {
 						login.show(stage);
@@ -251,7 +249,7 @@ public class Leaderboard extends ChildScreen {
 	}
 
 	private void requestScores() {
-		if (App.isLoggedIn()) {
+		if (App.services.isLoggedIn()) {
 			App.services.lb_getListFor(BoardId, lb_collection, ts,
 					success_show_scores);
 			message.setText("Loading ...");

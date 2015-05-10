@@ -220,5 +220,4 @@ public class ChildScreen implements Screen, InputProcessor {
 	public boolean scrolled(int amount) {
 		return false;
 	}
-
 }

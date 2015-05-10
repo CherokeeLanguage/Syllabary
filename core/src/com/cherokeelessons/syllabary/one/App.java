@@ -15,8 +15,6 @@ import com.cherokeelessons.util.GooglePlayGameServices;
 
 public class App {
 
-	public static GooglePlayGameServices gpgs;
-
 	private static Color clearColor;
 
 	public static void glClearColor() {
@@ -161,17 +159,12 @@ public class App {
 		toJson(info, folder.child("info.json"));
 	}
 	
+	public static FileHandle getSlotInfoFileHandle(int ix) {
+		return getFolder(ix).child("info.json");
+	}
+	
 	public static interface PlatformTextInput {
 		public void getTextInput(final TextInputListener listener,
 				final String title, final String text, final String hint);
-	}
-
-	public static boolean isLoggedIn() {
-		return App.getPrefs().getBoolean("isLoggedIn", false);
-	}
-
-	public static void setLoggedIn(boolean b) {
-		App.getPrefs().putBoolean("isLoggedIn", b);
-		App.getPrefs().flush();
 	}
 }
