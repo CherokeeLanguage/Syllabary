@@ -2,9 +2,6 @@ package com.cherokeelessons.cards;
 
 import java.io.Serializable;
 
-import com.cherokeelessons.syllabary.one.App;
-import com.cherokeelessons.syllabary.one.GameSound;
-
 @SuppressWarnings("serial")
 public class SlotInfo implements Serializable {
 	
@@ -132,30 +129,4 @@ public class SlotInfo implements Serializable {
 	public void setElapsed_secs(float elapsed_secs) {
 		this.elapsed_secs = elapsed_secs;
 	}
-	
-	public boolean isVol_mute() {
-		return vol_mute;
-	}
-
-	public void setVol_mute(boolean vol_mute) {
-		this.vol_mute = vol_mute;
-	}
-	public float getVol_challenges() {
-		return vol_challenges;
-	}
-
-	public void setVol_challenges(float vol_challenges) {
-		this.vol_challenges = vol_challenges;
-	}
-	public float getVol_effects() {
-		return vol_effects;
-	}
-
-	public void setVol_effects(float vol_effects) {
-		this.vol_effects = vol_effects;
-	}
-	private float vol_effects=.7f;
-	private float vol_challenges = 1f;
-	private boolean vol_mute = false;
-	
 }

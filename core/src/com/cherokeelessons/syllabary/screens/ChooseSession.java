@@ -25,6 +25,8 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 
 	public ChooseSession(Screen caller) {
 		super(caller);
+		container = ui.getMenuTable();
+		stage.addActor(container);
 	}
 
 	private Runnable reload = new Runnable() {
@@ -35,41 +37,50 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 		}
 	};
 
-	private Table container;
+	private final Table container;
 
 	@Override
 	public void show() {
 		super.show();
-		container = ui.getMenuTable();
-		stage.addActor(container);
 		final UIDialog slotsDialog = ui.getMainSlotDialog(this);
-		RunnableAction focus = Actions.run(new Runnable() {
-			@Override
-			public void run() {
-				stage.setScrollFocus(slotsDialog);
-				stage.setKeyboardFocus(slotsDialog);
-			}
-		});
-
 		TextButton back = new TextButton("BACK", ui.getTbs());
 		back.addCaptureListener(exit);
 		slotsDialog.button(back);
-		slotsDialog.show(stage).addAction(focus);
+		slotsDialog.show(stage);
+		stage.setScrollFocus(slotsDialog);
+		stage.setKeyboardFocus(slotsDialog);
 	}
 
 	@Override
 	public void hide() {
 		super.hide();
-		container.clear();
-		container.remove();
 	}
 
 	@Override
 	public void play(final int slot) {
-		GameScreen screen = new GameScreen(caller, slot);
-		screen.setStageCount(1);
-		App.getGame().setScreen(screen);
-		this.dispose();
+		final Runnable play = new Runnable() {
+			@Override
+			public void run() {
+				GameScreen screen = new GameScreen(caller, slot);
+				screen.setStageCount(1);
+				App.getGame().setScreen(screen);
+				ChooseSession.this.dispose();				
+			}
+		};
+		final SlotInfo info = App.getSlotInfo(slot);
+		if (info.activeCards==0) {
+			Runnable save = new Runnable() {
+				@Override
+				public void run() {
+					App.saveSlotInfo(slot, info);
+					Gdx.app.postRunnable(play);
+				}
+			};
+			UIDialog dialog = ui.getSlotEditDialog(info, save);
+			dialog.show(stage);
+		} else {
+			Gdx.app.postRunnable(play);
+		}
 	}
 
 	@Override

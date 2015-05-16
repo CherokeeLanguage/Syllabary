@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
+import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.ui.UI.UIProgressBar;
@@ -41,7 +42,6 @@ public class GameBoard extends Table {
 
 	private Cell<Actor> leftTopCell;
 	private TextButton mainMenu;
-	private TextButton mute;
 
 	private TextButton pause;
 
@@ -110,15 +110,6 @@ public class GameBoard extends Table {
 			return true;
 		};
 	};
-	private final ClickListener doMute=new ClickListener(){
-		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-			if (handler==null) {
-				return false;
-			}
-			handler.mute();
-			return true;
-		};
-	};
 	public GameBoard(Stage stage, UI ui, GameSound gs) {
 		this.ui=ui;
 		this.gs=gs;
@@ -172,8 +163,6 @@ public class GameBoard extends Table {
 		challenge_pic.setScaling(Scaling.fit);
 		mainMenu = new TextButton("BACK", tbs);
 		mainMenu.addListener(doMainMenu);
-		mute = new TextButton("MUTE", tbs);
-		mute.addListener(doMute);
 		pause = new TextButton("PAUSE", tbs);
 		pause.addListener(new ClickListener(){
 			@Override
@@ -231,8 +220,6 @@ public class GameBoard extends Table {
 		leftColumn.add().expandY();
 		leftColumn.row();
 		leftColumn.add(pause).fillX();
-		leftColumn.row();
-		leftColumn.add(mute).fillX();
 		leftColumn.row();
 		leftColumn.add(mainMenu).fillX();
 		add(leftColumn);
@@ -419,6 +406,5 @@ public class GameBoard extends Table {
 	
 	public static interface GameboardHandler {
 		public void mainmenu();
-		public void mute();
 	}
 }

@@ -133,9 +133,9 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		gameboard = ui.getGameBoard(stage, ui, gs);
 		gameboard.setHandler(this);
 		SlotInfo info = App.getSlotInfo(slot);
-		App.Volume.challenges=info.getVol_challenges();
-		App.Volume.effects=info.getVol_effects();
-		App.Volume.mute=info.isVol_mute();
+		App.Volume.challenges=info.settings.vol_challenges;
+		App.Volume.effects=info.settings.vol_effects;
+		App.Volume.effectsMute=info.settings.muted;
 	}
 
 	@Override
@@ -247,8 +247,12 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		audio2_done = false;
 		decks.discards.cards.add(currentCard);
 		if (currentCard.newCard) {
-			newCardDialog(currentCard);
-			audio1_done = true;
+			if (info.settings.skipTraining) {
+				currentCard.newCard=false;
+			} else {
+				newCardDialog(currentCard);
+				audio1_done = true;
+			}
 		}
 		loadGameboardWith(currentCard);
 		gameboard.setActive(true);
@@ -616,11 +620,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	@Override
 	public void mainmenu() {
 		goodBye();
-	}
-
-	@Override
-	public void mute() {
-		App.Volume.mute=true;
 	}
 
 	private void newCardDialog(final Card card) {

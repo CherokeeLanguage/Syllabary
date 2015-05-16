@@ -31,7 +31,7 @@ public class App {
 	public static class Volume {
 		public static float effects = 0.7f;
 		public static float challenges = 1f;
-		public static boolean mute = false;
+		public static boolean effectsMute = false;
 	}
 
 	public static Preferences getPrefs() {

@@ -42,7 +42,7 @@ public class GameSound {
 		manager.load(sound_file, Sound.class);
 		manager.finishLoadingAsset(sound_file);
 		Sound sound = manager.get(sound_file, Sound.class);
-		sound.play(App.Volume.mute?0f:App.Volume.effects);
+		sound.play(App.Volume.effectsMute?0f:App.Volume.effects);
 	}
 	
 	public void pointsDeducted() {
@@ -64,7 +64,7 @@ public class GameSound {
 		manager.finishLoadingAsset(glyph_audio);
 		Music audio = manager.get(glyph_audio, Music.class);
 		audio.setLooping(false);
-		audio.setVolume(App.Volume.mute?0f:App.Volume.challenges);
+		audio.setVolume(App.Volume.challenges);
 		audio.setOnCompletionListener(new OnCompletionListener() {
 			@Override
 			public void onCompletion(Music music) {

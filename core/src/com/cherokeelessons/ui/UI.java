@@ -482,6 +482,8 @@ public class UI {
 	}
 	public UIDialog getSlotEditDialog(final SlotInfo info, final Runnable whenDone) {
 		
+		App.log(this, "getSlotEditDialog: "+info.slot);
+		
 		TextButtonStyle tbs = getTbs();
 		TextFieldStyle tfs = getTfs();
 		
@@ -534,6 +536,7 @@ public class UI {
 				return true;
 			}
 		});
+		
 		final TextButton muted = new TextButton(info.settings.muted ? "Yes"
 				: "No", tbs);
 		muted.addListener(new ClickListener() {
@@ -542,6 +545,18 @@ public class UI {
 					int pointer, int button) {
 				info.settings.muted = !info.settings.muted;
 				muted.setText(info.settings.muted ? "Yes" : "No");
+				return true;
+			}
+		});
+		
+		final TextButton training = new TextButton(info.settings.skipTraining ? "Yes"
+				: "No", tbs);
+		training.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				info.settings.skipTraining = !info.settings.skipTraining;
+				training.setText(info.settings.skipTraining ? "Yes" : "No");
 				return true;
 			}
 		});
@@ -556,7 +571,8 @@ public class UI {
 						info.settings.name = name.getText();
 						Gdx.app.postRunnable(whenDone);
 					}
-				}				
+				}
+				this.clear();
 			};
 
 			@Override
@@ -573,15 +589,25 @@ public class UI {
 		final Table contentTable = dialog.getContentTable();
 		dialog.setFillParent(true);
 		contentTable.clearChildren();
+		
 		contentTable.row();
-		contentTable.add(new Label("Name: ", ls)).left().fillX();
+		Label lbl_name = new Label("Name: ", ls);
+		contentTable.add(lbl_name).left().fillX();
 		contentTable.add(name).expand().fillX().left();
+		
 		contentTable.row();
-		contentTable.add(new Label("Display: ", ls)).left().fillX();
+		Label lbl_display = new Label("Display: ", ls);
+		contentTable.add(lbl_display).left().fillX();
 		contentTable.add(mode).expand().fillX().left();
-
+		
 		contentTable.row();
-		contentTable.add(new Label("Mute by default: ", ls)).left().fillX();
+		Label lbl_training = new Label("Skip new letter training?", ls);
+		contentTable.add(lbl_training).left().fillX();
+		contentTable.add(training).expand().fillX().left();
+		
+		contentTable.row();
+		Label lbl_mute_effects = new Label("Mute Sound Effects? ", ls);
+		contentTable.add(lbl_mute_effects).left().fillX();
 		contentTable.add(muted).expand().fillX().left();
 		contentTable.row();
 
