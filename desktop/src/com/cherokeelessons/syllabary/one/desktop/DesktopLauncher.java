@@ -19,8 +19,22 @@ public class DesktopLauncher {
 		int height = (70 * gd.getDisplayMode().getHeight()) / 100;
 //		width=2048/2;
 //		height=1536/2;
-//		width=1280;
-//		height=720;
+		/*
+		 * 720p
+		 */
+		width=1280;
+		height=720;
+		/*
+		 * iphone 4
+		 */
+//		width=960;
+//		height=640;
+		/*
+		 * generic tablet 7
+		 */
+//		width=1024;
+//		height=600;
+		
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.allowSoftwareMode = true;
 		config.forceExit = true;
