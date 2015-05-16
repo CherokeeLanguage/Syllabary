@@ -25,10 +25,30 @@ public class DesktopLauncher {
 		width=1280;
 		height=720;
 		/*
-		 * iphone 4
+		 * iPad
+		 */
+		width=1024;
+		height=768;
+		/*
+		 * iPhone 4 (3.5")
 		 */
 //		width=960;
 //		height=640;
+		/*
+		 * iPhone 5 (4")
+		 */
+//		width=1136;
+//		height=640;
+		/*
+		 * iPhone 6 (4.7")
+		 */
+//		width=1334;
+//		height=750;
+		/*
+		 * iPhone 6 Plus (5.5")
+		 */
+//		width=1104;//2208;
+//		height=621;//1242;
 		/*
 		 * generic tablet 7
 		 */
