@@ -3,6 +3,7 @@ package com.cherokeelessons.syllabary.one.desktop;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.cherokeelessons.play.GameServices;
