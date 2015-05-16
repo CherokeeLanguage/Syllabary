@@ -15,7 +15,7 @@ public class GameSound {
 		this.manager = manager;
 	}
 
-	public static final String STARTUP = "music/startup.wav";
+	public static final String STARTUP = "music/startup.mp3";
 	private static final String DING = "sounds/effects/ding.wav";
 	private static final String WHIP_POP = "sounds/effects/whip_pop.wav";
 	private static final String ALARM = "sounds/effects/alarm.wav";

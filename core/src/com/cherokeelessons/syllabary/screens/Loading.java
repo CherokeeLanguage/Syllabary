@@ -62,31 +62,31 @@ public class Loading extends ChildScreen {
 
 	private boolean sounddone=false;
 	private boolean startup=false;
+	private Music m;
 	@Override
 	public void act(float delta) {
 		super.act(delta);
 		if (!startup && manager.isLoaded(GameSound.STARTUP)){
+			App.log(this, "Music Loaded.");
 			startup=true;
-			Music m = manager.get(GameSound.STARTUP, Music.class);
-			m.setLooping(false);
-			m.setVolume(1f);
+			m = manager.get(GameSound.STARTUP, Music.class);
 			m.setOnCompletionListener(new OnCompletionListener() {
 				@Override
 				public void onCompletion(Music music) {
+					App.log(this, "Startup Music Done");
 					music.dispose();
 					manager.unload(GameSound.STARTUP);
-					sounddone=true;
 				}
 			});
 			m.play();
-			return;
+			if (!m.isPlaying()) {
+				App.log(this, "Failed to start music!");
+			}
 		}
-		if (!Fonts.isLoaded()) {
-			return;
-		}
-		if (manager.update() && sounddone) {
+		if (manager.update() && Fonts.isLoaded() && !m.isPlaying()) {
 			App.getGame().setScreen(new MainMenu());
 			this.dispose();
+			return;
 		}
 	}
 }
