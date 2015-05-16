@@ -15,6 +15,10 @@ public class IOSLauncher extends IOSApplication.Delegate {
         config.allowIpod=true;
         config.orientationLandscape=true;
         config.orientationPortrait=false;
+        config.displayScaleLargeScreenIfNonRetina=1.0f;
+        config.displayScaleLargeScreenIfRetina=1.0f;
+        config.displayScaleSmallScreenIfNonRetina=1.0f;
+        config.displayScaleSmallScreenIfRetina=1.0f;
         App.services=new GameServices(App.CredentialsFolder, new Platform());
         return new IOSApplication(new SyllabaryApp(), config);
     }
