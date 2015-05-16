@@ -27,8 +27,8 @@ public class DesktopLauncher {
 		/*
 		 * iPad
 		 */
-		width=1024;
-		height=768;
+//		width=1024;
+//		height=768;
 		/*
 		 * iPhone 4 (3.5")
 		 */
