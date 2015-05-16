@@ -12,6 +12,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        config.allowIpod=true;
+        config.orientationLandscape=true;
+        config.orientationPortrait=false;
         App.services=new GameServices(App.CredentialsFolder, new Platform());
         return new IOSApplication(new SyllabaryApp(), config);
     }
