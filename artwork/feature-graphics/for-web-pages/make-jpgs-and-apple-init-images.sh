@@ -35,11 +35,11 @@ function process_white() {
 process_white 1024x500 promo-image-flat.jpg
 process_white 180x120 promo-graphic-flat.jpg
 
-process 750x1334 Default-375w-667h@2x.png -rotate 90
-process 1242x2208 Default-414w-736h@3x.png -rotate 90
-process 640x1136 Default-568h@2x.png -rotate 90
-process 320x480 Default.png -rotate 90
-process 640x960 Default@2x.png -rotate 90
-process 1536x2008 Default@2x~ipad.png -rotate 90
-process 768x1004 Default~ipad.png -rotate 90
+process_white 750x1334 Default-375w-667h@2x.png -rotate 90
+process_white 1242x2208 Default-414w-736h@3x.png -rotate 90
+process_white 640x1136 Default-568h@2x.png -rotate 90
+process_white 320x480 Default.png -rotate 90
+process_white 640x960 Default@2x.png -rotate 90
+process_white 1536x2008 Default@2x~ipad.png -rotate 90
+process_white 768x1004 Default~ipad.png -rotate 90
 
