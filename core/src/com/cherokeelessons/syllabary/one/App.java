@@ -107,7 +107,13 @@ public class App {
 		String path0 = "CherokeeSyllabary/slots";
 		FileHandle p0;
 		FileHandle childFile;
-		p0 = Gdx.files.external(path0);
+		
+		if (Gdx.files.isExternalStorageAvailable()) {
+			p0 = Gdx.files.external(path0);
+		} else {
+			p0 = Gdx.files.local(path0);
+		}
+		
 		childFile = p0.child(child);
 		try {
 			childFile.mkdirs();
