@@ -53,18 +53,22 @@ public class GameSound {
 		play(DINGDING);		
 	}
 
+	private Music audio = null;
 	private String glyph_audio = null;
 	public void playGlyph(final char answer, final Runnable whenDone) {
-		if (glyph_audio!=null) {
-			manager.unload(glyph_audio);
-			glyph_audio=null;
+		if (audio!=null) {
+			audio.stop();
+			audio=null;
+			if (glyph_audio!=null) {
+				manager.unload(glyph_audio);
+			}
 		}
-		glyph_audio = "sounds/glyphs/"+Integer.toHexString(answer)+".wav";
+		glyph_audio = "sounds/glyphs/"+Integer.toHexString(answer)+".mp3";
 		manager.load(glyph_audio, Music.class);
 		manager.finishLoadingAsset(glyph_audio);
-		Music audio = manager.get(glyph_audio, Music.class);
+		audio = manager.get(glyph_audio, Music.class);
 		audio.setLooping(false);
-		audio.setVolume(App.Volume.challenges);
+		audio.setVolume(Math.max(App.Volume.challenges, 0f));
 		audio.setOnCompletionListener(new OnCompletionListener() {
 			@Override
 			public void onCompletion(Music music) {
