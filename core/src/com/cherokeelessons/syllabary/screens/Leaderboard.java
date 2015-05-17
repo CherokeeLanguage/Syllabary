@@ -250,7 +250,6 @@ public class Leaderboard extends ChildScreen {
 
 	private void requestScores() {
 		if (App.services.isLoggedIn()) {
-			App.log(this, "Requesting scores for: '"+lb_collection.name()+"' / '"+ts.name()+"'");
 			App.services.lb_getListFor(BoardId, lb_collection, ts,
 					success_show_scores);
 			message.setText("Loading ...");
