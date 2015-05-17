@@ -104,11 +104,19 @@ public class App {
 	}
 	
 	public static FileHandle getFolder(String child) {
-		final FileHandle p0;
 		String path0 = "CherokeeSyllabary/slots";
+		FileHandle p0;
+		FileHandle childFile;
 		p0 = Gdx.files.external(path0);
-		p0.child(child).mkdirs();
-		return p0.child(child);
+		childFile = p0.child(child);
+		try {
+			childFile.mkdirs();
+		} catch (Exception e) {
+			p0 = Gdx.files.local(path0);
+			childFile = p0.child(child);
+			childFile.mkdirs();
+		}
+		return childFile;
 	}
 	
 	private static Json _json;
