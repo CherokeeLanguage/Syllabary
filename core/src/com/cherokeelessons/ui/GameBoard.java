@@ -3,14 +3,12 @@ package com.cherokeelessons.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -26,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.ui.UI.UIProgressBar;
@@ -106,7 +103,21 @@ public class GameBoard extends Table {
 			if (handler==null) {
 				return false;
 			}
-			handler.mainmenu();
+			UIDialog dialog = new UIDialog("Please Conform Exit", true, true, ui) {
+				protected void result(Object object) {
+					GameBoard.this.paused=false;
+					if ("Y".equals(object)){
+						if (handler!=null) {
+							handler.mainmenu();
+						}
+					}
+				};
+			};
+			dialog.text("Do you want to discard your session?\n(All of your work will be lost if you say yes.)");
+			dialog.button("YES", "Y");
+			dialog.button("NO");
+			dialog.show(GameBoard.this.getStage());
+			GameBoard.this.paused=true;
 			return true;
 		};
 	};
