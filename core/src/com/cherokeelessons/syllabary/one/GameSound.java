@@ -16,14 +16,14 @@ public class GameSound {
 	}
 
 	public static final String STARTUP = "music/startup.mp3";
-	private static final String DING = "sounds/effects/ding.wav";
-	private static final String WHIP_POP = "sounds/effects/whip_pop.wav";
-	private static final String ALARM = "sounds/effects/alarm.wav";
-	private static final String BARK = "sounds/effects/bark.wav";
-	private static final String BUZZER = "sounds/effects/buzzer2.wav";
-	private static final String CASH = "sounds/effects/cash_out.wav";
-	private static final String ERROR = "sounds/effects/dialogerror.wav";
-	private static final String DINGDING = "sounds/effects/ding-ding-ding.wav";
+	private static final String DING = "sounds/effects/ding.mp3";
+	private static final String WHIP_POP = "sounds/effects/whip_pop.mp3";
+	private static final String ALARM = "sounds/effects/alarm.mp3";
+	private static final String BARK = "sounds/effects/bark.mp3";
+	private static final String BUZZER = "sounds/effects/buzzer2.mp3";
+	private static final String CASH = "sounds/effects/cash_out.mp3";
+	private static final String ERROR = "sounds/effects/dialogerror.mp3";
+	private static final String DINGDING = "sounds/effects/ding-ding-ding.mp3";
 	private static final String[] BAD;
 	static {
 		BAD = new String[] {ALARM, BARK, ERROR, BUZZER };
