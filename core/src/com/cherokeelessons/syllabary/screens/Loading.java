@@ -60,13 +60,15 @@ public class Loading extends ChildScreen {
 		super.dispose();
 	}
 
-	private boolean sounddone=false;
+	private float elapsed=0f;
 	private boolean startup=false;
 	private Music m;
 	@Override
 	public void act(float delta) {
 		super.act(delta);
+		elapsed+=delta;
 		if (!startup && manager.isLoaded(GameSound.STARTUP)){
+			elapsed=0f;
 			App.log(this, "Music Loaded.");
 			startup=true;
 			m = manager.get(GameSound.STARTUP, Music.class);
@@ -83,7 +85,7 @@ public class Loading extends ChildScreen {
 				App.log(this, "Failed to start music!");
 			}
 		}
-		if (manager.update() && Fonts.isLoaded() && !m.isPlaying()) {
+		if (manager.update() && Fonts.isLoaded() && (!m.isPlaying()||elapsed>5f)) {
 			App.getGame().setScreen(new MainMenu());
 			this.dispose();
 			return;
