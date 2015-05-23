@@ -40,19 +40,12 @@ public class Loading extends ChildScreen {
 		stage.addActor(img);
 		img.setFillParent(true);
 		manager.load(GameSound.STARTUP, Music.class);
-		
 		Fonts.init();
 	}
 
 	@Override
 	public void hide() {
 		super.hide();
-		for (int ix = 0; ix < 8; ix++) {
-			loading[ix % 4][ix / 4].dispose();
-			loading[ix % 4][ix / 4] = null;
-		}
-		stage.clear();
-		img.clear();
 	}
 	
 	@Override
