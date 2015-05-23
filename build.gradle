@@ -14,7 +14,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '3.04'
+    version = '3.05'
     ext {
         appName = 'Syllabary'
         gdxVersion = '1.6.0'
