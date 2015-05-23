@@ -14,7 +14,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '3.06'
+    version = '3.07'
     ext {
         appName = 'Syllabary'
         gdxVersion = '1.6.1'
@@ -74,6 +74,8 @@ project(":android") {
 		compile 'com.google.api-client:google-api-client-android:1.19.0' exclude module: 'httpclient'		
         compile 'com.google.apis:google-api-services-drive:v2-rev161-1.19.1' exclude module: 'httpclient'
 		compile 'com.google.apis:google-api-services-games:v1-rev93-1.19.1' exclude module: 'httpclient'
+		//FOR CRASH REPORTING
+		compile 'ch.acra:acra:4.6.2'
     }
 }
 
