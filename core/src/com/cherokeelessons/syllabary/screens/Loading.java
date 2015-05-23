@@ -69,8 +69,16 @@ public class Loading extends ChildScreen {
 				@Override
 				public void onCompletion(Music music) {
 					App.log(this, "Startup Music Done");
-					music.dispose();
-					manager.unload(GameSound.STARTUP);
+					try {
+						if (music!=null) {
+							music.stop();
+						}
+						if (manager.isLoaded(GameSound.STARTUP)){
+							manager.unload(GameSound.STARTUP);
+						}
+					} catch (Exception e) {
+						App.log("IGNORING: "+e.getMessage()+" in 'onCompletion(Music music)'");
+					}
 				}
 			});
 			m.play();
