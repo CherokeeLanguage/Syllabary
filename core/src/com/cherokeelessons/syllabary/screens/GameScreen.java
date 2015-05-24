@@ -470,7 +470,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		} else {
 			gameboard.setChallenge_latin("");
 		}
-		if (card.box == 0 && card.correct_in_a_row == 0) {
+		if (card.box == 0 && card.correct_in_a_row == 0 && !info.settings.skipTraining) {
 			String answer_img = getGlyphFilename(card.answer.charAt(0), 1)
 					.toString();
 			gameboard.setChallenge_img(answer_img);
@@ -656,7 +656,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gameboard.addAction(sequence);
 			}
 		};
-		Label l1 = new Label(card.challenge, ui.getLsXLarge());
 		TextButton ready = new TextButton("SKIP", ui.getTbs());
 		Table content = d.getContentTable();
 		Table pix = new Table();
@@ -691,8 +690,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 		actions.add(dialogDone[0]);
 		content.clearChildren();
-		content.row();
-		content.add(l1);
+		
+		if (info.settings.display.equals(DisplayMode.Latin)) {
+			Label l1 = new Label(card.challenge, ui.getLsXLarge());
+			content.row();
+			content.add(l1);
+		}
+		
 		content.row();
 		content.add(pix).expandX().fillX();
 		d.button(ready);
