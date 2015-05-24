@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import com.cherokeelessons.syllabary.one.App;
+
 public class Deck implements Serializable {
 	private static Comparator<Card> byShowTime = new Comparator<Card>() {
 		@Override
@@ -254,6 +256,7 @@ public class Deck implements Serializable {
 				continue;
 			}
 			card.newCard = true;
+			App.log(this, "Retraining for: '"+card.answer+"'");
 		}
 	}
 }
