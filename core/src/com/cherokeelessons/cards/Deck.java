@@ -252,7 +252,7 @@ public class Deck implements Serializable {
 			if (card.noErrors == true) {
 				continue;
 			}
-			if (card.correct_in_a_row > 0) {
+			if (card.correct_in_a_row > 3) {
 				continue;
 			}
 			card.newCard = true;
