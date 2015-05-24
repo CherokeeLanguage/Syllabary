@@ -601,6 +601,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		trackAlreadyCards(info.deck);
 		retireNotYetCards(info.deck);
 		decks.discards.loadAll(info.deck);
+		decks.discards.resetNewFlag();
 		decks.discards.resetScoring();
 		decks.discards.resetCorrectInARow();
 		decks.discards.resetRetriesCount();

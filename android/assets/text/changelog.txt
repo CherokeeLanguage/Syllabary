@@ -1,3 +1,7 @@
+3.08
+
+(By request) Look for previous cards that are in box 0 and that show errors and mark them as new to trigger retraining.
+
 3.07
 
 Add ACRA crash reporting module to try and get logs for crashes that end with no logs via TestFairy or Google Play.
