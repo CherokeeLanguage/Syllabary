@@ -14,6 +14,11 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		config.hideStatusBar=true;
+		config.useImmersiveMode=true;
+		config.useAccelerometer=false;
+		config.useCompass=false;
+		config.useWakelock=false;
 		initialize(new SyllabaryApp(), config);
 		Platform.application=this;
 		App.services=new GameServices(App.CredentialsFolder, new Platform());
