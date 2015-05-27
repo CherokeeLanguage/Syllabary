@@ -598,15 +598,15 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			ipending.remove();
 			App.log(this, "Removed no longer valid entry: " + active.answer);
 		}
+		info.deck.clampBoxes();
+		info.deck.resetNewFlag();
+		info.deck.resetScoring();
+		info.deck.resetCorrectInARow();
+		info.deck.resetRetriesCount();
+		info.deck.resetErrorMarker();
 		trackAlreadyCards(info.deck);
 		retireNotYetCards(info.deck);
 		decks.discards.loadAll(info.deck);
-		decks.discards.resetNewFlag();
-		decks.discards.resetScoring();
-		decks.discards.resetCorrectInARow();
-		decks.discards.resetRetriesCount();
-		decks.discards.resetErrorMarker();
-		decks.discards.clampBoxes();
 		decks.discards.shuffle();
 		decks.discards.sortByShowTimeMinutes();
 
