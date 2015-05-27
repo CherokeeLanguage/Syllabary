@@ -1,3 +1,7 @@
+3.10
+
+Fix issue with cards being in a negative "box" causing negative scoring when getting them correct.
+
 3.09
 
 Make the reset for training check a little more aggressive.
