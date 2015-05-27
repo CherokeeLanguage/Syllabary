@@ -433,9 +433,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			nodupes.add(card.answer);
 			return card;
 		}
-		decks.finished.clampToMinutes();
-		decks.finished.shuffle();
-		decks.finished.sortByShowTimeMinutes();
 		return decks.finished.cards.remove(0);
 	}
 
@@ -719,6 +716,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			decks.finished.cards.add(card);
 			icard.remove();
 		}
+		decks.finished.shuffle();
+		decks.finished.sortByShowTimeMinutes();
 		App.log(this, "Moved " + decks.finished.cards.size()
 				+ " future pending"
 				+ " or fully learned cards into the 'finished' deck.");
