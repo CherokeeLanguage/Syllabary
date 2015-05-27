@@ -479,8 +479,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 		boolean valid = false;
 		char lastLetter = decks.getLastLetter();
-		App.log(this, "Current Letter: '" + card.answer + "'");
-		App.log(this, "Last Letter: '" + lastLetter + "'");
 		do {
 			totalRight = 0;
 			wrongAnswers.clear();
@@ -624,14 +622,17 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	}
 
 	private void newCardDialog(final Card card) {
+		final TextButton ready = new TextButton("SKIP", ui.getTbs());
 		dialogShowing = true;
 		final RunnableAction[] dialogDone = new RunnableAction[1];
 		final UIDialog d = new UIDialog("New Letter", true, true, ui) {
 			@Override
 			protected void result(Object object) {
 				cancel();
-				getButtonTable().setTouchable(Touchable.disabled);
-				addAction(dialogDone[0]);
+				ready.setTouchable(Touchable.disabled);
+				ready.getColor().a=0f;
+				clearActions();
+				addAction(Actions.delay(.3f, dialogDone[0]));
 			}
 		};
 		dialogDone[0] = new RunnableAction() {
@@ -657,7 +658,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gameboard.addAction(sequence);
 			}
 		};
-		TextButton ready = new TextButton("SKIP", ui.getTbs());
 		Table content = d.getContentTable();
 		Table pix = new Table();
 		pix.defaults().pad(8);

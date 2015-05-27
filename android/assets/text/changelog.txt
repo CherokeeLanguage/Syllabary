@@ -1,6 +1,8 @@
 3.10
 
+(By request) Add delay for "skip" on training screen to prevent accidental click through...
 Fix issue with cards being in a negative "box" causing negative scoring when getting them correct.
+When "no latin" mode is selected for "immersive" learning assistance, don't show latin on the training screen as well as not showing it on the challenge/response screen.  
 
 3.09
 
