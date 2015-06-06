@@ -159,9 +159,20 @@ public class ChildScreen implements Screen, InputProcessor {
 
 	@Override
 	public void dispose() {
-		App.log(this, "dispose()");
-		stage.dispose();
-		manager.dispose();
+		Gdx.app.postRunnable(new Runnable() {
+			private final Runnable _self=this;
+			private int counter=10;
+			@Override
+			public void run() {
+				if (counter-->0) {
+					Gdx.app.postRunnable(_self);
+					return;
+				}
+				App.log(this, "dispose()");
+				stage.dispose();
+				manager.dispose();
+			}
+		});
 	}
 
 	@Override

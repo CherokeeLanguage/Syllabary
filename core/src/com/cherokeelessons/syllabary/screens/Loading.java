@@ -43,16 +43,6 @@ public class Loading extends ChildScreen {
 		Fonts.init();
 	}
 
-	@Override
-	public void hide() {
-		super.hide();
-	}
-	
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
 	private float elapsed=0f;
 	private boolean startup=false;
 	private Music m;
