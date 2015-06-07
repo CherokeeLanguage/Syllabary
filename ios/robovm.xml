@@ -5,7 +5,7 @@
   <arch>thumbv7</arch>
   <target>ios</target>
   <iosInfoPList>Info.plist.xml</iosInfoPList>
-  <treeShaker>conservative</treeShaker>
+  <treeShaker>none</treeShaker>
   <resources>
     <resource>
       <directory>../android/assets</directory>
