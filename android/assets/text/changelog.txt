@@ -1,3 +1,7 @@
+3.13
+
+Crash fix when loading a bad saved slot.
+
 3.12
 
 Update to libGdx 1.6.2 and RoboVM 1.3.0

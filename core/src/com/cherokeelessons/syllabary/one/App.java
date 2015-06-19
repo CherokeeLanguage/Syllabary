@@ -162,6 +162,9 @@ public class App {
 			return info;
 		}
 		SlotInfo fromJson = fromJson(json_file, SlotInfo.class);
+		if (fromJson==null) {
+			fromJson = new SlotInfo();
+		}
 		fromJson.slot=ix;
 		return fromJson;
 	}
