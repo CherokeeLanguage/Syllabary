@@ -142,7 +142,10 @@ public class Deck implements Serializable {
 
 	public void resetRetriesCount() {
 		for (Card card : cards) {
-			card.tries_remaining = Card.SendToNextBoxThreshold;
+			card.tries_remaining = Card.SendToNextBoxThreshold-card.box;
+			if (card.tries_remaining<1) {
+				card.tries_remaining=1;
+			}
 		}
 	}
 

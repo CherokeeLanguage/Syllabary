@@ -426,10 +426,10 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				continue;
 			}
 			Card card = new Card(next);
-			card.reset();
 			card.box = 0;
 			card.newCard = true;
 			card.show_again_ms = Deck.getNextInterval(0);
+			card.reset();
 			nodupes.add(card.answer);
 			return card;
 		}
