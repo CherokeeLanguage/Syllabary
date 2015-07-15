@@ -6,7 +6,7 @@ public class Card implements Comparable<Card> {
 	public static final int SendToNextBoxThreshold = 7;
 	
 	public boolean sendToNextBox(){
-		return correct_in_a_row>=SendToNextBoxThreshold && noErrors;
+		return tries_remaining<1 && noErrors;
 	}
 	
 	public Card() {
