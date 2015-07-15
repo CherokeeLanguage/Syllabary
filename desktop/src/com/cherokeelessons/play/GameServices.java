@@ -150,6 +150,7 @@ public class GameServices implements GooglePlayGameServices {
 					credential = authorize();
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					postRunnable(callback.with(e));
 				}
 			}
