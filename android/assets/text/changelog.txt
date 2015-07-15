@@ -1,3 +1,8 @@
+3.14
+
+Reduce number of times a refresh challenge is shown based on knowledge rating of item to reduce time reviewing well known material.
+Update to libGDX 1.6.4, RoboVM 1.5.0
+
 3.13
 
 Crash fix when loading a bad saved slot.

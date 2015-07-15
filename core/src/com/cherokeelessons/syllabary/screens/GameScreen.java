@@ -447,7 +447,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			decks.pending.updateTime(minShiftTimeOf);
 			Card nextAvailableCard = getNextAvailableCard();
 			App.log(this, "Adding '" + nextAvailableCard.answer
-					+ "' to pending deck.");
+					+ "' ["+nextAvailableCard.tries_remaining+"] to pending deck.");
 			return nextAvailableCard;
 		}
 		return decks.pending.cards.remove(0);
@@ -536,6 +536,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								card.showCount++;
 								card.showTime += currentCard_elapsed;
 								card.tries_remaining--;
+								App.log(this, "=== Card box, tries remaining: '"
+										+ card.answer + "' ["+card.box+", "+card.tries_remaining+"]");
 							}
 							card.show_again_ms += Deck
 									.getNextInterval(card.correct_in_a_row);

@@ -100,7 +100,7 @@ public class Card implements Comparable<Card> {
 		noErrors=true;
 		showCount=0;
 		showTime=0f;
-		tries_remaining = Card.SendToNextBoxThreshold-box;
+		tries_remaining = Card.SendToNextBoxThreshold-box*2;
 		if (tries_remaining<1) {
 			tries_remaining=1;
 		}
