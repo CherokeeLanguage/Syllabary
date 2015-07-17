@@ -225,6 +225,7 @@ public class GameServices implements GooglePlayGameServices {
 					submit.execute();
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			} 
@@ -248,7 +249,7 @@ public class GameServices implements GooglePlayGameServices {
 					PlayerLeaderboardScoreListResponse result = scores
 							.execute();
 					List<PlayerLeaderboardScore> list = result.getItems();
-					for (PlayerLeaderboardScore e : list) {
+					if (list!=null) for (PlayerLeaderboardScore e : list) {
 						GameScore gs = new GameScore();
 						gs.rank = "";
 						gs.tag = URLDecoder.decode(e.getScoreTag(), "UTF-8");
@@ -258,6 +259,7 @@ public class GameServices implements GooglePlayGameServices {
 					}
 					postRunnable(callback.with(gscores));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -285,11 +287,7 @@ public class GameServices implements GooglePlayGameServices {
 					scores.setMaxResults(30);
 					LeaderboardScores result = scores.execute();
 					List<LeaderboardEntry> list = result.getItems();
-					if (list == null) {
-						postRunnable(callback.with(gscores));
-						return;
-					}
-					for (LeaderboardEntry e : list) {
+					if (list!=null) for (LeaderboardEntry e : list) {
 						GameScore gs = new GameScore();
 						gs.rank = e.getFormattedScoreRank();
 						gs.tag = URLDecoder.decode(e.getScoreTag(), "UTF-8");
@@ -302,6 +300,7 @@ public class GameServices implements GooglePlayGameServices {
 					gscores.ts = ts;
 					postRunnable(callback.with(gscores));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -325,7 +324,7 @@ public class GameServices implements GooglePlayGameServices {
 					scores.setMaxResults(5);
 					LeaderboardScores result = scores.execute();
 					List<LeaderboardEntry> list = result.getItems();
-					for (LeaderboardEntry e : list) {
+					if (list!=null) for (LeaderboardEntry e : list) {
 						GameScore gs = new GameScore();
 						gs.rank = e.getFormattedScoreRank();
 						gs.tag = URLDecoder.decode(e.getScoreTag(), "UTF-8");
@@ -338,6 +337,7 @@ public class GameServices implements GooglePlayGameServices {
 					gscores.ts = ts;
 					postRunnable(callback.with(gscores));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -367,6 +367,7 @@ public class GameServices implements GooglePlayGameServices {
 					ac.reveal(id).execute();
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -385,6 +386,7 @@ public class GameServices implements GooglePlayGameServices {
 					ac.unlock(id).execute();
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -404,7 +406,7 @@ public class GameServices implements GooglePlayGameServices {
 					PlayerAchievementListResponse response = ac.list("me")
 							.execute();
 					List<PlayerAchievement> list = response.getItems();
-					for (PlayerAchievement pa : list) {
+					if (list!=null) for (PlayerAchievement pa : list) {
 						GameAchievement a = new GameAchievement();
 						a.id = pa.getId();
 						a.state = pa.getAchievementState();
@@ -412,6 +414,7 @@ public class GameServices implements GooglePlayGameServices {
 					}
 					postRunnable(callback.with(results));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -444,6 +447,7 @@ public class GameServices implements GooglePlayGameServices {
 									"UTF-8").intern();
 							postRunnable(callback.with(result));
 						} catch (Exception e) {
+							e.printStackTrace();
 							retry(_self);
 						}
 					}
@@ -510,6 +514,7 @@ public class GameServices implements GooglePlayGameServices {
 					fm.url = meta.getDownloadUrl();
 					postRunnable(callback.with(fm));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				} 
 			}
@@ -533,7 +538,7 @@ public class GameServices implements GooglePlayGameServices {
 					request.setQ("'appfolder' in parents");
 					FileList fl = request.execute();
 					List<File> items = fl.getItems();
-					for (File item : items) {
+					if (items!=null) for (File item : items) {
 						FileMeta af = new FileMeta();
 						af.isAppData = item.getAppDataContents();
 						af.created = new Date(item.getCreatedDate().getValue());
@@ -546,6 +551,7 @@ public class GameServices implements GooglePlayGameServices {
 					}
 					postRunnable(callback.with(afs));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -571,6 +577,7 @@ public class GameServices implements GooglePlayGameServices {
 					drive.files().delete(id).execute();
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}				
 			}
@@ -591,7 +598,7 @@ public class GameServices implements GooglePlayGameServices {
 		Callback<FileMetaList> getTitles = new Callback<FileMetaList>() {
 			@Override
 			public void success(FileMetaList result) {
-				for (FileMeta file : result.files) {
+				if (result.files!=null) for (FileMeta file : result.files) {
 					if (file.title.equals(title)) {
 						drive_deleteById(file.id, noop);
 					}
@@ -682,6 +689,7 @@ public class GameServices implements GooglePlayGameServices {
 					File inserted = insert.execute();
 					postRunnable(callback.with(inserted.getId()));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -707,6 +715,7 @@ public class GameServices implements GooglePlayGameServices {
 							.intern();
 					postRunnable(callback.with(result));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -730,6 +739,7 @@ public class GameServices implements GooglePlayGameServices {
 							fos);
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -750,6 +760,7 @@ public class GameServices implements GooglePlayGameServices {
 					downloader.download(new GenericUrl(url), fos);
 					postRunnable(callback.withNull());
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
@@ -772,6 +783,7 @@ public class GameServices implements GooglePlayGameServices {
 							.intern();
 					postRunnable(callback.with(result));
 				} catch (Exception e) {
+					e.printStackTrace();
 					retry(_self);
 				}
 			}
