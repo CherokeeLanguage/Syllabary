@@ -1,7 +1,8 @@
 3.14
 
 Reduce number of times a refresh challenge is shown based on knowledge rating of item to reduce time reviewing well known material.
-Update to libGDX 1.6.4, RoboVM 1.5.0
+Update to libGDX 1.6.4, RoboVM 1.5.0.
+Update to latest Google Play.
 
 3.13
 
