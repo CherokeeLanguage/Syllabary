@@ -94,15 +94,28 @@ public class Card implements Comparable<Card> {
 		key.append(challenge);
 		return key.toString().intern();
 	}
+	
+	public void resetTriesRemaining(){
+		tries_remaining = Card.SendToNextBoxThreshold;
+		if (box==1) {
+			tries_remaining=3;
+		}
+		if (box==2) {
+			tries_remaining=2;
+		}
+		if (box>2) {
+			tries_remaining=1;
+		}
+		if (tries_remaining<1) {
+			tries_remaining=1;
+		}
+	}
 
 	public void reset() {
 		correct_in_a_row=0;
 		noErrors=true;
 		showCount=0;
 		showTime=0f;
-		tries_remaining = Card.SendToNextBoxThreshold-box*3;
-		if (tries_remaining<1) {
-			tries_remaining=1;
-		}
+		
 	}
 }
