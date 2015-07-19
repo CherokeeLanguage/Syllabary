@@ -1,3 +1,7 @@
+3.16
+
+Fix serious bug in card scheduling introduced in last update.
+
 3.15
 
 if learning box == 0 tries per card is 7
