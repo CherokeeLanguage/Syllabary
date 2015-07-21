@@ -1,3 +1,7 @@
+3.17
+
+Desktop: Implement "always on top" input window for name of slot input.
+
 3.16
 
 Fix serious bug in card scheduling introduced in last update.
