@@ -42,6 +42,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private enum Choices {
 		Leaderboard, MainMenu, NextStage;
 	}
+
 	private static class ImgBoxObject {
 		public Color color;
 
@@ -50,12 +51,15 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		public int ix;
 		public int iy;
 		public ClickListener listener;
+
 		public ImgBoxObject() {
 		}
 	}
+
 	private enum YesNo {
 		No, Yes;
 	}
+
 	private static final float BOARD_TICK = 2f * 60f;
 	private static final float CARD_TICK = 4f;
 	private static final int MinCardsInPlay = 7;
@@ -133,9 +137,9 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		gameboard = ui.getGameBoard(stage, ui, gs);
 		gameboard.setHandler(this);
 		SlotInfo info = App.getSlotInfo(slot);
-		App.Volume.challenges=info.settings.vol_challenges;
-		App.Volume.effects=info.settings.vol_effects;
-		App.Volume.effectsMute=info.settings.muted;
+		App.Volume.challenges = info.settings.vol_challenges;
+		App.Volume.effects = info.settings.vol_effects;
+		App.Volume.effectsMute = info.settings.muted;
 	}
 
 	@Override
@@ -176,7 +180,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gs.playGlyph(currentCard.answer.charAt(0), whenDone);
 			}
 			if (challenge_elapsed > CARD_TICK) {
-				gameboard.addToScore(-(currentCard.box * 5 + 1));
+				gameboard.addToScore(-(currentCard.box + 1));
 				perfectStage = false;
 				audio1_done = false;
 				audio2_done = false;
@@ -248,7 +252,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		decks.discards.cards.add(currentCard);
 		if (currentCard.newCard) {
 			if (info.settings.skipTraining) {
-				currentCard.newCard=false;
+				currentCard.newCard = false;
 			} else {
 				newCardDialog(currentCard);
 				audio1_done = true;
@@ -270,27 +274,29 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		info.recalculateStats();
 		info.lastrun = System.currentTimeMillis();
 		if (App.services.isLoggedIn()) {
-			if (info.signature==null || info.signature.length()==0) {
+			if (info.signature == null || info.signature.length() == 0) {
 				String s1 = Long.toString(System.currentTimeMillis(),
 						Character.MAX_RADIX);
 				String s2 = Integer.toString(
 						new Random().nextInt(Integer.MAX_VALUE),
 						Character.MAX_RADIX);
-				info.signature=s1 + "-" + s2;
+				info.signature = s1 + "-" + s2;
 			}
 		}
 		App.saveSlotInfo(slot, info);
 		if (App.services.isLoggedIn()) {
 			FileHandle fh = App.getSlotInfoFileHandle(slot);
-			Callback<String> ifError=new Callback<String>() {
+			Callback<String> ifError = new Callback<String>() {
 				public void error(Exception exception) {
 					ui.errorDialog(exception, null);
 				}
+
 				@Override
 				public void success(String result) {
 				};
 			};
-			App.services.drive_replace(fh, slot+"-"+fh.name(), slot+"-"+fh.name(), ifError);
+			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-"
+					+ fh.name(), ifError);
 		}
 
 		final UIDialog finished = new UIDialog("Stage Complete!", true, true,
@@ -449,8 +455,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		if (minShiftTimeOf > 120f) {
 			decks.pending.updateTime(minShiftTimeOf);
 			Card nextAvailableCard = getNextAvailableCard();
-			App.log(this, "Adding '" + nextAvailableCard.answer
-					+ "' ["+nextAvailableCard.tries_remaining+"] to pending deck.");
+			App.log(this, "Adding '" + nextAvailableCard.answer + "' ["
+					+ nextAvailableCard.tries_remaining + "] to pending deck.");
 			return nextAvailableCard;
 		}
 		return decks.pending.cards.remove(0);
@@ -470,7 +476,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		} else {
 			gameboard.setChallenge_latin("");
 		}
-		if (card.box == 0 && card.correct_in_a_row == 0 && !info.settings.skipTraining) {
+		if (card.box == 0 && card.correct_in_a_row == 0
+				&& !info.settings.skipTraining) {
 			String answer_img = getGlyphFilename(card.answer.charAt(0), 1)
 					.toString();
 			gameboard.setChallenge_img(answer_img);
@@ -496,9 +503,14 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 					int font = r.nextInt(5);
 					StringBuilder img = getGlyphFilename(letter, font);
 					gameboard.setImageAt(ix, iy, img.toString());
-					Color color = UI.randomBrightColor();
+					Color color;
+					if (info.settings.blackTiles) {
+						color = new Color(Color.BLACK);
+					} else {
+						color = UI.randomBrightColor();
+					}
 					gameboard.setColorAt(ix, iy, color);
-					final int score = card.box * 5 + 5 + card.correct_in_a_row;
+					final int score = card.box + 1 + card.correct_in_a_row;
 					final int img_ix = ix;
 					final int img_iy = iy;
 					final Image img_actor = gameboard.getImageAt(ix, iy);
@@ -539,8 +551,11 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								card.showCount++;
 								card.showTime += currentCard_elapsed;
 								card.tries_remaining--;
-								App.log(this, "=== Card box, tries remaining: '"
-										+ card.answer + "' ["+card.box+", "+card.tries_remaining+"]");
+								App.log(this,
+										"=== Card box, tries remaining: '"
+												+ card.answer + "' ["
+												+ card.box + ", "
+												+ card.tries_remaining + "]");
 							}
 							card.show_again_ms += Deck
 									.getNextInterval(card.correct_in_a_row);
@@ -552,7 +567,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								decks.finished.cards.add(card);
 								if (card.sendToNextBox()) {
 									card.box++;
-									gameboard.addToScore(card.box * 100);
+									gameboard.addToScore(card.box);
 								} else {
 									card.box--;
 								}
@@ -632,7 +647,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			protected void result(Object object) {
 				cancel();
 				ready.setTouchable(Touchable.disabled);
-				ready.getColor().a=0f;
+				ready.getColor().a = 0f;
 				clearActions();
 				addAction(Actions.delay(.3f, dialogDone[0]));
 			}
@@ -693,13 +708,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 		actions.add(dialogDone[0]);
 		content.clearChildren();
-		
+
 		if (info.settings.display.equals(DisplayMode.Latin)) {
 			Label l1 = new Label(card.challenge, ui.getLsXLarge());
 			content.row();
 			content.add(l1);
 		}
-		
+
 		content.row();
 		content.add(pix).expandX().fillX();
 		d.button(ready);

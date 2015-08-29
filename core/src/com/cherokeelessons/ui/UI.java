@@ -449,6 +449,7 @@ public class UI {
 					final Runnable nobusy=new Runnable() {
 						@Override
 						public void run() {
+							Gdx.app.log(this.getClass().getSimpleName(), "busy#hide");
 							busy.hide();
 							handler.reload();
 						}
@@ -560,6 +561,18 @@ public class UI {
 				return true;
 			}
 		});
+		
+		final TextButton blackLetters = new TextButton(info.settings.blackTiles ? "Yes"
+				: "No", tbs);
+		blackLetters.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				info.settings.blackTiles = !info.settings.blackTiles;
+				blackLetters.setText(info.settings.blackTiles ? "Yes" : "No");
+				return true;
+			}
+		});
 
 		final TextButton ok = new TextButton("OK", tbs);
 		final TextButton cancel = new TextButton("CANCEL", tbs);
@@ -599,6 +612,11 @@ public class UI {
 		Label lbl_display = new Label("Display: ", ls);
 		contentTable.add(lbl_display).left().fillX();
 		contentTable.add(mode).expand().fillX().left();
+		
+		contentTable.row();
+		Label lbl_blackTiles = new Label("Show only solid black letters?", ls);
+		contentTable.add(lbl_blackTiles).left().fillX();
+		contentTable.add(blackLetters).expand().fillX().left();
 		
 		contentTable.row();
 		Label lbl_training = new Label("Skip new letter training?", ls);

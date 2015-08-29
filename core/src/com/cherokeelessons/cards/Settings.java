@@ -7,6 +7,7 @@ public class Settings {
 	public boolean skipTraining = false;
 	public float vol_challenges=1.0f;
 	public float vol_effects=.3f;
+	public boolean blackTiles=false;
 
 	public Settings() {
 	}

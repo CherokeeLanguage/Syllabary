@@ -120,6 +120,13 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 			UIDialog logind = new UIDialog("Google Play Services", true, true,
 					ui) {
 				protected void result(Object object) {
+					if (!object.equals(YesNo.Yes)){
+						if (whenDone!=null) {
+							Gdx.app.log(this.getClass().getSimpleName(), "Do not login chosen. Cancel...");
+							Gdx.app.postRunnable(whenDone);
+						}
+						return;
+					}
 					if (object.equals(YesNo.Yes)) {
 						Callback<Void> cb_login = new Callback<Void>() {
 							@Override
