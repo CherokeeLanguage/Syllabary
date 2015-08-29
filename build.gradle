@@ -153,3 +153,6 @@ tasks.eclipse.doLast {
     delete ".project"
 }
 
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.6'
+}
