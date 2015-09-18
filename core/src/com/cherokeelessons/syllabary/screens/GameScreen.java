@@ -328,7 +328,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 							return;
 						} else {
 							UIDialog logind = new UIDialog(
-									"Google Play Services", true, true, ui) {
+									"Leaderboard Service", true, true, ui) {
 								protected void result(Object object) {
 									if (object.equals(YesNo.Yes)) {
 										submitScore(viewScoresAfterSubmit);
@@ -336,7 +336,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								};
 							};
 							logind.text("Leaderboard support requires that\n"
-									+ "you to log in to Google Play Services.\n"
+									+ "you to login.\n"
 									+ "Would you like to login now?");
 							logind.button("YES", YesNo.Yes);
 							logind.button("NO", YesNo.No);

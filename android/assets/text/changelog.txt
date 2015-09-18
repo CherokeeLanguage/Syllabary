@@ -3,7 +3,7 @@
 Add option for solid black letters instead of the "marbled" letters. (Click the gear icon before starting a session.)
 Updated to LibDX 1.6.5
 Updated to RoboVM 1.6.0
-Updated to latest Google Apis Java library.
+Updated to latest Leaderboard Service Api Java library.
 Changed scoring algorithm. Scores generally will be now be lower, but this should end the un-realistic high scores some people get... 
 
 3.17
@@ -25,7 +25,7 @@ if learning box  > 2 tries per card is 1
 
 Reduce number of times a refresh challenge is shown based on knowledge rating of item to reduce time reviewing well known material.
 Update to libGDX 1.6.4, RoboVM 1.5.0.
-Update to latest Google Play.
+Update to latest Leaderboard Service Api
 
 3.13
 
@@ -52,7 +52,7 @@ Make the reset for training check a little more aggressive.
 
 3.07
 
-Add ACRA crash reporting module to try and get logs for crashes that end with no logs via TestFairy or Google Play.
+Add ACRA crash reporting module to try and get logs for crashes that end with no logs via TestFairy or Leaderboard Service Api.
 
 3.06
 

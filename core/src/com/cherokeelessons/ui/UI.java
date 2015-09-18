@@ -439,7 +439,7 @@ public class UI {
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y,
 						int pointer, int button) {
-					final UIDialog busy = new UIDialog("Google Play Services", true, true, UI.this);
+					final UIDialog busy = new UIDialog("Leaderboard Service", true, true, UI.this);
 					busy.text("Device sync in progress...");
 					busy.button("HIDE");
 					Stage stage = dialog.getStage();
@@ -704,7 +704,7 @@ public class UI {
 	}
 	
 	public UIDialog errorDialog(final Exception e, final Runnable done) {
-		UIDialog error = new UIDialog("Google Play Services", true, true, this) {
+		UIDialog error = new UIDialog("Leaderboard Service", true, true, this) {
 			@Override
 			protected void result(Object object) {
 				if (done!=null) {

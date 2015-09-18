@@ -117,7 +117,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 	@Override
 	public void sync(final int slot, final Runnable whenDone) {
 		if (!App.services.isLoggedIn()) {
-			UIDialog logind = new UIDialog("Google Play Services", true, true,
+			UIDialog logind = new UIDialog("Leaderboard Service", true, true,
 					ui) {
 				protected void result(Object object) {
 					if (!object.equals(YesNo.Yes)){
@@ -154,7 +154,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 				};
 			};
 			logind.text("Device sync support requires that\n"
-					+ "you to log in to Google Play Services.\n"
+					+ "you to login.\n"
 					+ "Would you like to login now?");
 			logind.button("YES", YesNo.Yes);
 			logind.button("NO", YesNo.No);

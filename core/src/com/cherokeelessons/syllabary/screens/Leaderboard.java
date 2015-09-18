@@ -54,7 +54,7 @@ public class Leaderboard extends ChildScreen {
 		public void success(GameScores data) {
 			Gdx.app.log("success_show_scores", "Scores received.");
 			if (data==null) {
-				message.setText("You must login to Google Play for Leaderboard Support");
+				message.setText("You must login for Leaderboard Support");
 				return;
 			}
 			if (data.collection==null) {
@@ -104,7 +104,7 @@ public class Leaderboard extends ChildScreen {
 			}
 			
 			if (!App.services.isLoggedIn()) {
-				message.setText("You must login to Google Play for Leaderboard Support");
+				message.setText("You must login for Leaderboard Support");
 			}
 		}
 	};
@@ -167,14 +167,14 @@ public class Leaderboard extends ChildScreen {
 			message = new Label("...", ls);
 
 			if (!App.services.isLoggedIn()) {
-				button = new TextButton("Login to Google Play", tbs);
-				message.setText("You must login to Google Play for Leaderboard Support");
+				button = new TextButton("Login", tbs);
+				message.setText("You must login for Leaderboard Support");
 			} else {
-				button = new TextButton("Logout of Google Play", tbs);
+				button = new TextButton("Logout", tbs);
 			}
 			final TextButton play_button = button;
-			final UIDialog login = new UIDialog("Google Play Services", true, true, ui);
-			login.text("Connecting to Google Play Services ...");
+			final UIDialog login = new UIDialog("Leaderboard Service", true, true, ui);
+			login.text("Connecting to Leaderboard Service ...");
 			login.button("DISMISS");
 			
 			final UIDialog[] error = new UIDialog[1];
@@ -186,7 +186,7 @@ public class Leaderboard extends ChildScreen {
 						error[0].hide();
 						login.hide();
 						requestScores();
-						play_button.setText("Logout of Google Play");
+						play_button.setText("Logout");
 					}
 					@Override
 					public void error(Exception e) {
@@ -203,7 +203,7 @@ public class Leaderboard extends ChildScreen {
 						error[0].hide();
 						login.hide();
 						requestScores();
-						play_button.setText("Login to Google Play");
+						play_button.setText("Login");
 					}
 					@Override
 					public void error(Exception exception) {
