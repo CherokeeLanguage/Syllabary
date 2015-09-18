@@ -116,6 +116,17 @@ project(":ios") {
         compile 'com.google.oauth-client:google-oauth-client-java6:1.20.0' exclude module: 'httpclient'
 		compile 'com.google.api-client:google-api-client-android:1.20.0' exclude module: 'httpclient'
     }
+    
+    robovm {
+    		//iosSignIdentity = "iPhone Distribution: Michael Joyner"
+    		//iosProvisioningProfile = 'iOS Store General Profile'
+    		iosSignIdentity = "iPhone Developer: Michael Joyner (7T8K4MBSQ2)"
+    		iosProvisioningProfile = "iOSTeam Provisioning Profile: *"
+    		iosSkipSigning = false;
+    		stdoutFifo = ""
+    		stderrFifo = ""
+    		archs = "thumbv7:arm64"
+}
 }
 
 project(":html") {
@@ -140,9 +151,9 @@ project(":core") {
     }
 }
 
-tasks.eclipse.doLast {
+/*tasks.eclipse.doLast {
     delete ".project"
-}
+}*/
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.7'
