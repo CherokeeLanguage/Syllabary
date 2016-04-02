@@ -28,13 +28,48 @@ public class DreamLo {
 	 * boardId = "animal-slot#-timstamp-random";
 	 */
 	private final Preferences prefs;
-	
-	@SuppressWarnings("deprecation")
-	private static String encode(String string) {
+
+	/**
+	 * Correctly percent encode for passing as URL component
+	 * {@link http://stackoverflow.com/questions/724043/http-url-address-encoding-in-java}
+	 * @param s
+	 * @return
+	 */
+	public static String encode(final String s) {
+		if (s == null) {
+			return "";
+		}
+
+		final StringBuilder sb = new StringBuilder();
+
 		try {
-			return URLEncoder.encode(string, "UTF-8").replaceAll("\\+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			return URLEncoder.encode(string).replaceAll("\\+", "%20");
+			for (final char c : s.toCharArray()) {
+				if (((c >= 'A') && (c <= 'Z')) //
+						|| ((c >= 'a') && (c <= 'z')) //
+						|| ((c >= '0') && (c <= '9')) //
+						|| (c == '-') //
+						|| (c == '.') //
+						|| (c == '_') //
+						|| (c == '~')) {
+					sb.append(c);
+					continue;
+				}
+
+				final byte[] bytes = ("" + c).getBytes("UTF-8");
+
+				for (byte b : bytes) {
+					sb.append('%');
+
+					int upper = (((int) b) >> 4) & 0xf;
+					sb.append(Integer.toHexString(upper).toUpperCase());
+
+					int lower = ((int) b) & 0xf;
+					sb.append(Integer.toHexString(lower).toUpperCase());
+				}
+			}
+			return sb.toString();
+		} catch (UnsupportedEncodingException uee) {
+			throw new RuntimeException("UTF-8 unsupported!?", uee);
 		}
 	}
 
