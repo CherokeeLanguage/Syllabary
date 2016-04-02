@@ -1,7 +1,12 @@
+3.19
+
+Updated to libGDX 1.9.2
+Switched to DreamLo leaderboard system. (It doesn't require logging in ...)
+
 3.18
 
 Add option for solid black letters instead of the "marbled" letters. (Click the gear icon before starting a session.)
-Updated to LibDX 1.6.5
+Updated to LibGDX 1.6.5
 Updated to RoboVM 1.6.0
 Updated to latest Leaderboard Service Api Java library.
 Changed scoring algorithm. Scores generally will be now be lower, but this should end the un-realistic high scores some people get... 
