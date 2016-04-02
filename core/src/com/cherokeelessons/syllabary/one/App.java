@@ -145,6 +145,11 @@ public class App {
 	
 	public static void toJson(Object object, FileHandle file) {
 		try {
+			file.parent().mkdirs();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		try {
 			file.writeString(json().prettyPrint(object), false, "UTF-8");
 		} catch (Exception e) {
 			Gdx.app.error("toJson", file.file().getAbsolutePath(), e);
