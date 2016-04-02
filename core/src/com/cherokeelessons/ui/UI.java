@@ -364,7 +364,8 @@ public class UI {
 		dialog.getContentTable().add(scroll).expand().fill();
 
 		for (int ix = 0; ix < 4; ix++) {
-			SlotInfo info = App.getSlotInfo(ix);
+			SlotInfo info;
+			info = App.getSlotInfo(ix);
 			info.validate();
 			if (!info.isUpdatedVersion()) {
 				info.recalculateStats();
@@ -442,7 +443,7 @@ public class UI {
 			syncb.addListener(new ClickListener() {
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-					final UIDialog busy = new UIDialog("Leaderboard Service", true, true, UI.this);
+					final UIDialog busy = new UIDialog("Sync Service", true, true, UI.this);
 					busy.text("Device sync in progress...");
 					busy.button("HIDE");
 					Stage stage = dialog.getStage();
@@ -693,7 +694,7 @@ public class UI {
 	}
 
 	public UIDialog errorDialog(final Exception e, final Runnable done) {
-		UIDialog error = new UIDialog("Leaderboard Service", true, true, this) {
+		UIDialog error = new UIDialog("Sync Service", true, true, this) {
 			@Override
 			protected void result(Object object) {
 				if (done != null) {

@@ -144,7 +144,12 @@ public class App {
 	}
 	
 	public static void toJson(Object object, FileHandle file) {
-		file.writeString(json().prettyPrint(object), false, "UTF-8");
+		try {
+			file.writeString(json().prettyPrint(object), false, "UTF-8");
+		} catch (Exception e) {
+			Gdx.app.error("toJson", file.file().getAbsolutePath(), e);
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static <T> T fromJson(FileHandle file, Class<T> type) {
@@ -153,9 +158,7 @@ public class App {
 	
 	public static SlotInfo getSlotInfo(int ix) {
 		FileHandle folder = getFolder(ix);
-		if (!folder.exists()) {
-			folder.mkdirs();
-		}
+		folder.mkdirs();
 		FileHandle json_file = folder.child("info.json");
 		if (!json_file.exists()) {
 			SlotInfo info = new SlotInfo();
