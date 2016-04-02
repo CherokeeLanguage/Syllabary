@@ -1,5 +1,6 @@
 package com.cherokeelessons.syllabary.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.util.SlotFolder;
 
 public class Loading extends ChildScreen {
 
@@ -23,6 +25,12 @@ public class Loading extends ChildScreen {
 
 	@Override
 	public void show() {
+		switch (Gdx.app.getType()) {
+		case Android:
+		case iOS:
+			SlotFolder.migrate();
+		default:
+		}
 		for (int ix = 0; ix < 8; ix++) {
 			loading[ix % 4][ix / 4] = ui.loadTexture("images/loading/p_loading_" + ix + ".png");
 		}
