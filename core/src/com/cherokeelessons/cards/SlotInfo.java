@@ -10,7 +10,7 @@ public class SlotInfo implements Serializable {
 	public static final int FULLY_LEARNED_BOX = 10;
 	public static final int JUST_LEARNED_BOX = 1;
 	public static final int PROFICIENT_BOX = 5;
-	private static final int StatsVersion = 4;
+	private static final int StatsVersion = 5;
 	public static void calculateStatsFor(SlotInfo info) {
 		Deck activeDeck = info.deck;
 		/*
