@@ -3,6 +3,7 @@ package com.cherokeelessons.syllabary.one;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -93,14 +94,20 @@ public enum Fonts {
 			}
 		}
 		for (Fonts font : values()) {			
-			FreeTypeFontLoaderParameter param = new FreeTypeFontLoaderParameter();
-			param.fontFileName = "fonts/CherokeeHandone.ttf";
-			param.fontParameters.characters = defaultChars;
-			param.fontParameters.kerning = true;
-			param.fontParameters.size = font.size;
-			param.fontParameters.magFilter = TextureFilter.Linear;
-			param.fontParameters.minFilter = TextureFilter.Linear;
-			manager.load(font.fontName(), BitmapFont.class, param);
+			FreeTypeFontLoaderParameter fontp = new FreeTypeFontLoaderParameter();
+			fontp.fontFileName = "fonts/CherokeeHandone.ttf";
+			fontp.fontParameters.borderGamma=1.0f;
+			fontp.fontParameters.borderStraight=false;
+			fontp.fontParameters.characters = defaultChars;
+			fontp.fontParameters.color=Color.WHITE;
+			fontp.fontParameters.gamma=1.1f;
+			fontp.fontParameters.kerning = true;
+			fontp.fontParameters.magFilter = TextureFilter.Linear;
+			fontp.fontParameters.minFilter = TextureFilter.Linear;
+			fontp.fontParameters.size = font.size;
+			fontp.fontParameters.spaceX=1;
+			fontp.fontParameters.spaceY=1;
+			manager.load(font.fontName(), BitmapFont.class, fontp);
 		}
 		return;
 	}

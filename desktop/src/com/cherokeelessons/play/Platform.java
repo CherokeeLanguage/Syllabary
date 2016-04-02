@@ -3,6 +3,7 @@ package com.cherokeelessons.play;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import com.badlogic.gdx.Gdx;
 import com.cherokeelessons.play.GameServices.PlatformInterface;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -19,6 +20,7 @@ public class Platform implements PlatformInterface {
 	@Override
 	public Credential getCredential(GoogleAuthorizationCodeFlow flow)
 			throws IOException {
+		Gdx.app.log(this.getClass().getSimpleName(), "getCredential");
 		LocalServerReceiver jettyServlet = new LocalServerReceiver();
 		return new AuthorizationCodeInstalledApp(flow, jettyServlet)
 				.authorize(USER);

@@ -2,6 +2,9 @@ package com.cherokeelessons.ui;
 
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.assets.AssetManager;
@@ -46,8 +49,7 @@ import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
-import com.cherokeelessons.util.StringUtils;
-import com.cherokeelessons.util.WordUtils;
+import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 
 public class UI {
 	
@@ -68,6 +70,11 @@ public class UI {
 	public static final String DIALOG9 = "images/ninepatch/dialog-9patch.png";
 	
 	private final AssetManager manager;
+	private Callback<Void> noop=new Callback<Void>() {
+		@Override
+		public void success(Void result) {
+		}
+	};
 
 	public UI(AssetManager manager) {
 		this.manager=manager;
@@ -365,6 +372,7 @@ public class UI {
 			info.validate();
 			if (!info.isUpdatedVersion()) {
 				info.recalculateStats();
+				App.lb.lb_submit(ix+"", info.activeCards, info.lastScore, info.level.getEnglish()+"!!!"+info.settings.name, noop);
 				App.saveSlotInfo(ix, info);
 			}
 			String displayName = info.settings.name;

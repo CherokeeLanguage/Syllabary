@@ -1,8 +1,8 @@
 package com.cherokeelessons.syllabary.one;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Input.TextInputListener;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.cards.SlotInfo;
+import com.cherokeelessons.util.DreamLo;
 import com.cherokeelessons.util.GooglePlayGameServices;
 
 public class App {
@@ -128,6 +129,7 @@ public class App {
 	private static Json _json;
 
 	public static GooglePlayGameServices services;
+	public static DreamLo lb;
 	public static Json json() {
 		if (_json!=null) {
 			return _json;

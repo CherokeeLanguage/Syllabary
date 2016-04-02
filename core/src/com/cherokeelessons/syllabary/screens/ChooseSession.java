@@ -2,6 +2,8 @@ package com.cherokeelessons.syllabary.screens;
 
 import java.util.Random;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
@@ -17,7 +19,6 @@ import com.cherokeelessons.ui.SlotsDialogHandler;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList;
-import com.cherokeelessons.util.WordUtils;
 
 public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 
@@ -117,7 +118,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 	@Override
 	public void sync(final int slot, final Runnable whenDone) {
 		if (!App.services.isLoggedIn()) {
-			UIDialog logind = new UIDialog("Leaderboard Service", true, true,
+			UIDialog logind = new UIDialog("Sync Service", true, true,
 					ui) {
 				protected void result(Object object) {
 					if (!object.equals(YesNo.Yes)){

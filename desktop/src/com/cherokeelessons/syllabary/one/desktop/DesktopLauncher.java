@@ -24,11 +24,11 @@ import javax.swing.event.DocumentListener;
 
 import org.lwjgl.opengl.Display;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.GraphicsType;
 import com.badlogic.gdx.Input.TextInputListener;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.cherokeelessons.play.GameServices;
@@ -226,5 +226,5 @@ public class DesktopLauncher implements PlatformTextInput  {
 
 			}
 		});
-	}	
+	}
 }

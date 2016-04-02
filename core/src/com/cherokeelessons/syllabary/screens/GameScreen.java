@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -35,7 +37,6 @@ import com.cherokeelessons.ui.GameBoard.GameboardHandler;
 import com.cherokeelessons.ui.UI;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.util.GooglePlayGameServices.Callback;
-import com.cherokeelessons.util.WordUtils;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
@@ -273,31 +274,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		info.deck.sortByShowTimeMinutes();
 		info.recalculateStats();
 		info.lastrun = System.currentTimeMillis();
-		if (App.services.isLoggedIn()) {
-			if (info.signature == null || info.signature.length() == 0) {
-				String s1 = Long.toString(System.currentTimeMillis(),
-						Character.MAX_RADIX);
-				String s2 = Integer.toString(
-						new Random().nextInt(Integer.MAX_VALUE),
-						Character.MAX_RADIX);
-				info.signature = s1 + "-" + s2;
-			}
-		}
-		App.saveSlotInfo(slot, info);
-		if (App.services.isLoggedIn()) {
-			FileHandle fh = App.getSlotInfoFileHandle(slot);
-			Callback<String> ifError = new Callback<String>() {
-				public void error(Exception exception) {
-					ui.errorDialog(exception, null);
-				}
-
-				@Override
-				public void success(String result) {
-				};
-			};
-			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-"
-					+ fh.name(), ifError);
-		}
 
 		final UIDialog finished = new UIDialog("Stage Complete!", true, true,
 				ui) {
@@ -318,30 +294,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 					}
 					if (object.equals(Choices.MainMenu)) {
 						GameScreen.this.goodBye();
-						return;
-					}
-					if (object.equals(Choices.Leaderboard)) {
-						cancel();
-						if (App.services.isLoggedIn()) {
-							App.getGame().setScreen(
-									new Leaderboard(GameScreen.this));
-							return;
-						} else {
-							UIDialog logind = new UIDialog(
-									"Leaderboard Service", true, true, ui) {
-								protected void result(Object object) {
-									if (object.equals(YesNo.Yes)) {
-										submitScore(viewScoresAfterSubmit);
-									}
-								};
-							};
-							logind.text("Leaderboard support requires that\n"
-									+ "you to login.\n"
-									+ "Would you like to login now?");
-							logind.button("YES", YesNo.Yes);
-							logind.button("NO", YesNo.No);
-							logind.show(stage);
-						}
 						return;
 					}
 				}
@@ -380,26 +332,52 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 
 		finished.button("NEXT STAGE", Choices.NextStage);
 		finished.button("MAIN MENU", Choices.MainMenu);
-		finished.button("VIEW TOP SCORES", Choices.Leaderboard);
 		finished.show(stage);
 		dialogShowing = true;
 
+		finished.getButtonTable().setVisible(false);
+		stage.addAction(Actions.sequence(Actions.delay(10f),
+				Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						finished.getButtonTable().setVisible(true);
+					}
+				})));
+		Callback<Void> enableButtons = new Callback<Void>() {
+			@Override
+			public void success(Void result) {
+				finished.getButtonTable().setVisible(true);
+			}
+			@Override
+			public void error(Exception exception) {
+				finished.getButtonTable().setVisible(true);
+			}
+		};
+		submitScore(enableButtons);
+		
+		if (info.signature == null || info.signature.length() == 0) {
+			String s1 = Long.toString(System.currentTimeMillis(),
+					Character.MAX_RADIX);
+			String s2 = Integer.toString(
+					new Random().nextInt(Integer.MAX_VALUE),
+					Character.MAX_RADIX);
+			info.signature = s1 + "-" + s2;
+		}
+			
+		App.saveSlotInfo(slot, info);
 		if (App.services.isLoggedIn()) {
-			finished.getButtonTable().setVisible(false);
-			stage.addAction(Actions.sequence(Actions.delay(10f),
-					Actions.run(new Runnable() {
-						@Override
-						public void run() {
-							finished.getButtonTable().setVisible(true);
-						}
-					})));
-			Callback<Void> enableButtons = new Callback<Void>() {
-				@Override
-				public void success(Void result) {
-					finished.getButtonTable().setVisible(true);
+			FileHandle fh = App.getSlotInfoFileHandle(slot);
+			Callback<String> ifError = new Callback<String>() {
+				public void error(Exception exception) {
+					ui.errorDialog(exception, null);
 				}
+
+				@Override
+				public void success(String result) {
+				};
 			};
-			submitScore(enableButtons);
+			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-"
+					+ fh.name(), ifError);
 		}
 	}
 
@@ -776,20 +754,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	}
 
 	private void submitScore(final Callback<Void> callback) {
-		Callback<Void> do_submit = new Callback<Void>() {
-			@Override
-			public void error(Exception exception) {
-				App.log(this, exception.getMessage());
-				callback.error(exception);
-			}
-
-			@Override
-			public void success(Void result) {
-				App.services.lb_submit(Leaderboard.BoardId, info.lastScore,
+			App.lb.lb_submit(slot+"",info.activeCards, info.lastScore,
 						info.level.getEnglish(), callback);
-			}
-		};
-		App.services.login(do_submit);
 	}
 
 	/**
