@@ -208,16 +208,14 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				gameboard.setActive(false);
 				dialogShowing = true;
 				for (ImgBoxObject x : wrongAnswers) {
-					ParallelAction ap = Actions.parallel(
-							Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
+					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
 					Image img = gameboard.getImageAt(x.ix, x.iy);
 					img.addAction(ap);
 					img.setLayoutEnabled(false);
 					img.setOrigin(img.getWidth() / 2f, img.getHeight() / 2f);
 				}
 				for (ImgBoxObject x : xboxes) {
-					ParallelAction ap = Actions.parallel(
-							Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
+					ParallelAction ap = Actions.parallel(Actions.scaleTo(0, 0, .4f), Actions.alpha(0f, .3f));
 					Image img = gameboard.getImageAt(x.ix, x.iy);
 					img.addAction(ap);
 					img.setLayoutEnabled(false);
@@ -275,14 +273,12 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		info.recalculateStats();
 		info.lastrun = System.currentTimeMillis();
 
-		final UIDialog finished = new UIDialog("Stage Complete!", true, true,
-				ui) {
+		final UIDialog finished = new UIDialog("Stage Complete!", true, true, ui) {
 			@Override
 			protected void result(Object object) {
 				if (object != null) {
 					if (object.equals(Choices.NextStage)) {
-						GameScreen nextScreen = new GameScreen(
-								GameScreen.this.caller, GameScreen.this.slot);
+						GameScreen nextScreen = new GameScreen(GameScreen.this.caller, GameScreen.this.slot);
 						if (perfectStage) {
 							nextScreen.setStageCount(stageCount + 1);
 						} else {
@@ -336,34 +332,31 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		dialogShowing = true;
 
 		finished.getButtonTable().setVisible(false);
-		stage.addAction(Actions.sequence(Actions.delay(10f),
-				Actions.run(new Runnable() {
-					@Override
-					public void run() {
-						finished.getButtonTable().setVisible(true);
-					}
-				})));
+		stage.addAction(Actions.sequence(Actions.delay(10f), Actions.run(new Runnable() {
+			@Override
+			public void run() {
+				finished.getButtonTable().setVisible(true);
+			}
+		})));
 		Callback<Void> enableButtons = new Callback<Void>() {
 			@Override
 			public void success(Void result) {
 				finished.getButtonTable().setVisible(true);
 			}
+
 			@Override
 			public void error(Exception exception) {
 				finished.getButtonTable().setVisible(true);
 			}
 		};
 		submitScore(enableButtons);
-		
+
 		if (info.signature == null || info.signature.length() == 0) {
-			String s1 = Long.toString(System.currentTimeMillis(),
-					Character.MAX_RADIX);
-			String s2 = Integer.toString(
-					new Random().nextInt(Integer.MAX_VALUE),
-					Character.MAX_RADIX);
+			String s1 = Long.toString(System.currentTimeMillis(), Character.MAX_RADIX);
+			String s2 = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), Character.MAX_RADIX);
 			info.signature = s1 + "-" + s2;
 		}
-			
+
 		App.saveSlotInfo(slot, info);
 		if (App.services.isLoggedIn()) {
 			FileHandle fh = App.getSlotInfoFileHandle(slot);
@@ -376,8 +369,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 				public void success(String result) {
 				};
 			};
-			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-"
-					+ fh.name(), ifError);
+			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-" + fh.name(), ifError);
 		}
 	}
 
@@ -427,14 +419,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		decks.pending.updateTime(currentCard_elapsed);
 		currentCard_elapsed = 0f;
 		challenge_elapsed = 0f;
-		float minShiftTimeOf = (float) decks.pending.getMinShiftTimeOf()
-				/ (float) ONE_SECOND_ms;
+		float minShiftTimeOf = (float) decks.pending.getMinShiftTimeOf() / (float) ONE_SECOND_ms;
 		App.log(this, "Min Shift Time Of: " + minShiftTimeOf);
 		if (minShiftTimeOf > 120f) {
 			decks.pending.updateTime(minShiftTimeOf);
 			Card nextAvailableCard = getNextAvailableCard();
-			App.log(this, "Adding '" + nextAvailableCard.answer + "' ["
-					+ nextAvailableCard.tries_remaining + "] to pending deck.");
+			App.log(this, "Adding '" + nextAvailableCard.answer + "' [" + nextAvailableCard.tries_remaining
+					+ "] to pending deck.");
 			return nextAvailableCard;
 		}
 		return decks.pending.cards.remove(0);
@@ -454,10 +445,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		} else {
 			gameboard.setChallenge_latin("");
 		}
-		if (card.box == 0 && card.correct_in_a_row == 0
-				&& !info.settings.skipTraining) {
-			String answer_img = getGlyphFilename(card.answer.charAt(0), 1)
-					.toString();
+		if (card.box == 0 && card.correct_in_a_row == 0 && !info.settings.skipTraining) {
+			String answer_img = getGlyphFilename(card.answer.charAt(0), 1).toString();
 			gameboard.setChallenge_img(answer_img);
 		} else {
 			gameboard.setChallenge_img("images/misc/003f_4.png");
@@ -472,8 +461,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 			for (int ix = 0; ix < GameBoard.width; ix++) {
 				for (int iy = 0; iy < GameBoard.height; iy++) {
 					int letter = r.nextInt(lastLetter - 'Ꭰ' + 1) + 'Ꭰ';
-					final boolean isCorrect = card.answer.equals(String
-							.valueOf((char) letter));
+					final boolean isCorrect = card.answer.equals(String.valueOf((char) letter));
 					if (isCorrect) {
 						valid = true;
 						totalRight++;
@@ -495,8 +483,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 					final ImgBoxObject ibo = new ImgBoxObject();
 					ClickListener listener = new ClickListener() {
 						@Override
-						public boolean touchDown(InputEvent event, float x,
-								float y, int pointer, int button) {
+						public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 							img_actor.setTouchable(Touchable.disabled);
 							int amt = card.noErrors ? score : score / 2;
 							if (isCorrect) {
@@ -505,10 +492,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								audio2_done = false;
 								totalRight--;
 								gameboard.addToScore(amt);
-								gameboard.setImageAt(img_ix, img_iy,
-										UI.CHECKMARK);
-								gameboard.setColorAt(img_ix, img_iy,
-										Color.GREEN);
+								gameboard.setImageAt(img_ix, img_iy, UI.CHECKMARK);
+								gameboard.setColorAt(img_ix, img_iy, Color.GREEN);
 							} else {
 								wrongAnswers.remove(ibo);
 								xboxes.add(ibo);
@@ -529,18 +514,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								card.showCount++;
 								card.showTime += currentCard_elapsed;
 								card.tries_remaining--;
-								App.log(this,
-										"=== Card box, tries remaining: '"
-												+ card.answer + "' ["
-												+ card.box + ", "
-												+ card.tries_remaining + "]");
+								App.log(this, "=== Card box, tries remaining: '" + card.answer + "' [" + card.box + ", "
+										+ card.tries_remaining + "]");
 							}
-							card.show_again_ms += Deck
-									.getNextInterval(card.correct_in_a_row);
+							card.show_again_ms += Deck.getNextInterval(card.correct_in_a_row);
 							if (card.tries_remaining <= 0) {
 								card.tries_remaining = -1;
-								App.log(this, "=== Retiring card: '"
-										+ card.answer + "'");
+								App.log(this, "=== Retiring card: '" + card.answer + "'");
 								decks.remove(card);
 								decks.finished.cards.add(card);
 								if (card.sendToNextBox()) {
@@ -549,8 +529,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 								} else {
 									card.box--;
 								}
-								card.show_again_ms += Deck
-										.getNextSessionInterval(card.box);
+								card.show_again_ms += Deck.getNextSessionInterval(card.box);
 							}
 							return true;
 						}
@@ -647,9 +626,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						audio1_done = false;
 					}
 				};
-				SequenceAction sequence = Actions.sequence(Actions.delay(1f),
-						Actions.run(runnable), Actions.delay(.25f),
-						Actions.run(runnable2));
+				SequenceAction sequence = Actions.sequence(Actions.delay(1f), Actions.run(runnable),
+						Actions.delay(.25f), Actions.run(runnable2));
 				gameboard.addAction(sequence);
 			}
 		};
@@ -660,8 +638,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		int startFont = 0;
 		int endFont = 4;
 		for (int ix = startFont; ix <= endFont; ix++) {
-			String file = getGlyphFilename(card.answer.charAt(0), ix)
-					.toString();
+			String file = getGlyphFilename(card.answer.charAt(0), ix).toString();
 			final Image glyph = ui.loadImage(file);
 			pix.add(glyph).width(192f).height(192f);
 			glyph.setScaling(Scaling.fit);
@@ -673,8 +650,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						public void run() {
 							if (actions.size() > 0) {
 								Action delay = Actions.delay(.7f);
-								d.addAction(Actions.sequence(delay,
-										actions.remove(0)));
+								d.addAction(Actions.sequence(delay, actions.remove(0)));
 							}
 						};
 					};
@@ -707,8 +683,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		Iterator<Card> icard = deck.cards.iterator();
 		while (icard.hasNext()) {
 			Card card = icard.next();
-			if (card.show_again_ms < ONE_HOUR_ms
-					&& card.box < SlotInfo.PROFICIENT_BOX) {
+			if (card.show_again_ms < ONE_HOUR_ms && card.box < SlotInfo.PROFICIENT_BOX) {
 				continue;
 			}
 			decks.finished.cards.add(card);
@@ -716,8 +691,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 		decks.finished.shuffle();
 		decks.finished.sortByShowTimeMinutes();
-		App.log(this, "Moved " + decks.finished.cards.size()
-				+ " future pending"
+		App.log(this, "Moved " + decks.finished.cards.size() + " future pending"
 				+ " or fully learned cards into the 'finished' deck.");
 	}
 
@@ -754,8 +728,8 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	}
 
 	private void submitScore(final Callback<Void> callback) {
-			App.lb.lb_submit(slot+"",info.activeCards, info.lastScore,
-						info.level.getEnglish(), callback);
+		App.lb.lb_submit(slot + "", info.activeCards, info.lastScore,
+				info.level.getEnglish() + "!!!" + info.settings.name, callback);
 	}
 
 	/**
