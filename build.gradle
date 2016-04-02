@@ -1,27 +1,29 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'org.robovm:robovm-gradle-plugin:1.6.0'
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'org.robovm:robovm-gradle-plugin:1.12.0'
     }
 }
 
+
 allprojects {
-    apply plugin: "eclipse-wtp"
+    apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '3.18'
+    version = '3.19'
     ext {
         appName = 'Syllabary'
-        gdxVersion = '1.6.5'
-        roboVMVersion = '1.6.0'
-        box2DLightsVersion = '1.3'
-        ashleyVersion = '1.3.1'
-        aiVersion = '1.5.0'
+        gdxVersion = '1.9.2'
+        roboVMVersion = '1.12.0'
+        box2DLightsVersion = '1.4'
+        ashleyVersion = '1.7.0'
+        aiVersion = '1.8.0'
     }
 
     repositories {
@@ -43,11 +45,38 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile 'org.apache.commons:commons-lang3:3.1'
         //FOR DESKTOP GOOGLE API
-        compile 'com.google.apis:google-api-services-games:v1-rev125-1.20.0'
-        compile 'com.google.apis:google-api-services-drive:v2-rev183-1.20.0'
-        compile 'com.google.oauth-client:google-oauth-client-java6:1.20.0'
-        compile 'com.google.oauth-client:google-oauth-client-jetty:1.20.0'
+        //compile 'com.google.apis:google-api-services-games:v1-rev172-1.21.0'
+        compile 'com.google.apis:google-api-services-drive:v3-rev16-1.21.0'
+        compile 'com.google.oauth-client:google-oauth-client:1.21.0'
+        compile 'com.google.oauth-client:google-oauth-client-jetty:1.21.0'
     }
+    
+     eclipseJdt << {
+	    File f = file('.settings/org.eclipse.core.resources.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('encoding/<project>=utf-8')
+	    f = file('.settings/org.eclipse.core.runtime.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('line.separator=\\n\n')
+	}
+	project.afterEvaluate {
+	// use jre lib matching version used by project, not the workspace default
+	if (sourceCompatibility != null) {
+		def target = project.sourceCompatibility.toString()
+		def containerPrefix = "org.eclipse.jdt.launching.JRE_CONTAINER"
+		def containerSuffix
+		if (target =~ /1.[4-5]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-' + target
+		} else if (target =~ /1.[6-8]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + target
+		}
+		if (containerSuffix != null) {
+			project.eclipse.classpath {
+				containers.removeAll { it.startsWith(containerPrefix) }
+				containers.add(containerPrefix + containerSuffix)
+			}
+		}
+	}}
 }
 
 project(":android") {
@@ -60,30 +89,62 @@ project(":android") {
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+        
         compile 'org.apache.commons:commons-lang3:3.1'
+        
         //FOR ANDROID GOOGLE API
-        compile ('com.google.apis:google-api-services-games:v1-rev125-1.20.0') {
+        /*compile ('com.google.apis:google-api-services-games:v1-rev172-1.21.0') {
+			exclude module: 'httpclient'
+			exclude module: 'xpp3'
+			exclude module: 'junit'
+			exclude module: 'android'
+		}*/
+        compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
 			exclude module: 'httpclient'
 			exclude module: 'xpp3'
 			exclude module: 'junit'
 			exclude module: 'android'
 		}
-        compile ('com.google.apis:google-api-services-drive:v2-rev183-1.20.0') {
-			exclude module: 'httpclient'
-			exclude module: 'xpp3'
-			exclude module: 'junit'
-			exclude module: 'android'
-		}
-        compile 'com.google.oauth-client:google-oauth-client-java6:1.20.0' exclude module: 'httpclient'
-		compile 'com.google.api-client:google-api-client-android:1.20.0' exclude module: 'httpclient'
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.21.0' exclude module: 'httpclient'
+		compile 'com.google.api-client:google-api-client-android:1.21.0' exclude module: 'httpclient'
 		//FOR CRASH REPORTING
 		compile 'ch.acra:acra:4.6.2'
     }
+    eclipseJdt << {
+	    File f = file('.settings/org.eclipse.core.resources.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('encoding/<project>=utf-8')
+	    f = file('.settings/org.eclipse.core.runtime.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('line.separator=\\n\n')
+	}
+	project.afterEvaluate {
+	// use jre lib matching version used by project, not the workspace default
+	if (sourceCompatibility != null) {
+		def target = project.sourceCompatibility.toString()
+		def containerPrefix = "org.eclipse.jdt.launching.JRE_CONTAINER"
+		def containerSuffix
+		if (target =~ /1.[4-5]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-' + target
+		} else if (target =~ /1.[6-8]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + target
+		}
+		if (containerSuffix != null) {
+			project.eclipse.classpath {
+				containers.removeAll { it.startsWith(containerPrefix) }
+				containers.add(containerPrefix + containerSuffix)
+			}
+		}
+	}}
 }
 
 project(":ios") {
@@ -94,27 +155,29 @@ project(":ios") {
 
     dependencies {
         compile project(":core")
+        compile project(":core")
         compile "org.robovm:robovm-rt:${roboVMVersion}"
         compile "org.robovm:robovm-cocoatouch:${roboVMVersion}"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        
         compile 'org.apache.commons:commons-lang3:3.1'
-        //FOR IOS GOOGLE API
-         compile ('com.google.apis:google-api-services-games:v1-rev125-1.20.0') {
+       //FOR IOS GOOGLE API
+         /*compile ('com.google.apis:google-api-services-games:v1-rev172-1.21.0') {
+			exclude module: 'httpclient'
+			exclude module: 'xpp3'
+			exclude module: 'junit'
+			exclude module: 'android'
+		}*/
+        compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
 			exclude module: 'httpclient'
 			exclude module: 'xpp3'
 			exclude module: 'junit'
 			exclude module: 'android'
 		}
-        compile ('com.google.apis:google-api-services-drive:v2-rev183-1.20.0') {
-			exclude module: 'httpclient'
-			exclude module: 'xpp3'
-			exclude module: 'junit'
-			exclude module: 'android'
-		}
-        compile 'com.google.oauth-client:google-oauth-client-java6:1.20.0' exclude module: 'httpclient'
-		compile 'com.google.api-client:google-api-client-android:1.20.0' exclude module: 'httpclient'
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.21.0' exclude module: 'httpclient'
+		compile 'com.google.api-client:google-api-client-android:1.21.0' exclude module: 'httpclient'
     }
     
     robovm {
@@ -126,10 +189,37 @@ project(":ios") {
     		stdoutFifo = ""
     		stderrFifo = ""
     		archs = "thumbv7:arm64"
-}
+	}
+
+eclipseJdt << {
+	    File f = file('.settings/org.eclipse.core.resources.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('encoding/<project>=utf-8')
+	    f = file('.settings/org.eclipse.core.runtime.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('line.separator=\\n\n')
+	}
+	project.afterEvaluate {
+	// use jre lib matching version used by project, not the workspace default
+	if (sourceCompatibility != null) {
+		def target = project.sourceCompatibility.toString()
+		def containerPrefix = "org.eclipse.jdt.launching.JRE_CONTAINER"
+		def containerSuffix
+		if (target =~ /1.[4-5]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-' + target
+		} else if (target =~ /1.[6-8]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + target
+		}
+		if (containerSuffix != null) {
+			project.eclipse.classpath {
+				containers.removeAll { it.startsWith(containerPrefix) }
+				containers.add(containerPrefix + containerSuffix)
+			}
+		}
+	}}
 }
 
-project(":html") {
+/*project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
 
@@ -140,7 +230,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
     }
-}
+}*/
 
 project(":core") {
     apply plugin: "java"
@@ -148,13 +238,36 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile 'org.apache.commons:commons-lang3:3.1'
     }
+    eclipseJdt << {
+	    File f = file('.settings/org.eclipse.core.resources.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('encoding/<project>=utf-8')
+	    f = file('.settings/org.eclipse.core.runtime.prefs')
+	    f.write('eclipse.preferences.version=1\n')
+	    f.append('line.separator=\\n\n')
+	}
+	project.afterEvaluate {
+	// use jre lib matching version used by project, not the workspace default
+	if (sourceCompatibility != null) {
+		def target = project.sourceCompatibility.toString()
+		def containerPrefix = "org.eclipse.jdt.launching.JRE_CONTAINER"
+		def containerSuffix
+		if (target =~ /1.[4-5]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-' + target
+		} else if (target =~ /1.[6-8]/) {
+			containerSuffix = '/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + target
+		}
+		if (containerSuffix != null) {
+			project.eclipse.classpath {
+				containers.removeAll { it.startsWith(containerPrefix) }
+				containers.add(containerPrefix + containerSuffix)
+			}
+		}
+	}}
 }
 
-/*tasks.eclipse.doLast {
+tasks.eclipse.doLast {
     delete ".project"
-}*/
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.7'
 }
