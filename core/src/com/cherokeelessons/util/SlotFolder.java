@@ -3,7 +3,6 @@ package com.cherokeelessons.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
-import com.cherokeelessons.bp.BoundPronouns;
 import com.cherokeelessons.syllabary.one.App;
 
 public class SlotFolder {
