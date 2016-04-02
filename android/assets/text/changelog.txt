@@ -1,3 +1,7 @@
+3.21
+
+Add code to migrate to internal device storage of slots.
+
 3.19
 
 Updated to libGDX 1.9.2

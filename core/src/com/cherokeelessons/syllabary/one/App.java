@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.util.DreamLo;
 import com.cherokeelessons.util.GooglePlayGameServices;
+import com.cherokeelessons.util.SlotFolder;
 
 public class App {
 
@@ -101,29 +102,7 @@ public class App {
 	}
 	
 	public static FileHandle getFolder(int ix) {
-		return getFolder(ix + "");
-	}
-	
-	public static FileHandle getFolder(String child) {
-		String path0 = "CherokeeSyllabary/slots";
-		FileHandle p0;
-		FileHandle childFile;
-		
-		if (Gdx.files.isExternalStorageAvailable()) {
-			p0 = Gdx.files.external(path0);
-		} else {
-			p0 = Gdx.files.local(path0);
-		}
-		
-		childFile = p0.child(child);
-		try {
-			childFile.mkdirs();
-		} catch (Exception e) {
-			p0 = Gdx.files.local(path0);
-			childFile = p0.child(child);
-			childFile.mkdirs();
-		}
-		return childFile;
+		return SlotFolder.getFolder(ix + "");
 	}
 	
 	private static Json _json;
