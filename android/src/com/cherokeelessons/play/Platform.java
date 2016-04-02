@@ -2,6 +2,8 @@ package com.cherokeelessons.play;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -19,7 +21,6 @@ import android.webkit.WebViewClient;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.cherokeelessons.play.GameServices.PlatformInterface;
-import com.cherokeelessons.util.StringUtils;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
@@ -183,6 +184,9 @@ public class Platform implements PlatformInterface {
 						return true;
 					}
 				};
+				webView.setMinimumHeight(600);
+				webView.setMinimumWidth(1024);
+				webView.setInitialScale(150);
 				alert.setView(webView);
 				alert.setCancelable(true);
 				final AlertDialog adialog = alert.show();
@@ -195,7 +199,7 @@ public class Platform implements PlatformInterface {
 				};
 				adialog.setOnDismissListener(listener);
 				webView.loadUrl("about:blank");
-
+				
 				application.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {

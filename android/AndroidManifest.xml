@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cherokeelessons.syllabary.one"
-    android:versionCode="318"
-    android:versionName="3.18" >
+    android:versionCode="319"
+    android:versionName="3.19" >
 
     <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="21" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="23" />
 
     <uses-feature
         android:glEsVersion="0x00020000"

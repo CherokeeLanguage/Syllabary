@@ -4,9 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,49 +11,72 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.cherokeelessons.util.GamesScopes;
 import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList.FileMeta;
-import com.cherokeelessons.util.GooglePlayGameServices.GameAchievements.GameAchievement;
-import com.cherokeelessons.util.GooglePlayGameServices.GameScores.GameScore;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
-import com.google.api.services.drive.Drive.Files.Insert;
+import com.google.api.services.drive.Drive.Files.Create;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
-import com.google.api.services.games.Games;
-import com.google.api.services.games.Games.Achievements;
-import com.google.api.services.games.Games.Scores;
-import com.google.api.services.games.Games.Scores.Submit;
-import com.google.api.services.games.GamesScopes;
-import com.google.api.services.games.model.LeaderboardEntry;
-import com.google.api.services.games.model.LeaderboardScores;
-import com.google.api.services.games.model.PlayerAchievement;
-import com.google.api.services.games.model.PlayerAchievementListResponse;
-import com.google.api.services.games.model.PlayerLeaderboardScore;
-import com.google.api.services.games.model.PlayerLeaderboardScoreListResponse;
 
 public class GameServices implements GooglePlayGameServices {
+	
+	private static final String APP_DATA_FOLDER = "appDataFolder";
 
-	public static String APP_NAME = "ᏣᎳᎩ-ᎦᏬᏂᎯᏍᏗ/1.0";
+	private static void appendSourceClassName(StringBuilder sb, LogRecord record) {
+		String sourceClassName = record.getSourceClassName();
+		if (sourceClassName != null) {
+			sb.append(" ");
+			sb.append(sourceClassName);
+		}
+	}
+	
+	private static final Formatter f1 = new Formatter() {
+		@Override
+		public String format(LogRecord record) {
+			StringBuilder sb = new StringBuilder(256);
+			sb.append("[GameServices] ");
+			sb.append(new java.util.Date(record.getMillis()));
+			appendSourceClassName(sb, record);
+			sb.append(", ");
+			sb.append(record.getMessage());
+			sb.append("\n");
+			return sb.toString();
+		}
+
+	};
+	
+	private final static Logger log;
+	static {
+		ConsoleHandler handler = new ConsoleHandler();
+		log = Logger.getLogger(GameServices.class.getName());
+		handler.setFormatter(f1);
+		log.setUseParentHandlers(false);
+		log.addHandler(handler);
+	}
+	
+
+	public static String APP_NAME = "CherokeeBoundPronouns/332095";
 
 	public static interface PlatformInterface {
-		public static final String USER = "user";
+		public static final String USER = "cherokee-bound-pronouns-332095-restapi";
 
 		public Credential getCredential(GoogleAuthorizationCodeFlow flow)
 				throws IOException;
@@ -139,13 +159,26 @@ public class GameServices implements GooglePlayGameServices {
 	public GoogleAuthorizationCodeFlow getFlow() throws IOException {
 		GoogleClientSecrets clientSecrets = null;
 		String json = Gdx.files.internal("google.json").readString();
+		
 		StringReader sr = new StringReader(json);
 		clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, sr);
 		Set<String> scopes = new HashSet<>(GamesScopes.all());
+		
+		//games
+		scopes.add("https://www.googleapis.com/auth/games");
+		scopes.add("https://www.googleapis.com/auth/drive.appdata");
+		scopes.add("https://www.googleapis.com/auth/plus.login");
+		
+		//profile
 		scopes.add("https://www.googleapis.com/auth/plus.me");
+		scopes.add("https://www.googleapis.com/auth/userinfo.profile");
+		
+		//v3 drive appdata
+		scopes.add("https://www.googleapis.com/auth/drive.appfolder");
+		
 		GoogleAuthorizationCodeFlow.Builder builder = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, JSON_FACTORY, clientSecrets, scopes);
-		builder.setApprovalPrompt("force");
+		builder.setApprovalPrompt("auto");
 		builder.setAccessType("offline");
 		builder.setDataStoreFactory(dataStoreFactory);
 		GoogleAuthorizationCodeFlow flow = builder.build();
@@ -189,16 +222,9 @@ public class GameServices implements GooglePlayGameServices {
 			@Override
 			public void run() {
 				try {
-					Gdx.app.log(this.getClass().getName(), "logout:init");
 					init();
-
-					Gdx.app.log(this.getClass().getName(), "logout:getflow");
 					GoogleAuthorizationCodeFlow flow = getFlow();
-
-					Gdx.app.log(this.getClass().getName(), "logout:flow#clear");
 					flow.getCredentialDataStore().clear();
-
-					Gdx.app.log(this.getClass().getName(), "credential=null");
 					credential = null;
 					postRunnable(success.withNull());
 				} catch (Exception e) {
@@ -225,244 +251,244 @@ public class GameServices implements GooglePlayGameServices {
 		logout(back_in);
 	}
 
-	@Override
-	public void lb_submit(final String boardId, final long score,
-			final String label, final Callback<Void> callback) {
-		final Runnable runnable = new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				try {
-					Games g = _getGamesObject();
-					Submit submit = g.scores().submit(boardId, score);
-					String tag = URLEncoder.encode(label, "UTF-8");
-					submit.setScoreTag(tag);
-					submit.setScore(score);
-					submit.execute();
-					postRunnable(callback.withNull());
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		};
-		platform.runTask(runnable);
-	}
-
-	@Override
-	public void lb_getScoresFor(final String boardId,
-			final Callback<GameScores> callback) {
-		final Runnable runnable = new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				GameScores gscores = new GameScores();
-				try {
-					Games g = _getGamesObject();
-					Scores.Get scores = g.scores().get("me", boardId,
-							TimeSpan.ALL_TIME.name());
-					scores.setMaxResults(30);
-					PlayerLeaderboardScoreListResponse result = scores
-							.execute();
-					List<PlayerLeaderboardScore> list = result.getItems();
-					if (list != null)
-						for (PlayerLeaderboardScore e : list) {
-							GameScore gs = new GameScore();
-							gs.rank = "";
-							gs.tag = URLDecoder.decode(
-									StringUtils.defaultString(e.getScoreTag()),
-									"UTF-8");
-							gs.value = e.getScoreString();
-							gs.user = "";
-							gscores.list.add(gs);
-						}
-					postRunnable(callback.with(gscores));
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		};
-		platform.runTask(runnable);
-	}
-
-	@Override
-	public void lb_getListFor(final String boardId,
-			final Collection collection, final TimeSpan ts,
-			final Callback<GameScores> callback) {
-		final Runnable runnable = new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				GameScores gscores = new GameScores();
-				try {
-					Games g = _getGamesObject();
-					Scores.List scores = g.scores().list(boardId,
-							collection.name(), ts.toString());
-					scores.setMaxResults(30);
-					LeaderboardScores result = scores.execute();
-					List<LeaderboardEntry> list = result.getItems();
-					if (list != null)
-						for (LeaderboardEntry e : list) {
-							GameScore gs = new GameScore();
-							gs.rank = StringUtils.defaultString(e
-									.getFormattedScoreRank());
-							try {
-								try {
-									gs.tag = URLDecoder.decode(StringUtils
-											.defaultString(e.getScoreTag()),
-											"UTF-8");
-								} catch (UnsupportedEncodingException e1) {
-									e1.printStackTrace();
-									gs.tag = "Unknown";
-								}
-								gs.value = StringUtils.defaultString(e
-										.getFormattedScore());
-								gs.user = StringUtils.defaultString(e
-										.getPlayer().getDisplayName());
-								gs.imgUrl = StringUtils.defaultString(e
-										.getPlayer().getAvatarImageUrl());
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-							gscores.list.add(gs);
-						}
-					gscores.collection = collection;
-					gscores.ts = ts;
-					postRunnable(callback.with(gscores));
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		};
-		platform.runTask(runnable);
-	}
-
-	@Override
-	public void lb_getListWindowFor(final String boardId,
-			final Collection collection, final TimeSpan ts,
-			final Callback<GameScores> callback) {
-		final Runnable runnable = new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				GameScores gscores = new GameScores();
-				try {
-					Games g = _getGamesObject();
-					Scores.ListWindow scores = g.scores().listWindow(boardId,
-							collection.name(), ts.name());
-					scores.setMaxResults(5);
-					LeaderboardScores result = scores.execute();
-					List<LeaderboardEntry> list = result.getItems();
-					if (list != null)
-						for (LeaderboardEntry e : list) {
-							GameScore gs = new GameScore();
-							gs.rank = e.getFormattedScoreRank();
-							gs.tag = URLDecoder.decode(
-									StringUtils.defaultString(e.getScoreTag()),
-									"UTF-8");
-							gs.value = e.getFormattedScore();
-							gs.user = e.getPlayer().getDisplayName();
-							gs.imgUrl = e.getPlayer().getAvatarImageUrl();
-							gscores.list.add(gs);
-						}
-					gscores.collection = collection;
-					gscores.ts = ts;
-					postRunnable(callback.with(gscores));
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		};
-		platform.runTask(runnable);
-	}
-
-	private Games _getGamesObject() throws GeneralSecurityException,
-			IOException {
-		_login();
-		Games.Builder b = new Games.Builder(httpTransport, JSON_FACTORY,
-				credential);
-		b.setApplicationName(APP_NAME);
-		Games g = b.build();
-		return g;
-	}
-
-	@Override
-	public void ach_reveal(final String id, final Callback<Void> callback) {
-		platform.runTask(new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				try {
-					Games g = _getGamesObject();
-					Achievements ac = g.achievements();
-					ac.reveal(id).execute();
-					postRunnable(callback.withNull());
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		});
-	}
-
-	@Override
-	public void ach_unlocked(final String id, final Callback<Void> callback) {
-		platform.runTask(new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				try {
-					Games g = _getGamesObject();
-					Achievements ac = g.achievements();
-					ac.unlock(id).execute();
-					postRunnable(callback.withNull());
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		});
-	}
-
-	@Override
-	public void ach_list(final Callback<GameAchievements> callback) {
-		final Runnable runnable = new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				GameAchievements results = new GameAchievements();
-				try {
-					Games g = _getGamesObject();
-					Achievements ac = g.achievements();
-					PlayerAchievementListResponse response = ac.list("me")
-							.execute();
-					List<PlayerAchievement> list = response.getItems();
-					if (list != null)
-						for (PlayerAchievement pa : list) {
-							GameAchievement a = new GameAchievement();
-							a.id = pa.getId();
-							a.state = pa.getAchievementState();
-							results.list.add(a);
-						}
-					postRunnable(callback.with(results));
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		};
-		platform.runTask(runnable);
-	}
+//	@Override
+//	public void lb_submit(final String boardId, final long score,
+//			final String label, final Callback<Void> callback) {
+//		final Runnable runnable = new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				try {
+//					Games g = _getGamesObject();
+//					Submit submit = g.scores().submit(boardId, score);
+//					String tag = URLEncoder.encode(label, "UTF-8");
+//					submit.setScoreTag(tag);
+//					submit.setScore(score);
+//					submit.execute();
+//					postRunnable(callback.withNull());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		};
+//		platform.runTask(runnable);
+//	}
+//
+//	@Override
+//	public void lb_getScoresFor(final String boardId,
+//			final Callback<GameScores> callback) {
+//		final Runnable runnable = new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				GameScores gscores = new GameScores();
+//				try {
+//					Games g = _getGamesObject();
+//					Scores.Get scores = g.scores().get("me", boardId,
+//							TimeSpan.ALL_TIME.name());
+//					scores.setMaxResults(30);
+//					PlayerLeaderboardScoreListResponse result = scores
+//							.execute();
+//					List<PlayerLeaderboardScore> list = result.getItems();
+//					if (list != null)
+//						for (PlayerLeaderboardScore e : list) {
+//							GameScore gs = new GameScore();
+//							gs.rank = "";
+//							gs.tag = URLDecoder.decode(
+//									StringUtils.defaultString(e.getScoreTag()),
+//									"UTF-8");
+//							gs.value = e.getScoreString();
+//							gs.user = "";
+//							gscores.list.add(gs);
+//						}
+//					postRunnable(callback.with(gscores));
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		};
+//		platform.runTask(runnable);
+//	}
+//
+//	@Override
+//	public void lb_getListFor(final String boardId,
+//			final Collection collection, final TimeSpan ts,
+//			final Callback<GameScores> callback) {
+//		final Runnable runnable = new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				GameScores gscores = new GameScores();
+//				try {
+//					Games g = _getGamesObject();
+//					Scores.List scores = g.scores().list(boardId,
+//							collection.name(), ts.toString());
+//					scores.setMaxResults(30);
+//					LeaderboardScores result = scores.execute();
+//					List<LeaderboardEntry> list = result.getItems();
+//					if (list != null)
+//						for (LeaderboardEntry e : list) {
+//							GameScore gs = new GameScore();
+//							gs.rank = StringUtils.defaultString(e
+//									.getFormattedScoreRank());
+//							try {
+//								try {
+//									gs.tag = URLDecoder.decode(StringUtils
+//											.defaultString(e.getScoreTag()),
+//											"UTF-8");
+//								} catch (UnsupportedEncodingException e1) {
+//									e1.printStackTrace();
+//									gs.tag = "Unknown";
+//								}
+//								gs.value = StringUtils.defaultString(e
+//										.getFormattedScore());
+//								gs.user = StringUtils.defaultString(e
+//										.getPlayer().getDisplayName());
+//								gs.imgUrl = StringUtils.defaultString(e
+//										.getPlayer().getAvatarImageUrl());
+//							} catch (Exception e1) {
+//								e1.printStackTrace();
+//							}
+//							gscores.list.add(gs);
+//						}
+//					gscores.collection = collection;
+//					gscores.ts = ts;
+//					postRunnable(callback.with(gscores));
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		};
+//		platform.runTask(runnable);
+//	}
+//
+//	@Override
+//	public void lb_getListWindowFor(final String boardId,
+//			final Collection collection, final TimeSpan ts,
+//			final Callback<GameScores> callback) {
+//		final Runnable runnable = new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				GameScores gscores = new GameScores();
+//				try {
+//					Games g = _getGamesObject();
+//					Scores.ListWindow scores = g.scores().listWindow(boardId,
+//							collection.name(), ts.name());
+//					scores.setMaxResults(5);
+//					LeaderboardScores result = scores.execute();
+//					List<LeaderboardEntry> list = result.getItems();
+//					if (list != null)
+//						for (LeaderboardEntry e : list) {
+//							GameScore gs = new GameScore();
+//							gs.rank = e.getFormattedScoreRank();
+//							gs.tag = URLDecoder.decode(
+//									StringUtils.defaultString(e.getScoreTag()),
+//									"UTF-8");
+//							gs.value = e.getFormattedScore();
+//							gs.user = e.getPlayer().getDisplayName();
+//							gs.imgUrl = e.getPlayer().getAvatarImageUrl();
+//							gscores.list.add(gs);
+//						}
+//					gscores.collection = collection;
+//					gscores.ts = ts;
+//					postRunnable(callback.with(gscores));
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		};
+//		platform.runTask(runnable);
+//	}
+//
+//	private Games _getGamesObject() throws GeneralSecurityException,
+//			IOException {
+//		_login();
+//		Games.Builder b = new Games.Builder(httpTransport, JSON_FACTORY,
+//				credential);
+//		b.setApplicationName(APP_NAME);
+//		Games g = b.build();
+//		return g;
+//	}
+//
+//	@Override
+//	public void ach_reveal(final String id, final Callback<Void> callback) {
+//		platform.runTask(new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				try {
+//					Games g = _getGamesObject();
+//					Achievements ac = g.achievements();
+//					ac.reveal(id).execute();
+//					postRunnable(callback.withNull());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		});
+//	}
+//
+//	@Override
+//	public void ach_unlocked(final String id, final Callback<Void> callback) {
+//		platform.runTask(new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				try {
+//					Games g = _getGamesObject();
+//					Achievements ac = g.achievements();
+//					ac.unlock(id).execute();
+//					postRunnable(callback.withNull());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		});
+//	}
+//
+//	@Override
+//	public void ach_list(final Callback<GameAchievements> callback) {
+//		final Runnable runnable = new Runnable() {
+//			private final Runnable _self = this;
+//
+//			@Override
+//			public void run() {
+//				GameAchievements results = new GameAchievements();
+//				try {
+//					Games g = _getGamesObject();
+//					Achievements ac = g.achievements();
+//					PlayerAchievementListResponse response = ac.list("me")
+//							.execute();
+//					List<PlayerAchievement> list = response.getItems();
+//					if (list != null)
+//						for (PlayerAchievement pa : list) {
+//							GameAchievement a = new GameAchievement();
+//							a.id = pa.getId();
+//							a.state = pa.getAchievementState();
+//							results.list.add(a);
+//						}
+//					postRunnable(callback.with(results));
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					retry(_self);
+//				}
+//			}
+//		};
+//		platform.runTask(runnable);
+//	}
 
 	@Override
 	public void drive_getFileByTitle(final String title,
@@ -481,11 +507,8 @@ public class GameServices implements GooglePlayGameServices {
 						}
 						try {
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							MediaHttpDownloader downloader = new MediaHttpDownloader(
-									httpTransport, credential);
-							downloader.download(
-									new GenericUrl(result.files.get(0).url),
-									baos);
+							Drive drive = _getDriveObject();
+							drive.files().get(result.files.get(0).id).executeAndDownloadTo(baos);
 							String result = new String(baos.toByteArray(),
 									"UTF-8").intern();
 							postRunnable(callback.with(result));
@@ -517,7 +540,6 @@ public class GameServices implements GooglePlayGameServices {
 				Iterator<FileMeta> iter = result.files.iterator();
 				while (iter.hasNext()) {
 					FileMeta file = iter.next();
-					Gdx.app.log(TAG, file.title);
 					if (!file.title.equals(title)) {
 						iter.remove();
 						continue;
@@ -549,13 +571,13 @@ public class GameServices implements GooglePlayGameServices {
 					Drive drive = _getDriveObject();
 					File meta = drive.files().get(id).execute();
 					FileMeta fm = new FileMeta();
-					fm.created = new Date(meta.getCreatedDate().getValue());
+					DateTime createdTime = meta.getCreatedTime();
+					DateTime modifiedTime = meta.getModifiedTime();
+					fm.created = new Date(createdTime!=null?createdTime.getValue():0);
+					fm.lastModified = new Date(modifiedTime!=null?modifiedTime.getValue():0);
 					fm.id = meta.getId();
-					fm.isAppData = meta.getAppDataContents();
-					fm.lastModified = new Date(meta.getModifiedDate()
-							.getValue());
-					fm.title = meta.getTitle();
-					fm.url = meta.getDownloadUrl();
+					fm.title = meta.getName();
+					fm.url = meta.getWebContentLink();
 					postRunnable(callback.with(fm));
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -566,7 +588,7 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	/**
-	 * Lists all files in 'appfolder'
+	 * Lists all files in APP_DATA_FOLDER
 	 */
 	@Override
 	public void drive_list(final Callback<FileMetaList> callback) {
@@ -578,22 +600,19 @@ public class GameServices implements GooglePlayGameServices {
 				try {
 					FileMetaList afs = new FileMetaList();
 					Drive drive = _getDriveObject();
-
-					Files.List request = drive.files().list();
-					request.setQ("'appfolder' in parents");
+					Files.List request = drive.files().list().setSpaces(APP_DATA_FOLDER);
 					FileList fl = request.execute();
-					List<File> items = fl.getItems();
+					List<File> items = fl.getFiles();
 					if (items != null)
 						for (File item : items) {
 							FileMeta af = new FileMeta();
-							af.isAppData = item.getAppDataContents();
-							af.created = new Date(item.getCreatedDate()
-									.getValue());
+							DateTime createdTime = item.getCreatedTime();
+							DateTime modifiedTime = item.getModifiedTime();
+							af.created = new Date(createdTime!=null?createdTime.getValue():0);
+							af.lastModified = new Date(modifiedTime!=null?modifiedTime.getValue():0);
 							af.id = item.getId();
-							af.lastModified = new Date(item.getModifiedDate()
-									.getValue());
-							af.title = item.getTitle();
-							af.url = item.getDownloadUrl();
+							af.title = item.getName();
+							af.url = item.getWebContentLink();// getDownloadUrl();
 							afs.files.add(af);
 						}
 					postRunnable(callback.with(afs));
@@ -668,7 +687,6 @@ public class GameServices implements GooglePlayGameServices {
 	@Override
 	public void drive_replace(final FileHandle file, final String title,
 			final String description, final Callback<String> callback) {
-		Gdx.app.log(TAG, "drive_replace: " + title);
 		final FileMetaList[] toDelete = new FileMetaList[1];
 		final Callback<String> deleteOthers = new Callback<String>() {
 			@Override
@@ -698,7 +716,7 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	/**
-	 * Add file to 'appfolder'. Uses source file name as destination "title"
+	 * Add file to APP_DATA_FOLDER. Uses source file name as destination "title"
 	 * 
 	 * @param file
 	 * @param callback
@@ -709,7 +727,7 @@ public class GameServices implements GooglePlayGameServices {
 	}
 
 	/**
-	 * Add file to 'appfolder'. Uses specified title and description for
+	 * Add file to APP_DATA_FOLDER. Uses specified title and description for
 	 * metadata. Will not replace any previous files with the same title.
 	 */
 	@Override
@@ -730,12 +748,11 @@ public class GameServices implements GooglePlayGameServices {
 				try {
 					Drive drive = _getDriveObject();
 					File meta = new File();
-					meta.setParents(Arrays.asList(new ParentReference()
-							.setId("appfolder")));
-					meta.setTitle(_title);
+					meta.setParents(Arrays.asList(APP_DATA_FOLDER));
+					meta.setName(_title);
 					FileContent content = new FileContent(
 							"application/octet-stream", file.file());
-					Insert insert = drive.files().insert(meta, content);
+					Create insert = drive.files().create(meta, content);
 					File inserted = insert.execute();
 					postRunnable(callback.with(inserted.getId()));
 				} catch (Exception e) {
@@ -757,11 +774,7 @@ public class GameServices implements GooglePlayGameServices {
 				try {
 					Drive drive = _getDriveObject();
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					File meta = drive.files().get(id).execute();
-					MediaHttpDownloader downloader = new MediaHttpDownloader(
-							httpTransport, credential);
-					downloader.download(new GenericUrl(meta.getDownloadUrl()),
-							baos);
+					drive.files().get(id).executeAndDownloadTo(baos);
 					String result = new String(baos.toByteArray(), "UTF-8")
 							.intern();
 					postRunnable(callback.with(result));
@@ -784,58 +797,8 @@ public class GameServices implements GooglePlayGameServices {
 				try {
 					Drive drive = _getDriveObject();
 					FileOutputStream fos = new FileOutputStream(file.file());
-					File meta = drive.files().get(id).execute();
-					MediaHttpDownloader downloader = new MediaHttpDownloader(
-							httpTransport, credential);
-					downloader.download(new GenericUrl(meta.getDownloadUrl()),
-							fos);
+					drive.files().get(id).executeMediaAndDownloadTo(fos);
 					postRunnable(callback.withNull());
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		});
-	}
-
-	@Override
-	public void drive_getFileByUrl(final String url, final FileHandle file,
-			final Callback<Void> callback) {
-		platform.runTask(new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				try {
-					FileOutputStream fos = new FileOutputStream(file.file());
-					MediaHttpDownloader downloader = new MediaHttpDownloader(
-							httpTransport, credential);
-					downloader.download(new GenericUrl(url), fos);
-					postRunnable(callback.withNull());
-				} catch (Exception e) {
-					e.printStackTrace();
-					retry(_self);
-				}
-			}
-		});
-	}
-
-	@Override
-	public void drive_getFileByUrl(final String url,
-			final Callback<String> callback) {
-		platform.runTask(new Runnable() {
-			private final Runnable _self = this;
-
-			@Override
-			public void run() {
-				try {
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					MediaHttpDownloader downloader = new MediaHttpDownloader(
-							httpTransport, credential);
-					downloader.download(new GenericUrl(url), baos);
-					String result = new String(baos.toByteArray(), "UTF-8")
-							.intern();
-					postRunnable(callback.with(result));
 				} catch (Exception e) {
 					e.printStackTrace();
 					retry(_self);
