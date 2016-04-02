@@ -13,6 +13,7 @@ public class SlotFolder {
 		Preferences prefs = App.getPrefs();
 		String key = "migrate-" + base;
 		if (prefs.getBoolean(key, false)) {
+			Gdx.app.log("Migrate", "Marked as already migrated. Skipping");
 			return;
 		}
 		FileHandle lpath = Gdx.files.local(base);
@@ -20,6 +21,7 @@ public class SlotFolder {
 			lpath.deleteDirectory();
 		}
 		if (lpath.child("slots").child("0").isDirectory()) {
+			Gdx.app.log("Migrate", "Already have a slots/0 folder, marking as migrated.");
 			prefs.remove(key);
 			prefs.putBoolean(key, true);
 			prefs.flush();
@@ -27,7 +29,10 @@ public class SlotFolder {
 		}
 		FileHandle epath = Gdx.files.external(base);
 		if (epath.child("slots").child("0").isDirectory()) {
+			Gdx.app.log("Migrate", "Moving: "+epath.file().getAbsolutePath()+" to "+lpath.file().getAbsolutePath());
+			lpath.deleteDirectory();
 			epath.moveTo(lpath);
+			epath.deleteDirectory();
 		}
 		prefs.remove(key);
 		prefs.putBoolean(key, true);
