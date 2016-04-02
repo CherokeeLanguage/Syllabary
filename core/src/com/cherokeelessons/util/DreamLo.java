@@ -45,7 +45,6 @@ public class DreamLo {
 	public boolean registerWithDreamLoBoard() {
 		if (prefs.getString(DREAMLO_USERID, "").length() == 0) {
 			if (!registeredListenerPending) {
-				Gdx.app.log("DreamLo", "registeredWithBoard: false");
 				registeredListenerPending = true;
 				Gdx.app.postRunnable(registerWithBoard);
 			}
@@ -78,14 +77,11 @@ public class DreamLo {
 	private Runnable registerWithBoard = new Runnable() {
 		@Override
 		public void run() {
-			Gdx.app.log("DreamLo", "registerWithBoard");
 			HttpRequest httpRequest = new HttpRequest("GET");
 			httpRequest.setUrl(readUrl + "/pipe");
-			Gdx.app.log("DreamLo", "URL: '" + httpRequest.getUrl() + "'");
 			HttpResponseListener httpResponseListener = new HttpResponseListener() {
 				@Override
 				public void handleHttpResponse(HttpResponse httpResponse) {
-					Gdx.app.log("DreamLo", "registerWithBoard-init");
 					String str_scores = httpResponse.getResultAsString();
 					String[] scores = str_scores.split("\n");
 					Random r = new Random();
@@ -102,7 +98,6 @@ public class DreamLo {
 					HttpRequest httpRequest = new HttpRequest("GET");
 					httpRequest.setTimeOut(10000);
 					httpRequest.setUrl(writeUrl + "/add/" + id + "-0/0/0/"+encode("ᎢᏤ ᏴᏫ!!!ᎩᎶ ᎢᏤ"));
-					Gdx.app.log("Register url:", httpRequest.getUrl());
 					Gdx.net.sendHttpRequest(httpRequest, registeredListener);
 					prefs.putString(DREAMLO_USERID, id + "");
 					prefs.flush();
