@@ -21,6 +21,9 @@ public class SlotFolder {
 			lpath.deleteDirectory();
 		}
 		FileHandle epath = Gdx.files.external(base);
+		if (epath.file().getAbsolutePath().equals(lpath.file().getAbsolutePath())) {
+			return;
+		}
 		if (epath.child("slots").child("0").isDirectory()) {
 			Gdx.app.log("Migrate", "Moving: "+epath.file().getAbsolutePath()+" to "+lpath.file().getAbsolutePath());
 			lpath.deleteDirectory();
