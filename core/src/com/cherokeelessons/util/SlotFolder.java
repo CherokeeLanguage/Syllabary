@@ -28,6 +28,7 @@ public class SlotFolder {
 			Gdx.app.log("Migrate", "Moving: "+epath.file().getAbsolutePath()+" to "+lpath.file().getAbsolutePath());
 			lpath.deleteDirectory();
 			epath.moveTo(lpath);
+			Gdx.app.log("Migrate", "Done.");
 		}
 		prefs.remove(key);
 		prefs.putBoolean(key, true);
