@@ -184,7 +184,7 @@ project(":ios") {
     		//iosSignIdentity = "iPhone Distribution: Michael Joyner"
     		//iosProvisioningProfile = 'iOS Store General Profile'
     		iosSignIdentity = "iPhone Developer: Michael Joyner (7T8K4MBSQ2)"
-    		iosProvisioningProfile = "iOSTeam Provisioning Profile: *"
+    		iosProvisioningProfile = "iOS Development - Provisioning"
     		iosSkipSigning = false;
     		stdoutFifo = ""
     		stderrFifo = ""
