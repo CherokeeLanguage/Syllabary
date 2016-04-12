@@ -49,6 +49,7 @@ import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.util.RandomName;
 import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 
 public class UI {
@@ -381,6 +382,11 @@ public class UI {
 				displayName = "** BLANK **";
 				isBlank = true;
 			}
+			if (StringUtils.isBlank(displayName) && info.activeCards !=0) {
+				displayName=RandomName.getRandomName();
+				info.settings.name=displayName;
+				App.saveSlotInfo(ix, info);
+			}
 			StringBuilder sb = new StringBuilder();
 			sb.append(info.level.getEnglish());
 			sb.append(" ");
@@ -495,7 +501,7 @@ public class UI {
 
 		info.validate();
 		if (info.lastrun != 0) {
-			info.settings.name = (StringUtils.isBlank(info.settings.name)) ? "ᏐᏈᎵ ᏂᏧᏙᎥᎾ" : info.settings.name;
+			info.settings.name = (StringUtils.isBlank(info.settings.name)) ? RandomName.getRandomName() : info.settings.name;
 		}
 
 		final TextField name = new TextField(info.settings.name, tfs);

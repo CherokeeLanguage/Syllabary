@@ -19,6 +19,7 @@ import com.cherokeelessons.ui.SlotsDialogHandler;
 import com.cherokeelessons.ui.UI.UIDialog;
 import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 import com.cherokeelessons.util.GooglePlayGameServices.FileMetaList;
+import com.cherokeelessons.util.RandomName;
 
 public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 
@@ -102,6 +103,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 			@Override
 			public void run() {
 				SlotInfo info = new SlotInfo();
+				info.settings.name=RandomName.getRandomName();
 				App.saveSlotInfo(slot, info);
 				Gdx.app.postRunnable(reload);
 			}
@@ -314,7 +316,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 		sb.append(cloud_info.level);
 		sb.append(" ");
 		sb.append((cloud_info.settings.name == null || cloud_info.settings.name
-				.length() == 0) ? "ᎤᏲᏒ ᏥᏍᏕᏥ!" : cloud_info.settings.name);
+				.length() == 0) ? RandomName.getRandomName() : cloud_info.settings.name);
 		sb.append("\n");
 		sb.append(cloud_info.activeCards);
 		sb.append(" letters: ");
@@ -347,7 +349,7 @@ public class ChooseSession extends ChildScreen implements SlotsDialogHandler {
 		sb.append(device_info.level);
 		sb.append(" ");
 		sb.append((device_info.settings.name == null || device_info.settings.name
-				.length() == 0) ? "ᎤᏲᏒ ᏥᏍᏕᏥ!" : device_info.settings.name);
+				.length() == 0) ? RandomName.getRandomName() : device_info.settings.name);
 		sb.append("\n");
 		sb.append(device_info.activeCards);
 		sb.append(" letters: ");

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.util.DreamLo;
 import com.cherokeelessons.util.GooglePlayGameServices;
+import com.cherokeelessons.util.RandomName;
 import com.cherokeelessons.util.SlotFolder;
 
 public class App {
@@ -146,6 +147,7 @@ public class App {
 		FileHandle json_file = folder.child("info.json");
 		if (!json_file.exists()) {
 			SlotInfo info = new SlotInfo();
+			info.settings.name=RandomName.getRandomName();
 			info.slot=ix;
 			toJson(info, json_file);
 			return info;
@@ -153,6 +155,7 @@ public class App {
 		SlotInfo fromJson = fromJson(json_file, SlotInfo.class);
 		if (fromJson==null) {
 			fromJson = new SlotInfo();
+			fromJson.settings.name=RandomName.getRandomName();
 		}
 		fromJson.slot=ix;
 		return fromJson;

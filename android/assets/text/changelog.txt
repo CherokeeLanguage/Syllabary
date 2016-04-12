@@ -1,3 +1,7 @@
+3.23
+
+Misc fixes.
+
 3.21
 
 Add code to migrate to internal device storage of slots.
