@@ -14,7 +14,7 @@ mkdir "${DEST2}"
 
 F1=./Fonts/AboriginalSerifREGULAR943.ttf
 F2=./Fonts/Digohweli_1_7.ttf
-F3=./Fonts/CherokeeHandone.ttf
+F3=./Fonts/CherokeeHandoneB.ttf
 F4=./Fonts/Nikwasi.ttf
 F5=./Fonts/Oconostota.ttf
 
