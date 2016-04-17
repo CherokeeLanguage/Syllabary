@@ -1,9 +1,9 @@
-package com.cherokeelessons.cards;
+package com.cherokeelessons.syllabary.one;
 
-public enum DisplayMode {
+public enum DisplayModeColors {
 	Latin("Show Latin"), None(
 			"Hide Latin");
-	private DisplayMode(String english) {
+	private DisplayModeColors(String english) {
 		this.english = english.intern();
 	}
 
@@ -13,7 +13,7 @@ public enum DisplayMode {
 		return english;
 	};
 
-	public static DisplayMode getNext(DisplayMode mode) {
+	public static DisplayModeColors getNext(DisplayModeColors mode) {
 		for (int ix = 0; ix < values().length - 1; ix++) {
 			if (values()[ix].equals(mode)) {
 				return values()[ix + 1];

@@ -28,9 +28,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 import com.cherokeelessons.cards.Card;
 import com.cherokeelessons.cards.Deck;
-import com.cherokeelessons.cards.DisplayMode;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
+import com.cherokeelessons.syllabary.one.DisplayModeColors;
+import com.cherokeelessons.syllabary.one.DisplayModeOldSyllabary;
 import com.cherokeelessons.syllabary.one.Syllabary;
 import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.GameBoard.GameboardHandler;
@@ -440,7 +441,7 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	}
 
 	private void loadGameboardWith(final Card card) {
-		if (info.settings.display.equals(DisplayMode.Latin)) {
+		if (info.settings.display.equals(DisplayModeColors.Latin)) {
 			gameboard.setChallenge_latin(card.challenge);
 		} else {
 			gameboard.setChallenge_latin("");
@@ -467,6 +468,12 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 						totalRight++;
 					}
 					int font = r.nextInt(5);
+					if (info.settings.oldSyllabaryForms==DisplayModeOldSyllabary.Both) {
+						font = r.nextInt(6);
+					}
+					if (info.settings.oldSyllabaryForms==DisplayModeOldSyllabary.OldOnly) {
+						font = 5;
+					}
 					StringBuilder img = getGlyphFilename(letter, font);
 					gameboard.setImageAt(ix, iy, img.toString());
 					Color color;
@@ -637,33 +644,50 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		final List<RunnableAction> actions = new ArrayList<>();
 		int startFont = 0;
 		int endFont = 4;
-		for (int ix = startFont; ix <= endFont; ix++) {
-			String file = getGlyphFilename(card.answer.charAt(0), ix).toString();
-			final Image glyph = ui.loadImage(file);
-			pix.add(glyph).width(192f).height(192f);
-			glyph.setScaling(Scaling.fit);
-			glyph.setColor(UI.randomBrightColor());
-			glyph.getColor().a = 0f;
-			actions.add(new RunnableAction() {
-				public void run() {
-					Runnable whenDone = new Runnable() {
-						public void run() {
-							if (actions.size() > 0) {
-								Action delay = Actions.delay(.7f);
-								d.addAction(Actions.sequence(delay, actions.remove(0)));
-							}
+		int repeat = 1;
+		float size = 192f;
+		if (info.settings.oldSyllabaryForms == DisplayModeOldSyllabary.Both) {
+			endFont = 5;
+			size = 160f;
+		}
+		if (info.settings.oldSyllabaryForms == DisplayModeOldSyllabary.OldOnly) {
+			startFont = 5;
+			endFont = 5;
+			repeat = 3;
+		}
+		for (int xx = 0; xx < repeat; xx++) {
+			for (int ix = startFont; ix <= endFont; ix++) {
+				String file = getGlyphFilename(card.answer.charAt(0), ix).toString();
+				final Image glyph = ui.loadImage(file);
+				pix.add(glyph).width(size).height(size);
+				glyph.setScaling(Scaling.fit);
+				if (info.settings.blackTiles) {
+					glyph.setColor(new Color(Color.BLACK));
+				} else {
+					glyph.setColor(UI.randomBrightColor());
+				}
+				glyph.getColor().a = 0f;
+				actions.add(new RunnableAction() {
+					public void run() {
+						Runnable whenDone = new Runnable() {
+							public void run() {
+								if (actions.size() > 0) {
+									Action delay = Actions.delay(.7f);
+									d.addAction(Actions.sequence(delay, actions.remove(0)));
+								}
+							};
 						};
+						glyph.addAction(Actions.alpha(1f, .3f));
+						gs.playGlyph(card.answer.charAt(0), whenDone);
 					};
-					glyph.addAction(Actions.alpha(1f, .3f));
-					gs.playGlyph(card.answer.charAt(0), whenDone);
-				};
 
-			});
+				});
+			}
 		}
 		actions.add(dialogDone[0]);
 		content.clearChildren();
 
-		if (info.settings.display.equals(DisplayMode.Latin)) {
+		if (info.settings.display.equals(DisplayModeColors.Latin)) {
 			Label l1 = new Label(card.challenge, ui.getLsXLarge());
 			content.row();
 			content.add(l1);

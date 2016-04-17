@@ -44,9 +44,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.cherokeelessons.cards.DisplayMode;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.syllabary.one.App;
+import com.cherokeelessons.syllabary.one.DisplayModeColors;
+import com.cherokeelessons.syllabary.one.DisplayModeOldSyllabary;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
 import com.cherokeelessons.util.RandomName;
@@ -536,7 +537,7 @@ public class UI {
 		mode.addListener(new ClickListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				info.settings.display = DisplayMode.getNext(info.settings.display);
+				info.settings.display = DisplayModeColors.getNext(info.settings.display);
 				mode.setText(info.settings.display.toString());
 				return true;
 			}
@@ -568,6 +569,16 @@ public class UI {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				info.settings.blackTiles = !info.settings.blackTiles;
 				blackLetters.setText(info.settings.blackTiles ? "Yes" : "No");
+				return true;
+			}
+		});
+		
+		final TextButton oldSyllabaryForms = new TextButton(info.settings.oldSyllabaryForms.toString(), tbs);
+		oldSyllabaryForms.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				info.settings.oldSyllabaryForms = DisplayModeOldSyllabary.getNext(info.settings.oldSyllabaryForms);
+				oldSyllabaryForms.setText(info.settings.oldSyllabaryForms.toString());
 				return true;
 			}
 		});
@@ -615,6 +626,11 @@ public class UI {
 		Label lbl_blackTiles = new Label("Show only solid black letters?", ls);
 		contentTable.add(lbl_blackTiles).left().fillX();
 		contentTable.add(blackLetters).expand().fillX().left();
+		
+		contentTable.row();
+		Label lbl_oldSyllabary = new Label("Use old syllabary?", ls);
+		contentTable.add(lbl_oldSyllabary).left().fillX();
+		contentTable.add(oldSyllabaryForms).expand().fillX().left();
 
 		contentTable.row();
 		Label lbl_training = new Label("Skip new letter training?", ls);

@@ -103,7 +103,7 @@ public class GameBoard extends Table {
 			if (handler==null) {
 				return false;
 			}
-			UIDialog dialog = new UIDialog("Please Conform Exit", true, true, ui) {
+			UIDialog dialog = new UIDialog("Please Confirm Exit", true, true, ui) {
 				protected void result(Object object) {
 					GameBoard.this.paused=false;
 					if ("Y".equals(object)){
