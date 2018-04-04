@@ -16,11 +16,11 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '3.24'
+    version = '3.25'
     ext {
         appName = 'Syllabary'
-        gdxVersion = '1.9.2'
-        roboVMVersion = '1.12.0'
+        gdxVersion = '1.9.8'
+        roboVMVersion = '2.3.3'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
@@ -146,7 +146,7 @@ project(":android") {
 		}
 	}}
 }
-
+/*
 project(":ios") {
     apply plugin: "java"
     apply plugin: "robovm"
@@ -163,14 +163,14 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
         
         compile 'org.apache.commons:commons-lang3:3.1'
-       //FOR IOS GOOGLE API
+       //FOR IOS GOOGLE API /*
          /*compile ('com.google.apis:google-api-services-games:v1-rev172-1.21.0') {
 			exclude module: 'httpclient'
 			exclude module: 'xpp3'
 			exclude module: 'junit'
 			exclude module: 'android'
 		}*/
-        compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
+/*        compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
 			exclude module: 'httpclient'
 			exclude module: 'xpp3'
 			exclude module: 'junit'
@@ -190,8 +190,8 @@ project(":ios") {
     		stderrFifo = ""
     		archs = "thumbv7:arm64"
 	}
-
-eclipseJdt << {
+*/
+/* eclipseJdt << {
 	    File f = file('.settings/org.eclipse.core.resources.prefs')
 	    f.write('eclipse.preferences.version=1\n')
 	    f.append('encoding/<project>=utf-8')
@@ -218,6 +218,7 @@ eclipseJdt << {
 		}
 	}}
 }
+*/
 
 /*project(":html") {
     apply plugin: "gwt"
@@ -269,5 +270,5 @@ project(":core") {
 }
 
 tasks.eclipse.doLast {
-    delete ".project"
+    //delete ".project"
 }

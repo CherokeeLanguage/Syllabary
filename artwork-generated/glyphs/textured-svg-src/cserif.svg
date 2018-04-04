@@ -9,11 +9,11 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="256"
-   height="256"
+   width="273.06668"
+   height="273.06668"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="cserif.svg"
    viewBox="0 0 256 256"
    inkscape:export-filename="13a0_0.png"
@@ -123,7 +123,7 @@
        y="-0.25"
        width="1.5"
        x="-0.25"
-       style="color-interpolation-filters:sRGB;"
+       style="color-interpolation-filters:sRGB"
        id="filter4735">
       <feGaussianBlur
          stdDeviation="4"
@@ -182,9 +182,9 @@
       <feSpecularLighting
          in="result0"
          result="result1"
-         lighting-color="rgb(255,255,255)"
+         lighting-color="#ffffff"
          surfaceScale="8"
-         specularConstant="0.8"
+         specularConstant="0.80000001"
          specularExponent="30"
          id="feSpecularLighting4757">
         <feDistantLight
@@ -205,7 +205,9 @@
          k2="1"
          k3="1"
          in2="result2"
-         id="feComposite4763" />
+         id="feComposite4763"
+         k1="0"
+         k4="0" />
       <feColorMatrix
          result="fbSourceGraphicAlpha"
          in="fbSourceGraphic"
@@ -248,9 +250,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.3173828"
-     inkscape:cx="107.81204"
-     inkscape:cy="30.691427"
+     inkscape:zoom="2.7941893"
+     inkscape:cx="136.53334"
+     inkscape:cy="136.53334"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -268,7 +270,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -279,14 +281,14 @@
      transform="translate(0,-796.36218)">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:364.88750458px;line-height:100%;font-family:ALEWISDODI;-inkscape-font-specification:'ALEWISDODI, Ultra-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4735);"
+       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;line-height:0%;font-family:ALEWISDODI;-inkscape-font-specification:'ALEWISDODI, Ultra-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4735)"
        x="128.17816"
        y="1046.4941"
-       id="text4512"
-       sodipodi:linespacing="100%"><tspan
+       id="text4512"><tspan
          sodipodi:role="line"
          id="tspan4514"
          x="128.17816"
-         y="1046.4941">Ꮝ</tspan></text>
+         y="1046.4941"
+         style="font-size:364.88751221px;line-height:1">Ꮝ</tspan></text>
   </g>
 </svg>

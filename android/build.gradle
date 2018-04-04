@@ -16,7 +16,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("/home/mjoyner/Keystore")
+            storeFile file("/home/muksihs/Keystore")
             storePassword "Wayawaya359"
             keyAlias "cherokeelessons.apk"
             keyPassword "Wayawaya359"

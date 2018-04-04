@@ -9,11 +9,11 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="512"
-   height="128"
+   width="546.13336"
+   height="136.53334"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="paused.svg"
    viewBox="0 0 512 128"
    inkscape:export-filename="paused.png"
@@ -156,9 +156,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="465.54425"
-     inkscape:cy="29.983456"
+     inkscape:zoom="3.2739256"
+     inkscape:cx="273.06668"
+     inkscape:cy="68.26667"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -176,7 +176,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -187,15 +187,15 @@
      transform="translate(0,-924.36218)">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:160.52949524px;line-height:100%;font-family:ALEWISDODI;-inkscape-font-specification:'ALEWISDODI, Ultra-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3337)"
+       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;line-height:0%;font-family:ALEWISDODI;-inkscape-font-specification:'ALEWISDODI, Ultra-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3337)"
        x="254.39314"
        y="977.88049"
        id="text3333"
-       sodipodi:linespacing="100%"
        transform="matrix(0.90180311,0,0,0.90180311,25.138401,154.7695)"><tspan
          sodipodi:role="line"
          id="tspan3335"
          x="254.39313"
-         y="977.88049">PAUSED</tspan></text>
+         y="977.88049"
+         style="font-size:160.52949524px;line-height:1">PAUSED</tspan></text>
   </g>
 </svg>

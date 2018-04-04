@@ -1,3 +1,7 @@
+3.25
+
+Remove ACRA error reporting library for Google compliance.
+
 3.24
 
 Added option to use old "pre-printing press" syllabary forms.

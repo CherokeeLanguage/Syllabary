@@ -10,11 +10,11 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="765"
-   height="990"
+   width="816"
+   height="1056"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="dialog-9patch.svg"
    viewBox="0 0 765 990"
    inkscape:export-filename="dialog-9patch.png"
@@ -38,7 +38,7 @@
        y="-0.25"
        width="1.5"
        x="-0.25"
-       style="color-interpolation-filters:sRGB;"
+       style="color-interpolation-filters:sRGB"
        id="filter5783">
       <feGaussianBlur
          stdDeviation="4"
@@ -97,9 +97,9 @@
       <feSpecularLighting
          in="result0"
          result="result1"
-         lighting-color="rgb(255,255,255)"
+         lighting-color="#ffffff"
          surfaceScale="8"
-         specularConstant="0.8"
+         specularConstant="0.80000001"
          specularExponent="30"
          id="feSpecularLighting5805">
         <feDistantLight
@@ -120,7 +120,9 @@
          k2="1"
          k3="1"
          in2="result2"
-         id="feComposite5811" />
+         id="feComposite5811"
+         k1="0"
+         k4="0" />
     </filter>
   </defs>
   <sodipodi:namedview
@@ -130,9 +132,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1142721"
-     inkscape:cx="278.43458"
-     inkscape:cy="517.79607"
+     inkscape:zoom="0.72253788"
+     inkscape:cx="408"
+     inkscape:cy="528"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
