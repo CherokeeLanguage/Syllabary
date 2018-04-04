@@ -1,3 +1,7 @@
+3.26
+
+Remove Google Drive sync. New Google policy: webviews are no longer allowed for authorization.
+
 3.25
 
 Remove ACRA error reporting library for Google compliance.
