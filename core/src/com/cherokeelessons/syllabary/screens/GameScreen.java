@@ -37,7 +37,7 @@ import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.GameBoard.GameboardHandler;
 import com.cherokeelessons.ui.UI;
 import com.cherokeelessons.ui.UI.UIDialog;
-import com.cherokeelessons.util.GooglePlayGameServices.Callback;
+import com.cherokeelessons.util.Callback;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
@@ -359,19 +359,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 
 		App.saveSlotInfo(slot, info);
-		if (App.services.isLoggedIn()) {
-			FileHandle fh = App.getSlotInfoFileHandle(slot);
-			Callback<String> ifError = new Callback<String>() {
-				public void error(Exception exception) {
-					ui.errorDialog(exception, null);
-				}
-
-				@Override
-				public void success(String result) {
-				};
-			};
-			App.services.drive_replace(fh, slot + "-" + fh.name(), slot + "-" + fh.name(), ifError);
-		}
 	}
 
 	private StringBuilder getGlyphFilename(int letter, int font) {

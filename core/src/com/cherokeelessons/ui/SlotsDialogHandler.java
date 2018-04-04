@@ -16,11 +16,6 @@ public interface SlotsDialogHandler {
 	 */
 	public void erase(int slot);
 	/**
-	 * Sync slot with cloud service.
-	 * @param slot
-	 */
-	public void sync(int slot, Runnable whenDone);
-	/**
 	 * Reload slots...
 	 */
 	public void reload();

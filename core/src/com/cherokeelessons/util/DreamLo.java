@@ -15,9 +15,7 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.Preferences;
-import com.cherokeelessons.util.GooglePlayGameServices.Callback;
-import com.cherokeelessons.util.GooglePlayGameServices.GameScores;
-import com.cherokeelessons.util.GooglePlayGameServices.GameScores.GameScore;
+import com.cherokeelessons.util.GameScores.GameScore;
 
 public class DreamLo {
 	private static final String DREAMLO_USERID = "dreamlo-userid";
@@ -205,7 +203,7 @@ public class DreamLo {
 					gs.activeCards=StringUtils.strip(gs.activeCards, ",");
 					gss.list.add(gs);
 				}
-				Comparator<GameScore> descending = new Comparator<GooglePlayGameServices.GameScores.GameScore>() {
+				Comparator<GameScore> descending = new Comparator<GameScores.GameScore>() {
 					@Override
 					public int compare(GameScore o1, GameScore o2) {
 						if (o1 == o2) {

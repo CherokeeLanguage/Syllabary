@@ -31,9 +31,6 @@ import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.cherokeelessons.play.GameServices;
-import com.cherokeelessons.play.Platform;
-import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.syllabary.one.App.PlatformTextInput;
 import com.cherokeelessons.syllabary.one.SyllabaryApp;
 
@@ -93,7 +90,6 @@ public class DesktopLauncher implements PlatformTextInput  {
 		SyllabaryApp coreapp = new SyllabaryApp();
 		coreapp.pInput=new DesktopLauncher();
 		new LwjglApplication(coreapp, config);
-		App.services=new GameServices(App.CredentialsFolder, new Platform());
 	}
 	
 	@Override

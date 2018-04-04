@@ -14,12 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.cherokeelessons.syllabary.one.App;
 import com.cherokeelessons.ui.UI.UIDialog;
-import com.cherokeelessons.util.GooglePlayGameServices.Callback;
-import com.cherokeelessons.util.GooglePlayGameServices.GameScores;
-import com.cherokeelessons.util.GooglePlayGameServices.GameScores.GameScore;
+import com.cherokeelessons.util.Callback;
+import com.cherokeelessons.util.GameScores;
+import com.cherokeelessons.util.GameScores.GameScore;
 
 public class Leaderboard extends ChildScreen {
 
@@ -114,69 +113,6 @@ public class Leaderboard extends ChildScreen {
 			LabelStyle ls = ui.getLsSmall();
 			message = new Label("...", ls);
 			container.add(message).center().expandX().fillX().top();
-
-			if (!App.services.isLoggedIn()) {
-				button = new TextButton("Sync Login", tbs);
-			} else {
-				button = new TextButton("Sync Logout", tbs);
-			}
-			final TextButton play_button = button;
-			final UIDialog login = new UIDialog("Sync Service", true, true, ui);
-			login.text("Connecting to Sync Service ...");
-			login.button("DISMISS");
-
-			final UIDialog[] error = new UIDialog[1];
-			error[0] = ui.errorDialog(new Exception(""), null);
-			play_button.addListener(new ClickListener() {
-				Callback<Void> success_in = new Callback<Void>() {
-					@Override
-					public void success(Void result) {
-						error[0].hide();
-						login.hide();
-						requestScores();
-						play_button.setText("Logout of Sync");
-					}
-
-					@Override
-					public void error(Exception e) {
-						error[0].hide();
-						login.hide();
-						success_out.withNull().run();
-						error[0] = ui.errorDialog(e, null);
-						error[0].show(stage);
-					}
-				};
-				Callback<Void> success_out = new Callback<Void>() {
-					@Override
-					public void success(Void result) {
-						error[0].hide();
-						login.hide();
-						requestScores();
-						play_button.setText("Login to Sync");
-					}
-
-					@Override
-					public void error(Exception exception) {
-						error[0].hide();
-						login.hide();
-						success_out.withNull().run();
-						error[0] = ui.errorDialog(exception, null);
-						error[0].show(stage);
-					}
-				};
-
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-					if (App.services.isLoggedIn()) {
-						App.services.logout(success_out);
-					} else {
-						login.show(stage);
-						App.services.login(success_in);
-					}
-					return true;
-				}
-			});
-			container.add(button).right().top();
 
 			final int c = container.getCell(button).getColumn() + 1;
 

@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.cherokeelessons.cards.SlotInfo;
 import com.cherokeelessons.util.DreamLo;
-import com.cherokeelessons.util.GooglePlayGameServices;
 import com.cherokeelessons.util.RandomName;
 import com.cherokeelessons.util.SlotFolder;
 
@@ -108,7 +107,6 @@ public class App {
 	
 	private static Json _json;
 
-	public static GooglePlayGameServices services;
 	public static DreamLo lb;
 	public static Json json() {
 		if (_json!=null) {

@@ -46,9 +46,9 @@ project(":desktop") {
         compile 'org.apache.commons:commons-lang3:3.1'
         //FOR DESKTOP GOOGLE API
         //compile 'com.google.apis:google-api-services-games:v1-rev172-1.21.0'
-        compile 'com.google.apis:google-api-services-drive:v3-rev16-1.21.0'
-        compile 'com.google.oauth-client:google-oauth-client:1.21.0'
-        compile 'com.google.oauth-client:google-oauth-client-jetty:1.21.0'
+        //compile 'com.google.apis:google-api-services-drive:v3-rev16-1.21.0'
+        //compile 'com.google.oauth-client:google-oauth-client:1.21.0'
+        //compile 'com.google.oauth-client:google-oauth-client-jetty:1.21.0'
     }
     
      eclipseJdt << {
@@ -108,7 +108,7 @@ project(":android") {
 			exclude module: 'junit'
 			exclude module: 'android'
 		}*/
-        compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
+        /*compile ('com.google.apis:google-api-services-drive:v3-rev16-1.21.0') {
 			exclude module: 'httpclient'
 			exclude module: 'xpp3'
 			exclude module: 'junit'
@@ -118,6 +118,7 @@ project(":android") {
 		compile 'com.google.api-client:google-api-client-android:1.21.0' exclude module: 'httpclient'
 		//FOR CRASH REPORTING
 		compile 'ch.acra:acra:4.6.2'
+		*/
     }
     eclipseJdt << {
 	    File f = file('.settings/org.eclipse.core.resources.prefs')

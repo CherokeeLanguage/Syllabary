@@ -50,8 +50,8 @@ import com.cherokeelessons.syllabary.one.DisplayModeColors;
 import com.cherokeelessons.syllabary.one.DisplayModeOldSyllabary;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
+import com.cherokeelessons.util.Callback;
 import com.cherokeelessons.util.RandomName;
-import com.cherokeelessons.util.GooglePlayGameServices.Callback;
 
 public class UI {
 
@@ -465,7 +465,6 @@ public class UI {
 							handler.reload();
 						}
 					};
-					handler.sync(slot, nobusy);
 					return true;
 				}
 			});
