@@ -1,6 +1,7 @@
 3.26
 
 Remove Google Drive sync. New Google policy: webviews are no longer allowed for authorization.
+Remove all internet connected services and permissions to ensure new Google privacy compliance.
 
 3.25
 
