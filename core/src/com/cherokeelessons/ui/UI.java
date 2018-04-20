@@ -50,7 +50,6 @@ import com.cherokeelessons.syllabary.one.DisplayModeColors;
 import com.cherokeelessons.syllabary.one.DisplayModeOldSyllabary;
 import com.cherokeelessons.syllabary.one.Fonts;
 import com.cherokeelessons.syllabary.one.GameSound;
-import com.cherokeelessons.util.Callback;
 import com.cherokeelessons.util.RandomName;
 
 public class UI {
@@ -65,18 +64,12 @@ public class UI {
 
 	public static final String IMG_SETTINGS = "images/misc/gear.png";
 	public static final String IMG_ERASE = "images/misc/trash.png";
-	public static final String IMG_SYNC = "images/misc/refresh.png";
 	public static final String HEAVYX = "images/misc/2718_5.png";
 	public static final String CHECKMARK = "images/misc/2714_5.png";
 
 	public static final String DIALOG9 = "images/ninepatch/dialog-9patch.png";
 
 	private final AssetManager manager;
-	private Callback<Void> noop = new Callback<Void>() {
-		@Override
-		public void success(Void result) {
-		}
-	};
 
 	public UI(AssetManager manager) {
 		this.manager = manager;
@@ -371,10 +364,6 @@ public class UI {
 			info.validate();
 			if (!info.isUpdatedVersion()) {
 				info.recalculateStats();
-				if (info.activeCards > 0) {
-					App.lb.lb_submit(ix + "", info.activeCards, info.lastScore,
-							info.level.getEnglish() + "!!!" + info.settings.name, noop);
-				}
 				App.saveSlotInfo(ix, info);
 			}
 			String displayName = info.settings.name;
@@ -412,10 +401,8 @@ public class UI {
 			editControls.defaults().pad(10);
 			ImageButton editb = getImageButton(IMG_SETTINGS);
 			ImageButton deleteb = getImageButton(IMG_ERASE);
-			ImageButton syncb = getImageButton(IMG_SYNC);
 			editControls.add(editb).center();
 			editControls.add(deleteb).center();
-			editControls.add(syncb).center();
 			slots.add(editControls);
 			if (isBlank) {
 				editb.setDisabled(true);
@@ -444,27 +431,6 @@ public class UI {
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 					handler.erase(slot);
-					return true;
-				}
-			});
-			syncb.addListener(new ClickListener() {
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-					final UIDialog busy = new UIDialog("Sync Service", true, true, UI.this);
-					busy.text("Device sync in progress...");
-					busy.button("HIDE");
-					Stage stage = dialog.getStage();
-					if (stage != null) {
-						busy.show(stage);
-					}
-					final Runnable nobusy = new Runnable() {
-						@Override
-						public void run() {
-							Gdx.app.log(this.getClass().getSimpleName(), "busy#hide");
-							busy.hide();
-							handler.reload();
-						}
-					};
 					return true;
 				}
 			});

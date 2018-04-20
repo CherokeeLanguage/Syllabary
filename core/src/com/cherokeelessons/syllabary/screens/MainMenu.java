@@ -21,12 +21,6 @@ public class MainMenu extends ChildScreen {
 			return true;
 		};
 	};
-	private ClickListener showLeader=new ClickListener(){
-		public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-			App.getGame().setScreen(new Leaderboard(MainMenu.this));
-			return true;
-		};
-	};
 
 	public MainMenu() {
 		super(null);
@@ -64,18 +58,17 @@ public class MainMenu extends ChildScreen {
 		button = new TextButton("New Game", bstyle);
 		button.addCaptureListener(gameScreen);
 		container.add(button);
-		button = new TextButton("High Scores", bstyle);
-		container.add(button);
-		button.addCaptureListener(showLeader);
-		
 		container.row();
 		
 		button = new TextButton("About", bstyle);
-		container.add(button);//.colspan(2);
 		button.addCaptureListener(showAbout);
+		container.add(button);//.colspan(2);
+		container.row();
+		
 		button = new TextButton("Quit", bstyle);
 		button.addCaptureListener(exit);
 		container.add(button);//.colspan(2);
+		container.row();
 		
 		setDoBack(goodbye);
 	}

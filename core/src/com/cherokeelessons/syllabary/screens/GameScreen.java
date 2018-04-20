@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang3.text.WordUtils;
-
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -37,7 +34,6 @@ import com.cherokeelessons.ui.GameBoard;
 import com.cherokeelessons.ui.GameBoard.GameboardHandler;
 import com.cherokeelessons.ui.UI;
 import com.cherokeelessons.ui.UI.UIDialog;
-import com.cherokeelessons.util.Callback;
 
 public class GameScreen extends ChildScreen implements GameboardHandler {
 
@@ -56,10 +52,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 
 		public ImgBoxObject() {
 		}
-	}
-
-	private enum YesNo {
-		No, Yes;
 	}
 
 	private static final float BOARD_TICK = 2f * 60f;
@@ -113,20 +105,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 	private int totalRight = 0;
 	private boolean updateChallengeElapsed = true;
 	private float updateRemainingTick = 0f;
-
-	private Callback<Void> viewScoresAfterSubmit = new Callback<Void>() {
-		public void error(Exception exception) {
-			UIDialog error = new UIDialog("ERROR!", true, true, ui);
-			error.text(WordUtils.wrap(exception.getMessage(), 60, "\n", true));
-			error.button("OK");
-			error.show(stage);
-		}
-
-		@Override
-		public void success(Void result) {
-			App.getGame().setScreen(new Leaderboard(GameScreen.this));
-		};
-	};
 
 	private final List<ImgBoxObject> wrongAnswers = new ArrayList<>();
 
@@ -332,25 +310,13 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		finished.show(stage);
 		dialogShowing = true;
 
-		finished.getButtonTable().setVisible(false);
-		stage.addAction(Actions.sequence(Actions.delay(10f), Actions.run(new Runnable() {
-			@Override
-			public void run() {
-				finished.getButtonTable().setVisible(true);
-			}
-		})));
-		Callback<Void> enableButtons = new Callback<Void>() {
-			@Override
-			public void success(Void result) {
-				finished.getButtonTable().setVisible(true);
-			}
-
-			@Override
-			public void error(Exception exception) {
-				finished.getButtonTable().setVisible(true);
-			}
-		};
-		submitScore(enableButtons);
+//		finished.getButtonTable().setVisible(false);
+//		stage.addAction(Actions.sequence(Actions.delay(10f), Actions.run(new Runnable() {
+//			@Override
+//			public void run() {
+//				finished.getButtonTable().setVisible(true);
+//			}
+//		})));
 
 		if (info.signature == null || info.signature.length() == 0) {
 			String s1 = Long.toString(System.currentTimeMillis(), Character.MAX_RADIX);
@@ -736,11 +702,6 @@ public class GameScreen extends ChildScreen implements GameboardHandler {
 		}
 		decks.pending.updateTime(decks.pending.getMinShiftTimeOf());
 		currentCard = null;
-	}
-
-	private void submitScore(final Callback<Void> callback) {
-		App.lb.lb_submit(slot + "", info.activeCards, info.lastScore,
-				info.level.getEnglish() + "!!!" + info.settings.name, callback);
 	}
 
 	/**
