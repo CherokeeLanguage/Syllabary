@@ -38,8 +38,8 @@ public class DesktopLauncher2 implements PlatformTextInput  {
 	public static void main (String[] arg) {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice();
-		int width = (70 * gd.getDisplayMode().getWidth()) / 100;
-		int height = (70 * gd.getDisplayMode().getHeight()) / 100;
+		int width = 70 * gd.getDisplayMode().getWidth() / 100;
+		int height = 70 * gd.getDisplayMode().getHeight() / 100;
 //		width=2048/2;
 //		height=1536/2;
 		/*
@@ -88,7 +88,7 @@ public class DesktopLauncher2 implements PlatformTextInput  {
 		config.addIcon("icons/icon-32.png", FileType.Internal);
 		config.addIcon("icons/icon-16.png", FileType.Internal);
 		SyllabaryApp coreapp = new SyllabaryApp();
-		coreapp.pInput=new DesktopLauncher();
+		coreapp.pInput=new DesktopLauncher2();
 		new LwjglApplication(coreapp, config);
 	}
 	
@@ -116,6 +116,7 @@ public class DesktopLauncher2 implements PlatformTextInput  {
 
 				@SuppressWarnings("serial")
 				JPanel textPanel = new JPanel() {
+					@Override
 					public boolean isOptimizedDrawingEnabled() {
 						return false;
 					};
@@ -139,24 +140,25 @@ public class DesktopLauncher2 implements PlatformTextInput  {
 
 							@Override
 							public void removeUpdate(DocumentEvent arg0) {
-								this.updated();
+								updated();
 							}
 
 							@Override
 							public void insertUpdate(DocumentEvent arg0) {
-								this.updated();
+								updated();
 							}
 
 							@Override
 							public void changedUpdate(DocumentEvent arg0) {
-								this.updated();
+								updated();
 							}
 
 							private void updated() {
-								if (textField.getText().length() == 0)
+								if (textField.getText().length() == 0) {
 									placeholderLabel.setVisible(true);
-								else
+								} else {
 									placeholderLabel.setVisible(false);
+								}
 							}
 						});
 
@@ -211,7 +213,7 @@ public class DesktopLauncher2 implements PlatformTextInput  {
 				Object selectedValue = pane.getValue();
 
 				if (selectedValue != null
-						&& (selectedValue instanceof Integer)
+						&& selectedValue instanceof Integer
 						&& ((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
 					listener.input(textField.getText());
 					Gdx.input.setInputProcessor(savedInput);

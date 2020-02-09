@@ -6,6 +6,9 @@ sourceSets.main.resources.srcDirs = ["../android/assets"]
 
 project.ext.mainClassName = "com.cherokeelessons.syllabary.one.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../android/assets")
+eclipse.project {
+    name = appName + "-desktop"
+}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName

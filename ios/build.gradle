@@ -7,6 +7,11 @@ ext {
 	mainClassName = "com.cherokeelessons.syllabary.one.IOSLauncher"
 }
 
+eclipse.project {
+    name = appName + "-ios"
+    linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/android/assets'
+}
+
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
