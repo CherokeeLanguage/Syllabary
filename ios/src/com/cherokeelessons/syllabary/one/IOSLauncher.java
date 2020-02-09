@@ -5,22 +5,13 @@ import org.robovm.apple.uikit.UIApplication;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import com.cherokeelessons.play.GameServices;
-import com.cherokeelessons.play.Platform;
+import com.cherokeelessons.syllabary.one.App;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        config.allowIpod=true;
-        config.orientationLandscape=true;
-        config.orientationPortrait=false;
-        config.displayScaleLargeScreenIfNonRetina=1.0f;
-        config.displayScaleLargeScreenIfRetina=1.0f;
-        config.displayScaleSmallScreenIfNonRetina=1.0f;
-        config.displayScaleSmallScreenIfRetina=1.0f;
-        App.services=new GameServices(App.CredentialsFolder, new Platform());
-        return new IOSApplication(new SyllabaryApp(), config);
+        return new IOSApplication(new App(), config);
     }
 
     public static void main(String[] argv) {

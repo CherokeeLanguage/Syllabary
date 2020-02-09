@@ -5,6 +5,7 @@ sourceCompatibility = 1.7
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
+project.ext.assetsDir = new File("../android/assets")
 
 eclipse.project {
     name = appName + "-core"
