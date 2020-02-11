@@ -92,16 +92,19 @@ project(":ios") {
         
         compile 'org.apache.commons:commons-lang3:3.1'
        }
-/*    robovm {
-    		//iosSignIdentity = "iPhone Distribution: Michael Joyner"
+/*
+mconrad@Michaels-iMac Syllabary % security find-identity -v -p codesigning
+  1) 7D75B3C164A422B1E157526F63D52D36F6BA796C "Apple Development: Michael Joyner (7T8K4MBSQ2)"
+  2) 83640B408A972E709F75ED1DA1AA4F35411E37CD "Apple Distribution: Michael Joyner (43974U4CP4)"
+  3) 837AD3A30BDB5B9332508FD490E9156276F446B9 "Developer ID Application: Michael Joyner (43974U4CP4)"
+     3 valid identities found
+*/
+    robovm {
     		//iosProvisioningProfile = 'iOS Store General Profile'
-    		iosSignIdentity = "iPhone Developer: Michael Joyner (7T8K4MBSQ2)"
-    		iosProvisioningProfile = "iOS Development - Provisioning"
+		iosSignIdentity = "Apple Distribution: Michael Joyner (43974U4CP4)"
     		iosSkipSigning = false;
-    		stdoutFifo = ""
-    		stderrFifo = ""
     		archs = "thumbv7:arm64"
-	}*/
+	}
 }
 
 project(":core") {
