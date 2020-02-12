@@ -46,5 +46,7 @@
     </array>
     <key>CFBundleIconName</key>
     <string>AppIcon</string>
+	<key>MinimunOSVersion</key>
+	<string>7.0</string>
 </dict>
 </plist>
