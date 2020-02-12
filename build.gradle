@@ -14,6 +14,7 @@ buildscript {
 }
 
 allprojects {
+    version = '3.27'
 	apply plugin: "eclipse"
 	eclipse {
 	    classpath {
@@ -21,7 +22,6 @@ allprojects {
 	    }
 	}
 
-    version = '3.27'
     ext {
         appName = 'Syllabary'
         gdxVersion = '1.9.10'
