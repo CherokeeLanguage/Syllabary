@@ -1,3 +1,7 @@
+3.27
+
+Updated to libGDX 1.9.10 and MobiVM's RoboVM 2.3.9-SNAPSHOT
+
 3.26
 
 Remove Google Drive sync. New Google policy: webviews are no longer allowed for authorization.
