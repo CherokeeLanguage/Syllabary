@@ -14,6 +14,12 @@ buildscript {
 }
 
 allprojects {
+	apply plugin: "eclipse"
+	eclipse {
+	    classpath {
+	       downloadSources=true
+	    }
+	}
 
     version = '3.27'
     ext {
@@ -52,7 +58,7 @@ project(":desktop") {
 
 project(":android") {
     apply plugin: "android"
-	apply plugin: "eclipse-wtp"
+	//apply plugin: "eclipse-wtp"
 
    configurations { natives }
 
