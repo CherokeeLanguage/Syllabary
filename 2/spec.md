@@ -8,7 +8,7 @@ The Syllabary repo's releases have deployed through app stores and a site-hosted
 
 ## Scope
 
-The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment tooling per the BoundPronouns pattern, the push-target binding, and itch landing-page URL tracking, and the root `AGENTS.md` agent-instruction file (R-4 — directed into this spec by the developer's request to track the repo's agent-instructions work as a success criterion here; the repo has no existing README or agent-instruction file). Out of scope: the first production push (happens at the repo's next release).
+The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment tooling per the BoundPronouns pattern, the push-target binding, and itch landing-page URL tracking, and the root `AGENTS.md` agent-instruction file (R-4 — directed into this spec by the developer's request to track the repo's agent-instructions work as a success criterion here; the repo then had no existing README or agent-instruction file). Out of scope: the first production push (happens at the repo's next release).
 
 ## Requirements
 
