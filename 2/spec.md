@@ -23,9 +23,10 @@ The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment to
 |---|---|---|---|---|
 | SC-1 | `itch-push.sh` + `itch.conf.example` exist carrying the BoundPronouns-pattern guards (REPLACE_ME guard, butler resolution PATH→vendored, per-channel pushes); `itch.conf` is gitignored | structural | Read the script and config; check `.gitignore` | R-1 |
 | SC-2 | The repo tracks its itch.io published landing page URL: `ITCH_URL` in `itch.conf.example` and the URL stated in the README, both matching `https://cherokee-language.itch.io/cherokee-syllabary` | content | Read both files; string match against the paired page URL | R-2 |
-| SC-3 | The script's push target binds `cherokee-language/cherokee-syllabary` and its channel section encodes `win-linux-mac` (desktop jar) and `android` (release APK) | structural | Read the script | R-1 |
+| SC-3 | The script's channel section encodes `win-linux-mac` (desktop jar) and `android` (release APK) | structural | Read the script | R-1 |
 | SC-4 | Pushes carry no version claims | structural | Script read (`--userversion` absent) | R-3 |
 | SC-5 | Root `AGENTS.md` exists, states the module layout (`core`/`desktop`/`android`/`ios`) and the desktop/android release-artifact output locations, names the verified build-blocking toolchain constraints, and — once R-1's tooling exists — documents the itch deployment flow; every command and path it states matches the repo's actual build config | content | Read `AGENTS.md`; check each mandated element present; cross-check each stated command, path, and constraint against `settings.gradle`, the build scripts, and executed toolchain evidence | R-4 |
+| SC-6 | The script's push target binds `cherokee-language/cherokee-syllabary` | structural | Read the script | R-2 |
 
 ## Approach
 
@@ -38,6 +39,6 @@ Mirror the BoundPronouns repo's `itch-push.sh`/`itch.conf(.example)` pattern, ad
 
 ## Impact
 
-Repo-local tooling files, the root `AGENTS.md` doc, and a root README (created by this work — SC-2, the repo has none today); no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
+Repo-local tooling files, the root `AGENTS.md` doc, a root README (created by this work — SC-2, the repo has none today), and the root `.gitignore` (gains the `itch.conf` entry — SC-1); no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
 
 🤖 Co-authored with AI: OpenCode (huggingface/zai-org/GLM-5.3-Flash)
