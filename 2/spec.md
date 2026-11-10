@@ -12,7 +12,7 @@ The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment to
 
 ## Requirements
 
-- **R-1 — Deployment tooling.** Repo-local `itch-push.sh` plus `itch.conf.example` mirroring the BoundPronouns pattern (`butler` resolution PATH→vendored `.tools/butler/`, `REPLACE_ME` config guard, per-channel pushes; no secrets in the repo — butler credentials live in butler's own store), with `itch.conf` gitignored. The script's artifact/channel section maps the repo's libgdx build outputs: desktop jar (`desktop:dist` → `desktop/build/libs/`) → `win-linux-mac`; release APK (`android/build/outputs/apk/release/`) → `android` — the same output layout and channel shape the BoundPronouns pattern uses. The paired itch page launches desktop-only; its `android` channel appears when the first release push creates it.
+- **R-1 — Deployment tooling.** Repo-local `itch-push.sh` plus `itch.conf.example` mirroring the BoundPronouns pattern (`butler` resolution PATH→vendored `.tools/butler/`, `REPLACE_ME` config guard, per-channel pushes; no secrets in the repo — butler credentials live in butler's own store), with `itch.conf` and the vendored `.tools/butler/` gitignored. The script's artifact/channel section maps the repo's libgdx build outputs: desktop jar (`desktop:dist` → `desktop/build/libs/`) → `win-linux-mac`; release APK (`android/build/outputs/apk/release/`) → `android` — the same output layout and channel shape the BoundPronouns pattern uses. The paired itch page launches desktop-only; its `android` channel appears when the first release push creates it.
 - **R-2 — Target and landing-page URL tracking.** The push target binds to the paired itch project `cherokee-language/cherokee-syllabary`; the repo tracks its itch.io published landing page URL — `https://cherokee-language.itch.io/cherokee-syllabary` — in the itch config (`ITCH_URL` in `itch.conf.example`) and in the README.
 - **R-3 — No version claims.** Pushes carry no `--userversion`; butler's auto-numbering stands (metadata is not trusted — no version label is verified or asserted).
 - **R-4 — Agent instructions.** The repo carries a root `AGENTS.md` giving future agent sessions verified, repo-specific guidance: module layout (`core`/`desktop`/`android`/`ios`), build/run commands matching the repo's actual Gradle config, release-artifact outputs, and the toolchain constraints an agent would otherwise trip on. When R-1's itch tooling lands, `AGENTS.md` documents its use.
@@ -21,7 +21,7 @@ The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment to
 
 | ID | Criterion | Class | Instrument | Traces to |
 |---|---|---|---|---|
-| SC-1 | `itch-push.sh` + `itch.conf.example` exist carrying the BoundPronouns-pattern guards (REPLACE_ME guard, butler resolution PATH→vendored, per-channel pushes); `itch.conf` is gitignored | structural | Read the script and config; check `.gitignore` | R-1 |
+| SC-1 | `itch-push.sh` + `itch.conf.example` exist carrying the BoundPronouns-pattern guards (REPLACE_ME guard, butler resolution PATH→vendored, per-channel pushes); `itch.conf` and the vendored `.tools/butler/` are gitignored | structural | Read the script and config; check `.gitignore` | R-1 |
 | SC-2 | The repo tracks its itch.io published landing page URL: `ITCH_URL` in `itch.conf.example` and the URL stated in the README, both matching `https://cherokee-language.itch.io/cherokee-syllabary` | content | Read both files; string match against the paired page URL | R-2 |
 | SC-3 | The script's channel section encodes `win-linux-mac` (desktop jar) and `android` (release APK) | structural | Read the script | R-1 |
 | SC-4 | Pushes carry no version claims | structural | Script read (`--userversion` absent) | R-3 |
@@ -39,6 +39,6 @@ Mirror the BoundPronouns repo's `itch-push.sh`/`itch.conf(.example)` pattern, ad
 
 ## Impact
 
-Repo-local tooling files, the root `AGENTS.md` doc, a root README (created by this work — SC-2, the repo has none today), and the root `.gitignore` (gains the `itch.conf` entry — SC-1); no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
+Repo-local tooling files, the root `AGENTS.md` doc, a root README (created by this work — SC-2, the repo has none today), and the root `.gitignore` (gains the `itch.conf` and vendored `.tools/butler/` entries — SC-1); no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
 
 🤖 Co-authored with AI: OpenCode (huggingface/zai-org/GLM-5.3-Flash)
