@@ -39,3 +39,7 @@ spec:
         classification: finding
         text: SC-6's instrument ("Read the script") cannot observe the bound push-target value — under the BoundPronouns pattern the values live in itch.conf/itch.conf.example which the script sources at runtime; no other criterion's instrument covers the value
         remediation: SC-6's instrument extended to "Read the script and config; the config's target values match cherokee-language/cherokee-syllabary" (the capable form the paired spec CherokeeLessons.com#23 uses for the identical pattern check)
+  - round: 5
+    artifact_state: post round-4 remediation
+    verdict: PASS
+    findings: []
