@@ -67,3 +67,7 @@ build/
 /testfairy/
 /local.properties~
 /.opencode/
+
+## itch.io deployment tooling
+/itch.conf
+/.tools/butler/

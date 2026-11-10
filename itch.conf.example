@@ -1,0 +1,10 @@
+# itch.io publish target — used by itch-push.sh.
+# Replace REPLACE_ME with your real itch.io target; do NOT put any
+# passwords or API keys here — butler keeps credentials in its own store
+# (`butler login`).
+
+ITCH_USER=cherokee-language
+ITCH_GAME=cherokee-syllabary
+
+# Published landing page for this game (tracked in README.md too):
+ITCH_URL=https://cherokee-language.itch.io/cherokee-syllabary

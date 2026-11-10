@@ -37,7 +37,8 @@ as a Gradle multi-project: `core` (game logic), `desktop` (LWJGL2 backend),
 - `audio/`, `artwork/`, `artwork-generated/` hold source/working asset
   material — no build file references them. `notes.md` is a game-loop design
   note.
-- No test suite, no CI, and no README exist in this repo today.
+- itch.io publishing: build `desktop:dist` + `android:assembleRelease`, `cp itch.conf.example itch.conf`, `butler login` once, then `./itch-push.sh` (pushes the jar → `win-linux-mac` and the release APK → `android` on `cherokee-language/cherokee-syllabary`; landing page https://cherokee-language.itch.io/cherokee-syllabary). Credentials live in butler's own store; `itch.conf` and `.tools/butler/` are gitignored.
+- No test suite and no CI exist in this repo today; the itch landing page URL is tracked in `itch.conf.example` (`ITCH_URL`) and in `README.md`.
 - Trunk is `master`; the pre-commit/pre-push hooks block direct trunk commits
   and pushes — work on a feature branch and let a human merge the PR.
 - `.issues/` is the issue-store worktree (orphan `issues-data` branch) and
