@@ -19,3 +19,15 @@ spec:
         classification: finding
         text: SC-5 as R-4's sole verifier cannot observe the absence of R-4's mandated content (itch-tooling documentation clause untested; toolchain-constraints clause unreached; module-layout statement untested as content; vacuously satisfiable by a command-free file)
         remediation: SC-5 extended per the reviewer's fix direction (a) to verify R-4's mandated content — layout matching settings.gradle, release-artifact outputs, verified toolchain constraints, itch-flow documentation once R-1's tooling exists — with the instrument enumerating the elements
+  - round: 3
+    artifact_state: post round-2 remediation
+    verdict: FAIL
+    findings:
+      - family: blast-radius
+        classification: finding
+        text: Impact enumeration omits the root .gitignore edit that SC-1 mandates (itch.conf gitignored); the enumeration's boundary assertions frame it as the complete change surface
+        remediation: Impact enumeration amended to include the root .gitignore (gains the itch.conf entry — SC-1)
+      - family: traceability
+        classification: finding
+        text: SC-3's Traces-to cell records R-1 only, but its push-target-binding conjunct is R-2's requirement; SC-2 (R-2's other criterion) verifies only the URL half, leaving the binding's lineage misrecorded
+        remediation: SC-3's conjuncts split — SC-3 keeps the channel encoding (traces R-1); new SC-6 carries the push-target binding (traces R-2)
