@@ -62,3 +62,11 @@ spec:
         classification: finding
         text: Scope's present-tense "the repo has no existing README or agent-instruction file" is false post-merge — the spec's own R-4/SC-5 deliverable (AGENTS.md) exists on trunk, and the artifact misstates the current state of the deliverable its own criterion governs
         remediation: point-in-time reframe per the auditor's fix direction — "the repo then had no existing README or agent-instruction file" (historically accurate, no status-tracking content added)
+  - round: 8
+    artifact_state: post round-7 remediation
+    verdict: FAIL
+    findings:
+      - family: blast-radius
+        classification: finding
+        text: the spec's own SC-2 creates the README, which falsifies the delivered AGENTS.md's "no README" line, while R-4/SC-5's update trigger covers only R-1's itch tooling — the change puts the delivered artifact's accuracy at risk with no criterion preserving it
+        remediation: R-4's update trigger and SC-5's criterion+instrument extended to cover the README landing (state statements true of the repo as it then stands); Impact's AGENTS.md account names the kept-true duty
