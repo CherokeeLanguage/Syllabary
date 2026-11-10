@@ -1,1 +1,9 @@
-comments: []
+comments:
+- type: internal
+  body: 'Incident record: ticket was auto-closed on PR #3''s merge by the PR body''s
+    phrase ''does not close #2'' — GitHub''s closing-keyword scan matches ''close
+    #2'' inside the negation and attributes the close to the merging account. Developer
+    confirmed they did not close it; closure was an automation accident with no delivered-work
+    or verdict grounds. Reopened; SC-1..SC-4 and SC-6 remain pending, spec remains
+    at needs-approval.'
+  timestamp: '2026-11-10T04:05:13+00:00'
