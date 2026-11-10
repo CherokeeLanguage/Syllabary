@@ -11,3 +11,11 @@ spec:
         classification: finding
         text: Problem section named Amazon among the deploy stores with no source corroborating the Amazon leg (paired spec records only generic "stores"; repo trail corroborates Apple and generic Android release builds only)
         remediation: Store enumeration reduced to the corroborated generic "app stores and a site-hosted jar"
+  - round: 2
+    artifact_state: post round-1 remediation
+    verdict: FAIL
+    findings:
+      - family: gap-analysis
+        classification: finding
+        text: SC-5 as R-4's sole verifier cannot observe the absence of R-4's mandated content (itch-tooling documentation clause untested; toolchain-constraints clause unreached; module-layout statement untested as content; vacuously satisfiable by a command-free file)
+        remediation: SC-5 extended per the reviewer's fix direction (a) to verify R-4's mandated content — layout matching settings.gradle, release-artifact outputs, verified toolchain constraints, itch-flow documentation once R-1's tooling exists — with the instrument enumerating the elements
