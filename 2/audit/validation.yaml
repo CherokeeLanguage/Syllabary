@@ -51,3 +51,14 @@ spec:
         classification: finding
         text: R-1 transfers the pattern's vendored-butler mechanism (PATH→vendored .tools/butler/) but only half its gitignore handling — both working examples ignore /.tools/butler/ alongside /itch.conf, while the spec's requirement, SC-1, and Impact enumeration cover only itch.conf; implemented as written the vendored binary would be staged for commit and the script's "(gitignored)" premise would be false
         remediation: R-1's gitignore requirement, SC-1's criterion, and the Impact enumeration extended to cover the vendored .tools/butler/ entry alongside itch.conf, mirroring the working examples' actual handling
+  - round: 7
+    artifact_state: post round-6 remediation (which landed after the R-4/SC-5 deliverable merged to trunk)
+    verdict: FAIL
+    structural_re_evaluation:
+      outcome: Sound
+      grounds: count trigger (more than four finding-remediation revisions) mandated the examination; repo boundaries, concern separation (developer-bound single ticket), atomic decomposition, fatness, and intent reachability all examined — the artifact's structure stands, seven rounds have produced only point-fact findings, and the loop resumes on the unchanged artifact
+    findings:
+      - class: factual-error
+        classification: finding
+        text: Scope's present-tense "the repo has no existing README or agent-instruction file" is false post-merge — the spec's own R-4/SC-5 deliverable (AGENTS.md) exists on trunk, and the artifact misstates the current state of the deliverable its own criterion governs
+        remediation: point-in-time reframe per the auditor's fix direction — "the repo then had no existing README or agent-instruction file" (historically accurate, no status-tracking content added)
