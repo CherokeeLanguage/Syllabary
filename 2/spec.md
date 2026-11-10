@@ -4,7 +4,7 @@ Paired spec: **CherokeeLessons.com#23** — the itch.io page for Syllabary and t
 
 ## Problem
 
-The Syllabary repo's releases have deployed through app stores (Google Play, Amazon, Apple) and a site-hosted jar. The migration makes itch.io the deploy target for the repo's future releases: the paired cherokeelessons.com spec establishes the itch page and deploys the currently-published artifact from that repo's copy; this repo's own release pipeline must follow suit, using the standard itch.io deployment the BoundPronouns repo established.
+The Syllabary repo's releases have deployed through app stores and a site-hosted jar. The migration makes itch.io the deploy target for the repo's future releases: the paired cherokeelessons.com spec establishes the itch page and deploys the currently-published artifact from that repo's copy; this repo's own release pipeline must follow suit, using the standard itch.io deployment the BoundPronouns repo established.
 
 ## Scope
 
@@ -38,6 +38,6 @@ Mirror the BoundPronouns repo's `itch-push.sh`/`itch.conf(.example)` pattern, ad
 
 ## Impact
 
-Repo-local tooling files and the root `AGENTS.md` doc only; no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
+Repo-local tooling files, the root `AGENTS.md` doc, and a root README (created by this work — SC-2, the repo has none today); no runtime behavior change; the paired itch page gains no new state from this work (the `android` channel appears only at a future release push). The repo's future releases gain a repeatable path to itch.io.
 
 🤖 Co-authored with AI: OpenCode (huggingface/zai-org/GLM-5.3-Flash)
