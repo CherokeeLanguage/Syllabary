@@ -43,3 +43,11 @@ spec:
     artifact_state: post round-4 remediation
     verdict: PASS
     findings: []
+  - round: 6
+    artifact_state: on-demand audit (developer-directed; cross-reference of Animals and BoundPronouns working itch examples)
+    verdict: FAIL
+    findings:
+      - family: blast-radius
+        classification: finding
+        text: R-1 transfers the pattern's vendored-butler mechanism (PATH→vendored .tools/butler/) but only half its gitignore handling — both working examples ignore /.tools/butler/ alongside /itch.conf, while the spec's requirement, SC-1, and Impact enumeration cover only itch.conf; implemented as written the vendored binary would be staged for commit and the script's "(gitignored)" premise would be false
+        remediation: R-1's gitignore requirement, SC-1's criterion, and the Impact enumeration extended to cover the vendored .tools/butler/ entry alongside itch.conf, mirroring the working examples' actual handling
