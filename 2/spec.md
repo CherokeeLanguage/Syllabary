@@ -25,7 +25,7 @@ The Syllabary repo (`CherokeeLanguage/Syllabary`): repo-local itch deployment to
 | SC-2 | The repo tracks its itch.io published landing page URL: `ITCH_URL` in `itch.conf.example` and the URL stated in the README, both matching `https://cherokee-language.itch.io/cherokee-syllabary` | content | Read both files; string match against the paired page URL | R-2 |
 | SC-3 | The script's push target binds `cherokee-language/cherokee-syllabary` and its channel section encodes `win-linux-mac` (desktop jar) and `android` (release APK) | structural | Read the script | R-1 |
 | SC-4 | Pushes carry no version claims | structural | Script read (`--userversion` absent) | R-3 |
-| SC-5 | Root `AGENTS.md` exists and every build/run/deploy command it states matches the repo's actual Gradle build config (task definitions, module paths, artifact outputs) | content | Read `AGENTS.md`; cross-check each stated command against the build scripts | R-4 |
+| SC-5 | Root `AGENTS.md` exists, states the module layout (`core`/`desktop`/`android`/`ios`) and the desktop/android release-artifact output locations, names the verified build-blocking toolchain constraints, and — once R-1's tooling exists — documents the itch deployment flow; every command and path it states matches the repo's actual build config | content | Read `AGENTS.md`; check each mandated element present; cross-check each stated command, path, and constraint against `settings.gradle`, the build scripts, and executed toolchain evidence | R-4 |
 
 ## Approach
 
